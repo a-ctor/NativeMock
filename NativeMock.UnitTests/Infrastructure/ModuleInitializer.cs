@@ -10,6 +10,9 @@ namespace NativeMock.UnitTests.Infrastructure
       NativeMockRegistry.Initialize();
 
       NativeMockRegistry.Register<IFakeNativeApi>();
+      NativeMockRegistry.Register<IDuplicateNativeApi1>();
+      NativeMockRegistry.Register<IDuplicateNativeApi2>();
+      NativeMockRegistry.Register<IDuplicateNativeApi3>();
     }
   }
 }

@@ -7,6 +7,16 @@ namespace NativeMock
 
   public class NativeMockInterfaceDescriptionProvider : INativeMockInterfaceDescriptionProvider
   {
+    private record InterfaceSettings(string? Module)
+    {
+      public static readonly InterfaceSettings Default = new ((string?) null);
+    }
+
+    private record InterfaceMethodSettings(string? Name)
+    {
+      public static readonly InterfaceMethodSettings Default = new ((string?) null);
+    }
+
     /// <inheritdoc />
     public NativeMockInterfaceDescription GetMockInterfaceDescription (Type interfaceType)
     {
@@ -15,24 +25,51 @@ namespace NativeMock
       if (!interfaceType.IsInterface)
         throw new InvalidOperationException ("The specified type must be an interface.");
 
-      var methodDescriptions = interfaceType.GetMethods()
-        .Select (CreateMockInterfaceMethodDescription)
-        .ToImmutableArray();
-
+      var methodDescriptions = CreateMockInterfaceMethodDescriptions (interfaceType);
       if (methodDescriptions.IsEmpty)
         throw new InvalidOperationException ("The specified interface type has no methods.");
 
       return new NativeMockInterfaceDescription (interfaceType, methodDescriptions);
     }
 
-    private NativeMockInterfaceMethodDescription CreateMockInterfaceMethodDescription (MethodInfo methodInfo)
+    private ImmutableArray<NativeMockInterfaceMethodDescription> CreateMockInterfaceMethodDescriptions (Type interfaceType)
     {
-      var nativeMockFunctionAttribute = methodInfo.GetCustomAttribute<NativeMockCallbackAttribute>();
+      var interfaceSettings = GetInterfaceSettings (interfaceType);
+      return interfaceType.GetMethods()
+        .Select (method => CreateMockInterfaceMethodDescription (method, interfaceSettings))
+        .ToImmutableArray();
+    }
 
-      var functionName = nativeMockFunctionAttribute?.Name ?? methodInfo.Name;
+    private InterfaceSettings GetInterfaceSettings (Type type)
+    {
+      var nativeMockInterfaceAttribute = type.GetCustomAttribute<NativeMockInterfaceAttribute>();
+      if (nativeMockInterfaceAttribute == null)
+        return InterfaceSettings.Default;
 
-      var nativeFunctionIdentifier = new NativeFunctionIdentifier (functionName);
+      return new InterfaceSettings (nativeMockInterfaceAttribute.Module);
+    }
+
+    private NativeMockInterfaceMethodDescription CreateMockInterfaceMethodDescription (MethodInfo methodInfo, InterfaceSettings interfaceSettings)
+    {
+      var interfaceMethodSettings = GetInterfaceMethodSettings (methodInfo);
+
+      var moduleName = interfaceSettings.Module;
+      var functionName = interfaceMethodSettings.Name ?? methodInfo.Name;
+
+      var nativeFunctionIdentifier = moduleName != null
+        ? new NativeFunctionIdentifier (moduleName, functionName)
+        : new NativeFunctionIdentifier (functionName);
+
       return new NativeMockInterfaceMethodDescription (nativeFunctionIdentifier, methodInfo);
+    }
+
+    private InterfaceMethodSettings GetInterfaceMethodSettings (MethodInfo methodInfo)
+    {
+      var nativeMockCallbackAttribute = methodInfo.GetCustomAttribute<NativeMockCallbackAttribute>();
+      if (nativeMockCallbackAttribute == null)
+        return InterfaceMethodSettings.Default;
+
+      return new InterfaceMethodSettings (nativeMockCallbackAttribute.Name);
     }
   }
 }

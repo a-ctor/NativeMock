@@ -74,5 +74,20 @@ namespace NativeMock.UnitTests
       var method = nativeMockInterfaceDescription.Methods.Single();
       Assert.That (method.Name, Is.EqualTo (new NativeFunctionIdentifier ("B")));
     }
+
+    [NativeMockInterface ("A")]
+    private interface IModuleScopedInterface
+    {
+      void B();
+    }
+
+    [Test]
+    public void MapModuleScoped()
+    {
+      var nativeMockInterfaceDescription = _nativeMockInterfaceDescriptionProvider.GetMockInterfaceDescription (typeof(IModuleScopedInterface));
+
+      var method = nativeMockInterfaceDescription.Methods.Single();
+      Assert.That (method.Name, Is.EqualTo (new NativeFunctionIdentifier ("A", "B")));
+    }
   }
 }

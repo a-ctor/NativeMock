@@ -27,6 +27,8 @@ namespace NativeMock
     private static readonly DelegateGenerator s_delegateGenerator = new (new AssemblyName (c_assemblyName), c_moduleName);
     private static readonly NativeFunctionProxyFactory s_nativeFunctionProxyFactory = new (OnNativeHookCalled);
     private static readonly NativeFunctionProxyRegistry s_nativeFunctionProxyRegistry = new();
+
+    private static readonly ModuleNameResolver s_moduleNameResolver = new();
     private static readonly AsyncLocal<NativeMockCallbackRegistry> s_nativeMockCallbackRegistry = new();
 
     private static readonly ConcurrentDictionary<Type, NativeMockInterfaceDescription> s_registeredInterfaces = new();
@@ -84,7 +86,6 @@ namespace NativeMock
 
       lock (s_nativeFunctionProxyRegistry)
       {
-        
         if (s_registeredInterfaces.ContainsKey (interfaceType))
           throw new InvalidOperationException ("The specified type is already registered.");
 
@@ -103,7 +104,10 @@ namespace NativeMock
 
     private static IntPtr GetProcAddress (IntPtr module, string functionName)
     {
-      return s_nativeFunctionProxyRegistry.Resolve (functionName)?.NativePtr
+      var moduleName = s_moduleNameResolver.Resolve (module);
+      var nativeFunctionIdentifier = new NativeFunctionIdentifier (moduleName, functionName);
+
+      return s_nativeFunctionProxyRegistry.Resolve (nativeFunctionIdentifier)?.NativePtr
              ?? s_getProcAddressHook.Original (module, functionName);
     }
 

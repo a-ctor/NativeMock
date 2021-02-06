@@ -4,6 +4,8 @@ namespace NativeMock
 
   public readonly struct NativeFunctionIdentifier : IEquatable<NativeFunctionIdentifier>
   {
+    public string? ModuleName { get; }
+
     public string FunctionName { get; }
 
     public bool IsInvalid => FunctionName == null!;
@@ -13,17 +15,34 @@ namespace NativeMock
       if (functionName == null)
         throw new ArgumentNullException (nameof(functionName));
 
+      ModuleName = null;
+      FunctionName = functionName;
+    }
+
+    public NativeFunctionIdentifier (string moduleName, string functionName)
+    {
+      if (moduleName == null)
+        throw new ArgumentNullException (nameof(moduleName));
+      if (functionName == null)
+        throw new ArgumentNullException (nameof(functionName));
+
+      ModuleName = moduleName;
       FunctionName = functionName;
     }
 
     /// <inheritdoc />
-    public bool Equals (NativeFunctionIdentifier other) => FunctionName == other.FunctionName;
+    public bool Equals (NativeFunctionIdentifier other) => StringComparer.OrdinalIgnoreCase.Equals (ModuleName, other.ModuleName) && StringComparer.OrdinalIgnoreCase.Equals (FunctionName, other.FunctionName);
 
     /// <inheritdoc />
     public override bool Equals (object? obj) => obj is NativeFunctionIdentifier other && Equals (other);
 
     /// <inheritdoc />
-    public override int GetHashCode() => FunctionName.GetHashCode();
+    public override int GetHashCode()
+    {
+      var moduleNameHashCode = ModuleName == null ? StringComparer.OrdinalIgnoreCase.GetHashCode() : StringComparer.OrdinalIgnoreCase.GetHashCode (ModuleName);
+      var functionNameHashCode = FunctionName == null! ? StringComparer.OrdinalIgnoreCase.GetHashCode() : StringComparer.OrdinalIgnoreCase.GetHashCode (FunctionName);
+      return HashCode.Combine (moduleNameHashCode, functionNameHashCode);
+    }
 
     public static bool operator == (NativeFunctionIdentifier left, NativeFunctionIdentifier right) => left.Equals (right);
 
@@ -32,7 +51,9 @@ namespace NativeMock
     /// <inheritdoc />
     public override string ToString()
     {
-      return FunctionName ?? string.Empty;
+      return ModuleName != null
+        ? $"{ModuleName}+{FunctionName}"
+        : FunctionName;
     }
   }
 }

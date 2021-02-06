@@ -10,11 +10,17 @@ namespace NativeMock
   internal class NativeFunctionProxyFactory
   {
     // IMPORTANT: when changing the following lines the IL generation has to be fixed as well
-    private static readonly Expression<Func<NativeFunctionIdentifier>> s_nativeFunctionIdentifierConstructorExpression =
-      () => new NativeFunctionIdentifier ("test");
+    private static readonly Expression<Func<NativeFunctionIdentifier>> s_nativeFunctionIdentifierConstructor1Expression =
+      () => new NativeFunctionIdentifier ("a");
 
-    private static readonly ConstructorInfo s_nativeFunctionIdentifierConstructorInfo =
-      ((NewExpression) s_nativeFunctionIdentifierConstructorExpression.Body).Constructor!;
+    private static readonly Expression<Func<NativeFunctionIdentifier>> s_nativeFunctionIdentifierConstructor2Expression =
+      () => new NativeFunctionIdentifier ("a", "b");
+
+    private static readonly ConstructorInfo s_nativeFunctionIdentifierConstructor1Info =
+      ((NewExpression) s_nativeFunctionIdentifierConstructor1Expression.Body).Constructor!;
+
+    private static readonly ConstructorInfo s_nativeFunctionIdentifierConstructor2Info =
+      ((NewExpression) s_nativeFunctionIdentifierConstructor2Expression.Body).Constructor!;
 
     private readonly MethodInfo _nativeFunctionProxyTargetMethod;
 
@@ -27,7 +33,7 @@ namespace NativeMock
 
       _nativeFunctionProxyTargetMethod = nativeFunctionHook.Method;
     }
-    
+
     public NativeFunctionProxy CreateNativeFunctionProxy (NativeFunctionIdentifier name, Type nativeFunctionDelegateType)
     {
       if (name.IsInvalid)
@@ -45,8 +51,17 @@ namespace NativeMock
       var proxyMethod = new DynamicMethod ($"{name}_NativeFunctionProxy", returnType, parameterTypes);
       var ilGenerator = proxyMethod.GetILGenerator();
 
-      ilGenerator.Emit (OpCodes.Ldstr, name.FunctionName);
-      ilGenerator.Emit (OpCodes.Newobj, s_nativeFunctionIdentifierConstructorInfo);
+      if (name.ModuleName == null)
+      {
+        ilGenerator.Emit (OpCodes.Ldstr, name.FunctionName);
+        ilGenerator.Emit (OpCodes.Newobj, s_nativeFunctionIdentifierConstructor1Info);
+      }
+      else
+      {
+        ilGenerator.Emit (OpCodes.Ldstr, name.ModuleName);
+        ilGenerator.Emit (OpCodes.Ldstr, name.FunctionName);
+        ilGenerator.Emit (OpCodes.Newobj, s_nativeFunctionIdentifierConstructor2Info);
+      }
 
       // Create an array for the parameters
       ilGenerator.Emit (OpCodes.Ldc_I4, parameters.Length);

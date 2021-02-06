@@ -19,6 +19,7 @@ public static bool MyFunctionThatDependsOnAnExternalFunction(string s)
 In order to test this function you would normally need to use the native DLL in your tests. With *NativeMock* you can mock any calls your external library simply by defining an interface for it:
 
 ```c#
+[NativeMockInterface ("test.dll")]
 public interface IExternalDll
 {
   int MyExternalFunction([MarshalAs (UnmanagedType.LPUTF8Str)] string s); // Must match signature with the imported function
@@ -74,5 +75,5 @@ public class MyTests
 
 ## Limitations
 
-- Native function matching is only done using the function names. If two modules are using the same function name, it is not guaranteed which one will be mocked (the first one that is resolved will be used).
+- You cannot mock `GetModuleFileNameW` - bad luck if you need to mock it
 - A native library must still be loaded although it could be an empty library. The library also need not export any functions. This is true as long as all used functions are added in the mock interface.

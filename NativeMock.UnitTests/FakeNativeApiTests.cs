@@ -4,7 +4,7 @@ namespace NativeMock.UnitTests
   using Infrastructure;
   using NUnit.Framework;
 
-  public class NativeMockTests : NativeMockTestBase
+  public class FakeNativeApiTests : NativeMockTestBase<IFakeNativeApi>
   {
     [Test]
     public void EmptyMethodTest()
@@ -92,7 +92,7 @@ namespace NativeMock.UnitTests
     public void RenamedFunctionTest()
     {
       ApiMock.Setup (e => e.NmRename());
-      
+
       FakeNativeApi.NmRenameQ();
       ApiMock.VerifyAll();
     }

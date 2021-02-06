@@ -9,7 +9,9 @@ namespace NativeMock.UnitTests
     [Test]
     public void ThrowsOnNullArgumentTest()
     {
-      Assert.That (() => new NativeFunctionIdentifier (null), Throws.ArgumentNullException);
+      Assert.That (() => new NativeFunctionIdentifier (null!), Throws.ArgumentNullException);
+      Assert.That (() => new NativeFunctionIdentifier (null!, "a"), Throws.ArgumentNullException);
+      Assert.That (() => new NativeFunctionIdentifier ("a", null!), Throws.ArgumentNullException);
     }
 
     [Test]
@@ -24,13 +26,21 @@ namespace NativeMock.UnitTests
     {
       var a = new NativeFunctionIdentifier ("a");
       var b = new NativeFunctionIdentifier ("b");
+      var c = new NativeFunctionIdentifier ("a", "a");
 
       Assert.That (a == new NativeFunctionIdentifier ("a"));
       Assert.That (a != b);
       Assert.That (b == b);
-      Assert.That (a.Equals (new NativeFunctionIdentifier ("a")));
-      Assert.That (!a.Equals (b));
-      Assert.That (b.Equals (b));
+      Assert.That (a != c);
+      Assert.That (b != c);
+    }
+
+    [Test]
+    public void EqualityIgnoresCaseTest()
+    {
+      Assert.That (new NativeFunctionIdentifier ("A") == new NativeFunctionIdentifier ("a"));
+      Assert.That (new NativeFunctionIdentifier ("A", "b") == new NativeFunctionIdentifier ("a", "b"));
+      Assert.That (new NativeFunctionIdentifier ("a", "B") == new NativeFunctionIdentifier ("a", "b"));
     }
 
     [Test]
@@ -45,9 +55,8 @@ namespace NativeMock.UnitTests
     [Test]
     public void ToStringTest()
     {
-      var a = new NativeFunctionIdentifier ("a");
-
-      Assert.That (a.ToString(), Is.EqualTo ("a"));
+      Assert.That (new NativeFunctionIdentifier ("a").ToString(), Is.EqualTo ("a"));
+      Assert.That (new NativeFunctionIdentifier ("a", "b").ToString(), Is.EqualTo ("a+b"));
     }
   }
 }

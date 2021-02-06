@@ -34,7 +34,7 @@ namespace NativeMock
       var parameterTypes = parameters.Select (p => p.ParameterType).ToArray();
 
       // See also DelegateHelpers.MakeNewCustomDelegate in core clr
-      var delegateTypeBuilder = _moduleBuilder.DefineType ($"{methodInfo.Name}_NativeFunctionProxyDelegate", c_classTypeAttributes, typeof(MulticastDelegate));
+      var delegateTypeBuilder = _moduleBuilder.DefineType ($"{methodInfo.Name}_NativeFunctionProxyDelegate_{Guid.NewGuid()}", c_classTypeAttributes, typeof(MulticastDelegate));
 
       // Create the constructor
       var constructorBuilder = delegateTypeBuilder.DefineConstructor (c_constructorMethodAttributes, CallingConventions.Standard, s_constructorArgumentTypes);
