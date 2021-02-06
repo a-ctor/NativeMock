@@ -20,5 +20,9 @@ namespace NativeMock.UnitTests.Infrastructure
     void NmStringArg (string value);
 
     void NmUtf8StringArg ([MarshalAs (UnmanagedType.LPUTF8Str)] string value);
+
+
+    [NativeMockCallback ("NmRenameQ")]
+    void NmRename();
   }
 }

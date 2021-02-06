@@ -87,5 +87,14 @@ namespace NativeMock.UnitTests
 
       Assert.That (FakeNativeApi.NmEmpty, Throws.TypeOf<NativeFunctionNotMockedException>());
     }
+
+    [Test]
+    public void RenamedFunctionTest()
+    {
+      ApiMock.Setup (e => e.NmRename());
+      
+      FakeNativeApi.NmRenameQ();
+      ApiMock.VerifyAll();
+    }
   }
 }

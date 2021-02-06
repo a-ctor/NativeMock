@@ -33,5 +33,9 @@ namespace NativeMock.UnitTests.Infrastructure
 
     [DllImport (c_dllName)]
     public static extern void NmUtf8StringArg ([MarshalAs (UnmanagedType.LPUTF8Str)] string value);
+
+
+    [DllImport (c_dllName)]
+    public static extern void NmRenameQ ();
   }
 }

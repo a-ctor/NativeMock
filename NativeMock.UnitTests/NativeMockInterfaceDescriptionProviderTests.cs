@@ -1,6 +1,7 @@
 namespace NativeMock.UnitTests
 {
   using System;
+  using System.Linq;
   using System.Text;
   using NUnit.Framework;
 
@@ -57,6 +58,21 @@ namespace NativeMock.UnitTests
       var method = nativeMockInterfaceDescription.Methods[0];
       Assert.That (method.Name, Is.EqualTo (new NativeFunctionIdentifier ("Test")));
       Assert.That (method.MethodInfo, Is.EqualTo (typeof(IA).GetMethod ("Test")));
+    }
+
+    private interface IRenameInterface
+    {
+      [NativeMockCallback ("B")]
+      void A();
+    }
+
+    [Test]
+    public void MapRenameMethod()
+    {
+      var nativeMockInterfaceDescription = _nativeMockInterfaceDescriptionProvider.GetMockInterfaceDescription (typeof(IRenameInterface));
+
+      var method = nativeMockInterfaceDescription.Methods.Single();
+      Assert.That (method.Name, Is.EqualTo (new NativeFunctionIdentifier ("B")));
     }
   }
 }
