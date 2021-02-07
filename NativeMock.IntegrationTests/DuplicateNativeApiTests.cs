@@ -1,4 +1,4 @@
-namespace NativeMock.UnitTests
+namespace NativeMock.IntegrationTests
 {
   using Infrastructure;
   using Moq;

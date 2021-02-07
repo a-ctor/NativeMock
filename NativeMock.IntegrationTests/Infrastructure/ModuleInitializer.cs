@@ -1,4 +1,4 @@
-namespace NativeMock.UnitTests.Infrastructure
+namespace NativeMock.IntegrationTests.Infrastructure
 {
   using System.Runtime.CompilerServices;
 

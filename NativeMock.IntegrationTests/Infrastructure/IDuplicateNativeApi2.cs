@@ -1,4 +1,4 @@
-namespace NativeMock.UnitTests.Infrastructure
+namespace NativeMock.IntegrationTests.Infrastructure
 {
   [NativeMockModule (FakeDllNames.Dll2)]
   public interface IDuplicateNativeApi2
