@@ -31,5 +31,19 @@ namespace NativeMock.UnitTests.Infrastructure
 
     [DllImport (FakeDllNames.Dll1)]
     public static extern void NmRenameQ();
+
+
+    [DllImport (FakeDllNames.Dll1)]
+    [return: MarshalAs (UnmanagedType.LPUTF8Str)]
+    public static extern string NmMethodDefinitionReference ([MarshalAs (UnmanagedType.LPUTF8Str)] string value);
+
+    [DllImport (FakeDllNames.Dll1, EntryPoint = "NmMethodDefinitionReference2")]
+    [return: MarshalAs (UnmanagedType.LPUTF8Str)]
+    public static extern string NmMethodDefinitionReferenceRenamed ([MarshalAs (UnmanagedType.LPUTF8Str)] string value);
+
+    [DllImport (FakeDllNames.Dll1, EntryPoint = "NmPrivateRenamed")]
+    private static extern void NmPrivate();
+
+    public static void NmPrivateRenamed() => NmPrivate();
   }
 }

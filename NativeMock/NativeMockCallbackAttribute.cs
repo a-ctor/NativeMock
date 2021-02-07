@@ -7,6 +7,8 @@ namespace NativeMock
   {
     public string? Name { get; }
 
+    public Type? DeclaringType { get; set; }
+
     public NativeMockCallbackAttribute()
     {
     }

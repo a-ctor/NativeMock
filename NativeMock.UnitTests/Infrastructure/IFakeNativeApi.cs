@@ -24,5 +24,15 @@ namespace NativeMock.UnitTests.Infrastructure
 
     [NativeMockCallback ("NmRenameQ")]
     void NmRename();
+
+
+    [NativeMockCallback (DeclaringType = typeof(FakeNativeApi))]
+    string NmMethodDefinitionReference (string value);
+
+    [NativeMockCallback ("NmMethodDefinitionReference2", DeclaringType = typeof(FakeNativeApi))]
+    string NmMethodDefinitionReferenceRenamed (string value);
+
+    [NativeMockCallback (DeclaringType = typeof(FakeNativeApi))]
+    void NmPrivateRenamed();
   }
 }

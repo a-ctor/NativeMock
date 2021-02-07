@@ -96,5 +96,32 @@ namespace NativeMock.UnitTests
       FakeNativeApi.NmRenameQ();
       ApiMock.VerifyAll();
     }
+
+    [Test]
+    public void MethodDefinitionReference()
+    {
+      ApiMock.Setup (e => e.NmMethodDefinitionReference ("😄")).Returns ("😄");
+
+      Assert.That (FakeNativeApi.NmMethodDefinitionReference ("😄"), Is.EqualTo ("😄"));
+      ApiMock.VerifyAll();
+    }
+
+    [Test]
+    public void MethodDefinitionReferenceRenamed()
+    {
+      ApiMock.Setup (e => e.NmMethodDefinitionReferenceRenamed ("😄")).Returns ("😄");
+
+      Assert.That (FakeNativeApi.NmMethodDefinitionReferenceRenamed ("😄"), Is.EqualTo ("😄"));
+      ApiMock.VerifyAll();
+    }
+
+    [Test]
+    public void PrivateRenamed()
+    {
+      ApiMock.Setup (e => e.NmPrivateRenamed());
+
+      FakeNativeApi.NmPrivateRenamed();
+      ApiMock.VerifyAll();
+    }
   }
 }
