@@ -1,28 +1,26 @@
 namespace NativeMock.UnitTests
 {
   using System;
-  using System.Linq;
   using System.Text;
+  using Moq;
   using NUnit.Framework;
 
   [TestFixture]
   public class NativeMockInterfaceDescriptionProviderTests
   {
-    private interface IEmpty
-    {
-    }
-
-    private interface IA
-    {
-      void Test();
-    }
-
+    private Mock<INativeMockModuleDescriptionProvider> _moduleDescriptionProviderMock;
+    private Mock<INativeMockInterfaceMethodDescriptionProvider> _interfaceMethodDescriptionProviderMock;
     private NativeMockInterfaceDescriptionProvider _nativeMockInterfaceDescriptionProvider;
+
 
     [SetUp]
     public void SetUp()
     {
-      _nativeMockInterfaceDescriptionProvider = new NativeMockInterfaceDescriptionProvider();
+      _moduleDescriptionProviderMock = new Mock<INativeMockModuleDescriptionProvider> (MockBehavior.Strict);
+      _interfaceMethodDescriptionProviderMock = new Mock<INativeMockInterfaceMethodDescriptionProvider> (MockBehavior.Strict);
+      _nativeMockInterfaceDescriptionProvider = new NativeMockInterfaceDescriptionProvider (
+        _moduleDescriptionProviderMock.Object,
+        _interfaceMethodDescriptionProviderMock.Object);
     }
 
     [Test]
@@ -40,54 +38,43 @@ namespace NativeMock.UnitTests
       Assert.That (() => _nativeMockInterfaceDescriptionProvider.GetMockInterfaceDescription (null!), Throws.ArgumentNullException);
     }
 
+    private interface IEmpty
+    {
+    }
+
     [Test]
     public void ThrowsOnEmptyInterface()
     {
       Assert.That (() => _nativeMockInterfaceDescriptionProvider.GetMockInterfaceDescription (typeof(IEmpty)), Throws.InvalidOperationException);
     }
 
+    private interface ISimple
+    {
+      void Test();
+    }
+
     [Test]
     public void CorrectlyMapsInterfaceMethod()
     {
-      var nativeMockInterfaceDescription = _nativeMockInterfaceDescriptionProvider.GetMockInterfaceDescription (typeof(IA));
+      var nativeMockModuleDescription = new NativeMockModuleDescription ("Test");
+      _moduleDescriptionProviderMock
+        .Setup (m => m.GetMockModuleDescription (typeof(ISimple)))
+        .Returns (nativeMockModuleDescription);
+
+      var method = typeof(ISimple).GetMethod ("Test");
+      var methodDescription = new NativeMockInterfaceMethodDescription ("Test", method);
+      _interfaceMethodDescriptionProviderMock.Setup (m => m.GetMockInterfaceDescription (method)).Returns (methodDescription);
+
+      var nativeMockInterfaceDescription = _nativeMockInterfaceDescriptionProvider.GetMockInterfaceDescription (typeof(ISimple));
 
       Assert.That (nativeMockInterfaceDescription, Is.Not.Null);
-      Assert.That (nativeMockInterfaceDescription.InterfaceType, Is.SameAs (typeof(IA)));
+      Assert.That (nativeMockInterfaceDescription.InterfaceType, Is.SameAs (typeof(ISimple)));
+      Assert.That (nativeMockInterfaceDescription.Module, Is.EqualTo (nativeMockModuleDescription));
       Assert.That (nativeMockInterfaceDescription.Methods.Length, Is.EqualTo (1));
+      Assert.That (nativeMockInterfaceDescription.Methods[0], Is.EqualTo (methodDescription));
 
-      var method = nativeMockInterfaceDescription.Methods[0];
-      Assert.That (method.Name, Is.EqualTo (new NativeFunctionIdentifier ("Test")));
-      Assert.That (method.MethodInfo, Is.EqualTo (typeof(IA).GetMethod ("Test")));
-    }
-
-    private interface IRenameInterface
-    {
-      [NativeMockCallback ("B")]
-      void A();
-    }
-
-    [Test]
-    public void MapRenameMethod()
-    {
-      var nativeMockInterfaceDescription = _nativeMockInterfaceDescriptionProvider.GetMockInterfaceDescription (typeof(IRenameInterface));
-
-      var method = nativeMockInterfaceDescription.Methods.Single();
-      Assert.That (method.Name, Is.EqualTo (new NativeFunctionIdentifier ("B")));
-    }
-
-    [NativeMockInterface ("A")]
-    private interface IModuleScopedInterface
-    {
-      void B();
-    }
-
-    [Test]
-    public void MapModuleScoped()
-    {
-      var nativeMockInterfaceDescription = _nativeMockInterfaceDescriptionProvider.GetMockInterfaceDescription (typeof(IModuleScopedInterface));
-
-      var method = nativeMockInterfaceDescription.Methods.Single();
-      Assert.That (method.Name, Is.EqualTo (new NativeFunctionIdentifier ("A", "B")));
+      _moduleDescriptionProviderMock.VerifyAll();
+      _interfaceMethodDescriptionProviderMock.VerifyAll();
     }
   }
 }

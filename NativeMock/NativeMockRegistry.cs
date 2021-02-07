@@ -23,7 +23,9 @@ namespace NativeMock
     private static readonly object s_initializedLock = new();
     private static bool s_initialized;
 
-    private static readonly INativeMockInterfaceDescriptionProvider s_nativeMockInterfaceDescriptionProvider = new NativeMockInterfaceDescriptionProvider();
+    private static readonly INativeMockInterfaceDescriptionProvider s_nativeMockInterfaceDescriptionProvider = new NativeMockInterfaceDescriptionProvider (
+      new NativeMockModuleDescriptionProvider(),
+      new NativeMockInterfaceMethodDescriptionProvider());
     private static readonly DelegateGenerator s_delegateGenerator = new (new AssemblyName (c_assemblyName), c_moduleName);
     private static readonly NativeFunctionProxyFactory s_nativeFunctionProxyFactory = new (OnNativeHookCalled);
     private static readonly NativeFunctionProxyRegistry s_nativeFunctionProxyRegistry = new();
@@ -73,7 +75,10 @@ namespace NativeMock
 
       var nativeMockCallbackRegistry = s_nativeMockCallbackRegistry.Value ??= new NativeMockCallbackRegistry();
       foreach (var interfaceMethod in interfaceDescription.Methods)
-        nativeMockCallbackRegistry.Register (interfaceMethod.Name, interfaceMethod.CreateCallback (implementation));
+      {
+        var nativeFunctionIdentifier = interfaceDescription.CreateNativeFunctionIdentifier (interfaceMethod);
+        nativeMockCallbackRegistry.Register (nativeFunctionIdentifier, interfaceMethod.CreateCallback (implementation));
+      }
     }
 
     public static void Register<TInterface>()
@@ -89,16 +94,17 @@ namespace NativeMock
         if (s_registeredInterfaces.ContainsKey (interfaceType))
           throw new InvalidOperationException ("The specified type is already registered.");
 
-        var nativeMockInterfaceDescription = s_nativeMockInterfaceDescriptionProvider.GetMockInterfaceDescription (interfaceType);
+        var interfaceDescription = s_nativeMockInterfaceDescriptionProvider.GetMockInterfaceDescription (interfaceType);
 
-        foreach (var nativeMockInterfaceMethod in nativeMockInterfaceDescription.Methods)
+        foreach (var interfaceMethod in interfaceDescription.Methods)
         {
-          var delegateType = s_delegateGenerator.CreateDelegateType (nativeMockInterfaceMethod.MethodInfo);
-          var nativeFunctionProxy = s_nativeFunctionProxyFactory.CreateNativeFunctionProxy (nativeMockInterfaceMethod.Name, delegateType);
+          var delegateType = s_delegateGenerator.CreateDelegateType (interfaceMethod.MethodInfo);
+          var nativeFunctionIdentifier = interfaceDescription.CreateNativeFunctionIdentifier (interfaceMethod);
+          var nativeFunctionProxy = s_nativeFunctionProxyFactory.CreateNativeFunctionProxy (nativeFunctionIdentifier, delegateType);
           s_nativeFunctionProxyRegistry.Register (nativeFunctionProxy);
         }
 
-        s_registeredInterfaces.TryAdd (interfaceType, nativeMockInterfaceDescription);
+        s_registeredInterfaces.TryAdd (interfaceType, interfaceDescription);
       }
     }
 
