@@ -60,7 +60,7 @@ namespace NativeMock
             if (!importFunctionName.Equals (targetFunctionName.StringValue, StringComparison.CurrentCultureIgnoreCase))
               continue;
           }
-          
+
           return moduleBaseAddress + importTableEntry.RvaImportAddressTable + sizeof(nint) * j;
         }
       }

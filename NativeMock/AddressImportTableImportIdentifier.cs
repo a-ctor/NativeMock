@@ -19,7 +19,7 @@ namespace NativeMock
       ? (_value & c_ordinalFlag32) != 0
       : (_value & c_ordinalFlag64) != 0;
 
-    public unsafe nint Value => sizeof(nint) == 4 
+    public unsafe nint Value => sizeof(nint) == 4
       ? (nint) (_value & c_valueMask32)
       : (nint) (_value & c_valueMask64);
   }

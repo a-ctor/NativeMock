@@ -20,7 +20,7 @@ namespace NativeMock
       _method = method;
     }
 
-    public object? Invoke (object[] args)
+    public object? Invoke (object?[] args)
     {
       if (args == null)
         throw new ArgumentNullException (nameof(args));

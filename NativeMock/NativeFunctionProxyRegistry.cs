@@ -8,15 +8,12 @@ namespace NativeMock
   {
     private class Basket
     {
-      private readonly string _functionName;
-
       private readonly ConcurrentDictionary<string, NativeFunctionProxy> _moduleProxies = new (StringComparer.OrdinalIgnoreCase);
 
       private NativeFunctionProxy? _globalProxy;
 
-      public Basket (string functionName)
+      public Basket()
       {
-        _functionName = functionName;
       }
 
       public NativeFunctionProxy? Resolve (NativeFunctionIdentifier nativeFunctionIdentifier)
@@ -50,7 +47,7 @@ namespace NativeMock
 
     public NativeFunctionProxyRegistry()
     {
-      _basketFactory = functionName => new Basket (functionName);
+      _basketFactory = _ => new Basket();
     }
 
     public void Register (NativeFunctionProxy nativeFunctionProxy)

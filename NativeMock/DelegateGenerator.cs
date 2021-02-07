@@ -11,19 +11,20 @@ namespace NativeMock
     private const TypeAttributes c_classTypeAttributes = TypeAttributes.Class | TypeAttributes.Public | TypeAttributes.Sealed | TypeAttributes.AutoClass | TypeAttributes.AnsiClass;
 
     private const MethodAttributes c_constructorMethodAttributes = MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.RTSpecialName;
+
+    // ReSharper disable once BitwiseOperatorOnEnumWithoutFlags
     private const MethodImplAttributes c_runtimeManagedMethodImplAttributes = MethodImplAttributes.Runtime | MethodImplAttributes.Managed;
 
     private const MethodAttributes c_instanceMethodAttributes = MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.Virtual | MethodAttributes.NewSlot;
 
     private static readonly Type[] s_constructorArgumentTypes = {typeof(object), typeof(IntPtr)};
 
-    private readonly AssemblyBuilder _assemblyBuilder;
     private readonly ModuleBuilder _moduleBuilder;
 
     public DelegateGenerator (AssemblyName assemblyName, string moduleName)
     {
-      _assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly (assemblyName, AssemblyBuilderAccess.Run);
-      _moduleBuilder = _assemblyBuilder.DefineDynamicModule (moduleName);
+      var assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly (assemblyName, AssemblyBuilderAccess.Run);
+      _moduleBuilder = assemblyBuilder.DefineDynamicModule (moduleName);
     }
 
     public Type CreateDelegateType (MethodInfo methodInfo)

@@ -30,7 +30,6 @@ namespace NativeMock.UnitTests
 
       Assert.That (a == new NativeFunctionIdentifier ("a"));
       Assert.That (a != b);
-      Assert.That (b == b);
       Assert.That (a != c);
       Assert.That (b != c);
     }

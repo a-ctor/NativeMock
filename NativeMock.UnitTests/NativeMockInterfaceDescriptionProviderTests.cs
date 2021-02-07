@@ -61,8 +61,8 @@ namespace NativeMock.UnitTests
         .Setup (m => m.GetMockModuleDescription (typeof(ISimple)))
         .Returns (nativeMockModuleDescription);
 
-      var method = typeof(ISimple).GetMethod ("Test");
-      var methodDescription = new NativeMockInterfaceMethodDescription ("Test", method);
+      var method = typeof(ISimple).GetMethod ("Test")!;
+      var methodDescription = new NativeMockInterfaceMethodDescription ("Test", method!);
       _interfaceMethodDescriptionProviderMock.Setup (m => m.GetMockInterfaceDescription (method)).Returns (methodDescription);
 
       var nativeMockInterfaceDescription = _nativeMockInterfaceDescriptionProvider.GetMockInterfaceDescription (typeof(ISimple));

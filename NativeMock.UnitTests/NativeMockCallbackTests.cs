@@ -19,7 +19,7 @@ namespace NativeMock.UnitTests
     [Test]
     public void ThrowsOnNullArgumentTest()
     {
-      Assert.That (() => new NativeMockCallback (new object(), null), Throws.ArgumentNullException);
+      Assert.That (() => new NativeMockCallback (new object(), null!), Throws.ArgumentNullException);
     }
 
     [Test]
@@ -29,7 +29,7 @@ namespace NativeMock.UnitTests
 
       var target = new NativeMockCallback (actionMock.Object.Target, actionMock.Object.Method);
 
-      Assert.That (() => target.Invoke (null), Throws.ArgumentNullException);
+      Assert.That (() => target.Invoke (null!), Throws.ArgumentNullException);
     }
 
     [Test]
