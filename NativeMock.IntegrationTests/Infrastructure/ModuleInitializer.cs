@@ -13,6 +13,7 @@ namespace NativeMock.IntegrationTests.Infrastructure
       NativeMockRegistry.Register<IDuplicateNativeApi1>();
       NativeMockRegistry.Register<IDuplicateNativeApi2>();
       NativeMockRegistry.Register<IDuplicateNativeApi3>();
+      NativeMockRegistry.Register<IDeclaringTypeInheritNativeApi>();
     }
   }
 }

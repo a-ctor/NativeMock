@@ -17,17 +17,19 @@ namespace NativeMock
     }
 
     /// <inheritdoc />
-    public NativeMockInterfaceMethodDescription GetMockInterfaceDescription (MethodInfo method)
+    public NativeMockInterfaceMethodDescription GetMockInterfaceDescription (MethodInfo method, Type? defaultDeclaringType)
     {
       if (method == null)
         throw new ArgumentNullException (nameof(method));
 
       var nativeMockCallbackAttribute = method.GetCustomAttribute<NativeMockCallbackAttribute>();
+
       var functionName = nativeMockCallbackAttribute?.Name ?? method.Name;
+      var declaringType = nativeMockCallbackAttribute?.DeclaringType ?? defaultDeclaringType;
       return new NativeMockInterfaceMethodDescription (
         functionName,
         method,
-        ResolveMethod (method, functionName, nativeMockCallbackAttribute?.DeclaringType));
+        ResolveMethod (method, functionName, declaringType));
     }
 
     private MethodInfo ResolveMethod (MethodInfo originalMethod, string functionName, Type? declaringType)

@@ -63,13 +63,39 @@ namespace NativeMock.UnitTests
 
       var method = typeof(ISimple).GetMethod ("Test")!;
       var methodDescription = new NativeMockInterfaceMethodDescription ("Test", method!, method!);
-      _interfaceMethodDescriptionProviderMock.Setup (m => m.GetMockInterfaceDescription (method)).Returns (methodDescription);
+      _interfaceMethodDescriptionProviderMock.Setup (m => m.GetMockInterfaceDescription (method, null)).Returns (methodDescription);
 
       var nativeMockInterfaceDescription = _nativeMockInterfaceDescriptionProvider.GetMockInterfaceDescription (typeof(ISimple));
 
       Assert.That (nativeMockInterfaceDescription, Is.Not.Null);
       Assert.That (nativeMockInterfaceDescription.InterfaceType, Is.SameAs (typeof(ISimple)));
       Assert.That (nativeMockInterfaceDescription.Module, Is.EqualTo (nativeMockModuleDescription));
+      Assert.That (nativeMockInterfaceDescription.Methods.Length, Is.EqualTo (1));
+      Assert.That (nativeMockInterfaceDescription.Methods[0], Is.EqualTo (methodDescription));
+
+      _moduleDescriptionProviderMock.VerifyAll();
+      _interfaceMethodDescriptionProviderMock.VerifyAll();
+    }
+
+    [NativeMockInterface (DeclaringType = typeof(int))]
+    private interface ISimple2
+    {
+      void Test();
+    }
+
+    [Test]
+    public void CorrectlyMapsInterfaceMethod2()
+    {
+      var method = typeof(ISimple2).GetMethod ("Test")!;
+      _moduleDescriptionProviderMock.Setup (e => e.GetMockModuleDescription (typeof(ISimple2))).Returns ((NativeMockModuleDescription) null);
+      var methodDescription = new NativeMockInterfaceMethodDescription ("Test", method!, method!);
+      _interfaceMethodDescriptionProviderMock.Setup (m => m.GetMockInterfaceDescription (method, typeof(int))).Returns (methodDescription);
+
+      var nativeMockInterfaceDescription = _nativeMockInterfaceDescriptionProvider.GetMockInterfaceDescription (typeof(ISimple2));
+
+      Assert.That (nativeMockInterfaceDescription, Is.Not.Null);
+      Assert.That (nativeMockInterfaceDescription.InterfaceType, Is.SameAs (typeof(ISimple2)));
+      Assert.That (nativeMockInterfaceDescription.Module, Is.Null);
       Assert.That (nativeMockInterfaceDescription.Methods.Length, Is.EqualTo (1));
       Assert.That (nativeMockInterfaceDescription.Methods[0], Is.EqualTo (methodDescription));
 

@@ -70,14 +70,14 @@ namespace NativeMock.UnitTests
     [Test]
     public void ThrowsOnNullTest()
     {
-      Assert.That (() => _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (null!), Throws.ArgumentNullException);
+      Assert.That (() => _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (null!, typeof(int)), Throws.ArgumentNullException);
     }
 
     [Test]
     public void EmptyMethodTest()
     {
-      var method = GetInterfaceMethod (e => e.Empty());
-      var interfaceDescription = _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (method);
+      var method = GetInterfaceMethod<ITest> (e => e.Empty());
+      var interfaceDescription = _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (method, null);
 
       Assert.That (interfaceDescription, Is.Not.Null);
       Assert.That (interfaceDescription.FunctionName, Is.EqualTo (method.Name));
@@ -88,8 +88,8 @@ namespace NativeMock.UnitTests
     [Test]
     public void EmptyAnnotatedMethodTest()
     {
-      var method = GetInterfaceMethod (e => e.EmptyAnnotated());
-      var interfaceDescription = _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (method);
+      var method = GetInterfaceMethod<ITest> (e => e.EmptyAnnotated());
+      var interfaceDescription = _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (method, null);
 
       Assert.That (interfaceDescription, Is.Not.Null);
       Assert.That (interfaceDescription.FunctionName, Is.EqualTo (method.Name));
@@ -100,8 +100,8 @@ namespace NativeMock.UnitTests
     [Test]
     public void RenamedTest()
     {
-      var method = GetInterfaceMethod (e => e.Renamed());
-      var interfaceDescription = _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (method);
+      var method = GetInterfaceMethod<ITest> (e => e.Renamed());
+      var interfaceDescription = _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (method, null);
 
       Assert.That (interfaceDescription, Is.Not.Null);
       Assert.That (interfaceDescription.FunctionName, Is.EqualTo ("Test"));
@@ -112,23 +112,23 @@ namespace NativeMock.UnitTests
     [Test]
     public void MissingDeclarationTest()
     {
-      var interfaceMethod = GetInterfaceMethod (e => e.MissingDeclarationElsewhere());
-      Assert.That (() => _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (interfaceMethod), Throws.InvalidOperationException);
+      var interfaceMethod = GetInterfaceMethod<ITest> (e => e.MissingDeclarationElsewhere());
+      Assert.That (() => _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (interfaceMethod, null), Throws.InvalidOperationException);
     }
 
     [Test]
     public void NonExternDeclarationTest()
     {
-      var interfaceMethod = GetInterfaceMethod (e => e.NonExtern());
-      Assert.That (() => _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (interfaceMethod), Throws.InvalidOperationException);
+      var interfaceMethod = GetInterfaceMethod<ITest> (e => e.NonExtern());
+      Assert.That (() => _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (interfaceMethod, null), Throws.InvalidOperationException);
     }
 
     [Test]
     public void PublicDeclarationTest()
     {
-      var interfaceMethod = GetInterfaceMethod (e => e.PublicDeclarationElsewhere());
+      var interfaceMethod = GetInterfaceMethod<ITest> (e => e.PublicDeclarationElsewhere());
       var classMethod = GetClassMethod (Test.PublicDeclarationElsewhere);
-      var interfaceDescription = _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (interfaceMethod);
+      var interfaceDescription = _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (interfaceMethod, null);
 
       Assert.That (interfaceDescription, Is.Not.Null);
       Assert.That (interfaceDescription.FunctionName, Is.EqualTo ("PublicDeclarationElsewhere"));
@@ -139,9 +139,9 @@ namespace NativeMock.UnitTests
     [Test]
     public void PrivateDeclarationTest()
     {
-      var interfaceMethod = GetInterfaceMethod (e => e.PrivateDeclarationElsewhere());
+      var interfaceMethod = GetInterfaceMethod<ITest> (e => e.PrivateDeclarationElsewhere());
       var classMethod = typeof(Test).GetMethod ("PrivateDeclarationElsewhere", BindingFlags.NonPublic | BindingFlags.Static);
-      var interfaceDescription = _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (interfaceMethod);
+      var interfaceDescription = _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (interfaceMethod, null);
 
       Assert.That (interfaceDescription, Is.Not.Null);
       Assert.That (interfaceDescription.FunctionName, Is.EqualTo ("PrivateDeclarationElsewhere"));
@@ -152,9 +152,9 @@ namespace NativeMock.UnitTests
     [Test]
     public void RealRenamedDeclarationTest()
     {
-      var interfaceMethod = GetInterfaceMethod (e => e.RenamedDeclarationElsewhere());
+      var interfaceMethod = GetInterfaceMethod<ITest> (e => e.RenamedDeclarationElsewhere());
       var classMethod = GetClassMethod (Test.RealRenamedDeclarationElsewhere);
-      var interfaceDescription = _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (interfaceMethod);
+      var interfaceDescription = _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (interfaceMethod, null);
 
       Assert.That (interfaceDescription, Is.Not.Null);
       Assert.That (interfaceDescription.FunctionName, Is.EqualTo ("RealRenamedDeclarationElsewhere"));
@@ -165,9 +165,9 @@ namespace NativeMock.UnitTests
     [Test]
     public void VirtualRenamedDeclarationTest()
     {
-      var interfaceMethod = GetInterfaceMethod (e => e.RealRenamedDeclarationElsewhere2());
+      var interfaceMethod = GetInterfaceMethod<ITest> (e => e.RealRenamedDeclarationElsewhere2());
       var classMethod = GetClassMethod (Test.VirtualRenamedDeclarationElsewhere_);
-      var interfaceDescription = _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (interfaceMethod);
+      var interfaceDescription = _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (interfaceMethod, null);
 
       Assert.That (interfaceDescription, Is.Not.Null);
       Assert.That (interfaceDescription.FunctionName, Is.EqualTo ("VirtualRenamedDeclarationElsewhere"));
@@ -175,7 +175,53 @@ namespace NativeMock.UnitTests
       Assert.That (interfaceDescription.StubTargetMethod, Is.EqualTo (classMethod));
     }
 
-    private MethodInfo GetInterfaceMethod (Expression<Action<ITest>> lambdaExpression) => ((MethodCallExpression) lambdaExpression.Body).Method;
+    private interface ITest2
+    {
+      void InheritDeclaringType();
+
+      [NativeMockCallback (DeclaringType = typeof(Test2B))]
+      void OverrideDeclaringType();
+    }
+
+    private class Test2
+    {
+      [DllImport (FakeDllNames.Dll1)]
+      public static extern void InheritDeclaringType();
+    }
+
+    private class Test2B
+    {
+      [DllImport (FakeDllNames.Dll1)]
+      public static extern void OverrideDeclaringType();
+    }
+
+    [Test]
+    public void InheritDeclaringTypeTest()
+    {
+      var interfaceMethod = GetInterfaceMethod<ITest2> (e => e.InheritDeclaringType());
+      var classMethod = GetClassMethod (Test2.InheritDeclaringType);
+      var interfaceDescription = _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (interfaceMethod, typeof(Test2));
+
+      Assert.That (interfaceDescription, Is.Not.Null);
+      Assert.That (interfaceDescription.FunctionName, Is.EqualTo ("InheritDeclaringType"));
+      Assert.That (interfaceDescription.InterfaceMethod, Is.EqualTo (interfaceMethod));
+      Assert.That (interfaceDescription.StubTargetMethod, Is.EqualTo (classMethod));
+    }
+
+    [Test]
+    public void OverrideDeclaringTypeTest()
+    {
+      var interfaceMethod = GetInterfaceMethod<ITest2> (e => e.OverrideDeclaringType());
+      var classMethod = GetClassMethod (Test2B.OverrideDeclaringType);
+      var interfaceDescription = _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (interfaceMethod, typeof(Test2));
+
+      Assert.That (interfaceDescription, Is.Not.Null);
+      Assert.That (interfaceDescription.FunctionName, Is.EqualTo ("OverrideDeclaringType"));
+      Assert.That (interfaceDescription.InterfaceMethod, Is.EqualTo (interfaceMethod));
+      Assert.That (interfaceDescription.StubTargetMethod, Is.EqualTo (classMethod));
+    }
+
+    private MethodInfo GetInterfaceMethod<T> (Expression<Action<T>> lambdaExpression) => ((MethodCallExpression) lambdaExpression.Body).Method;
 
     private MethodInfo GetClassMethod (Action action) => action.Method;
   }

@@ -3,6 +3,7 @@ namespace NativeMock
   using System;
   using System.Collections.Immutable;
   using System.Linq;
+  using System.Reflection;
 
   public class NativeMockInterfaceDescriptionProvider : INativeMockInterfaceDescriptionProvider
   {
@@ -30,7 +31,12 @@ namespace NativeMock
         throw new InvalidOperationException ("The specified interface type has no methods.");
 
       var nativeMockModuleDescription = _nativeMockModuleDescriptionProvider.GetMockModuleDescription (interfaceType);
-      var methodDescriptions = methods.Select (_nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription)
+
+      var nativeMockInterfaceAttribute = interfaceType.GetCustomAttribute<NativeMockInterfaceAttribute>();
+      var defaultDeclaringType = nativeMockInterfaceAttribute?.DeclaringType;
+
+      var methodDescriptions = methods
+        .Select (method => _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (method, defaultDeclaringType))
         .ToImmutableArray();
 
       return new NativeMockInterfaceDescription (interfaceType, nativeMockModuleDescription, methodDescriptions);
