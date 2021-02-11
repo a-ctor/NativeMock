@@ -7,7 +7,7 @@ namespace NativeMock.IntegrationTests
   public class DeclaringTypeInheritNativeApiTests : NativeMockTestBase<IDeclaringTypeInheritNativeApi>
   {
     [Test]
-    public void DeclaringTypeInherit()
+    public void DeclaringTypeInheritTest()
     {
       ApiMock.Setup (e => e.NmDeclaringTypeInherit ("😄")).Returns ("😄");
 
@@ -16,7 +16,7 @@ namespace NativeMock.IntegrationTests
     }
 
     [Test]
-    public void DeclaringTypeOverride()
+    public void DeclaringTypeOverrideTest()
     {
       ApiMock.Setup (e => e.NmDeclaringTypeOverride ("😄")).Returns ("😄");
 

@@ -98,7 +98,7 @@ namespace NativeMock.IntegrationTests
     }
 
     [Test]
-    public void MethodDefinitionReference()
+    public void MethodDefinitionReferenceTest()
     {
       ApiMock.Setup (e => e.NmMethodDefinitionReference ("😄")).Returns ("😄");
 
@@ -107,7 +107,7 @@ namespace NativeMock.IntegrationTests
     }
 
     [Test]
-    public void MethodDefinitionReferenceRenamed()
+    public void MethodDefinitionReferenceRenamedTest()
     {
       ApiMock.Setup (e => e.NmMethodDefinitionReferenceRenamed ("😄")).Returns ("😄");
 
@@ -116,7 +116,7 @@ namespace NativeMock.IntegrationTests
     }
 
     [Test]
-    public void PrivateRenamed()
+    public void PrivateRenamedTest()
     {
       ApiMock.Setup (e => e.NmPrivateRenamed());
 

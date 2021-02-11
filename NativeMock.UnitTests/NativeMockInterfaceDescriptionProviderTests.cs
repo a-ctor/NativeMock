@@ -24,7 +24,7 @@ namespace NativeMock.UnitTests
     }
 
     [Test]
-    public void ThrowsOnNonInterface()
+    public void ThrowsOnNonInterfaceTest()
     {
       Assert.That (() => _nativeMockInterfaceDescriptionProvider.GetMockInterfaceDescription (typeof(int)), Throws.TypeOf<InvalidOperationException>());
       Assert.That (() => _nativeMockInterfaceDescriptionProvider.GetMockInterfaceDescription (typeof(ConsoleColor)), Throws.TypeOf<InvalidOperationException>());
@@ -33,7 +33,7 @@ namespace NativeMock.UnitTests
     }
 
     [Test]
-    public void ThrowsOnNull()
+    public void ThrowsOnNullTest()
     {
       Assert.That (() => _nativeMockInterfaceDescriptionProvider.GetMockInterfaceDescription (null!), Throws.ArgumentNullException);
     }
@@ -43,7 +43,7 @@ namespace NativeMock.UnitTests
     }
 
     [Test]
-    public void ThrowsOnEmptyInterface()
+    public void ThrowsOnEmptyInterfaceTest()
     {
       Assert.That (() => _nativeMockInterfaceDescriptionProvider.GetMockInterfaceDescription (typeof(IEmpty)), Throws.InvalidOperationException);
     }
@@ -54,7 +54,7 @@ namespace NativeMock.UnitTests
     }
 
     [Test]
-    public void CorrectlyMapsInterfaceMethod()
+    public void CorrectlyMapsInterfaceMethodTest()
     {
       var nativeMockModuleDescription = new NativeMockModuleDescription ("Test");
       _moduleDescriptionProviderMock
@@ -84,7 +84,7 @@ namespace NativeMock.UnitTests
     }
 
     [Test]
-    public void CorrectlyMapsInterfaceMethod2()
+    public void CorrectlyMapsInterfaceMethod2Test()
     {
       var method = typeof(ISimple2).GetMethod ("Test")!;
       _moduleDescriptionProviderMock.Setup (e => e.GetMockModuleDescription (typeof(ISimple2))).Returns ((NativeMockModuleDescription) null);
