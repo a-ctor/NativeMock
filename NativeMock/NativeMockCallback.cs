@@ -4,7 +4,7 @@ namespace NativeMock
   using System.Reflection;
   using System.Runtime.ExceptionServices;
 
-  public readonly struct NativeMockCallback
+  internal readonly struct NativeMockCallback
   {
     private readonly object? _target;
     private readonly MethodInfo _method;

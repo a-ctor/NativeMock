@@ -3,7 +3,7 @@ namespace NativeMock
   using System;
   using System.Collections.Immutable;
 
-  public record NativeMockInterfaceDescription(Type InterfaceType, NativeMockModuleDescription? Module, ImmutableArray<NativeMockInterfaceMethodDescription> Methods)
+  internal record NativeMockInterfaceDescription(Type InterfaceType, NativeMockModuleDescription? Module, ImmutableArray<NativeMockInterfaceMethodDescription> Methods)
   {
     public NativeFunctionIdentifier CreateNativeFunctionIdentifier (NativeMockInterfaceMethodDescription method)
     {

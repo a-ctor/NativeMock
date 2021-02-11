@@ -4,7 +4,7 @@ namespace NativeMock
 
   public class NativeFunctionNotMockedException : Exception
   {
-    public NativeFunctionNotMockedException (NativeFunctionIdentifier functionName)
+    public NativeFunctionNotMockedException (string functionName)
       : base ($"The native function '{functionName}' was called but not mock was found.")
     {
     }

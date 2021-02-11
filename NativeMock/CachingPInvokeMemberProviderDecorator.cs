@@ -4,7 +4,7 @@ namespace NativeMock
   using System.Collections.Concurrent;
   using System.Collections.Immutable;
 
-  public class CachingPInvokeMemberProviderDecorator : IPInvokeMemberProvider
+  internal class CachingPInvokeMemberProviderDecorator : IPInvokeMemberProvider
   {
     private readonly IPInvokeMemberProvider _innerPInvokeMemberProvider;
 

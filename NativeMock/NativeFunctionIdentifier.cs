@@ -2,7 +2,7 @@ namespace NativeMock
 {
   using System;
 
-  public readonly struct NativeFunctionIdentifier : IEquatable<NativeFunctionIdentifier>
+  internal readonly struct NativeFunctionIdentifier : IEquatable<NativeFunctionIdentifier>
   {
     public string? ModuleName { get; }
 

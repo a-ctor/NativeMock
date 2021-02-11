@@ -5,7 +5,7 @@ namespace NativeMock
   using System.ComponentModel;
   using System.Runtime.InteropServices;
 
-  public class ModuleNameResolver
+  internal class ModuleNameResolver
   {
     [DllImport ("Kernel32.dll", SetLastError = true)]
     private static extern unsafe int GetModuleFileNameW (IntPtr moduleHandle, byte* filename, int capacity);

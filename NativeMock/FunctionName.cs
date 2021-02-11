@@ -2,7 +2,7 @@ namespace NativeMock
 {
   using System;
 
-  public readonly struct FunctionName
+  internal readonly struct FunctionName
   {
     private readonly nint _ordinalValue;
     private readonly string? _stringValue;

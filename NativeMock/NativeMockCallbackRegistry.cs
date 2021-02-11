@@ -3,7 +3,7 @@ namespace NativeMock
   using System;
   using System.Collections.Concurrent;
 
-  public class NativeMockCallbackRegistry
+  internal class NativeMockCallbackRegistry
   {
     private readonly ConcurrentDictionary<NativeFunctionIdentifier, NativeMockCallback> _registeredCallbacks = new();
 
@@ -39,7 +39,7 @@ namespace NativeMock
         throw new ArgumentNullException (nameof(args));
 
       if (!_registeredCallbacks.TryGetValue (nativeFunctionIdentifier, out var callback))
-        throw new NativeFunctionNotMockedException (nativeFunctionIdentifier);
+        throw new NativeFunctionNotMockedException (nativeFunctionIdentifier.ToString());
 
       return callback.Invoke (args);
     }

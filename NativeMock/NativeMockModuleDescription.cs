@@ -1,4 +1,4 @@
 namespace NativeMock
 {
-  public record NativeMockModuleDescription(string Name);
+  internal record NativeMockModuleDescription(string Name);
 }

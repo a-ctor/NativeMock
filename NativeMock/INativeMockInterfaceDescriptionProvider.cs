@@ -2,7 +2,7 @@ namespace NativeMock
 {
   using System;
 
-  public interface INativeMockInterfaceDescriptionProvider
+  internal interface INativeMockInterfaceDescriptionProvider
   {
     NativeMockInterfaceDescription GetMockInterfaceDescription (Type interfaceType);
   }

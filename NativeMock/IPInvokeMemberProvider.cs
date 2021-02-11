@@ -3,7 +3,7 @@ namespace NativeMock
   using System;
   using System.Collections.Immutable;
 
-  public interface IPInvokeMemberProvider
+  internal interface IPInvokeMemberProvider
   {
     ImmutableArray<PInvokeMember> GetPInvokeMembers (Type type);
   }

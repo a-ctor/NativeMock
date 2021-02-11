@@ -2,5 +2,5 @@ namespace NativeMock
 {
   using System.Reflection;
 
-  public record PInvokeMember(string Name, MethodInfo Method);
+  internal record PInvokeMember(string Name, MethodInfo Method);
 }
