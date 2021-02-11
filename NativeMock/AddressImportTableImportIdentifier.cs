@@ -2,7 +2,12 @@ namespace NativeMock
 {
   using System.Runtime.InteropServices;
 
-  // see http://sandsprite.com/CodeStuff/Understanding_imports.html
+  /// <summary>
+  /// Represents a function entry in the RVA lookup table of the PE header.
+  /// </summary>
+  /// <remarks>
+  /// For more information see http://sandsprite.com/CodeStuff/Understanding_imports.html
+  /// </remarks>
   [StructLayout (LayoutKind.Sequential)]
   internal readonly struct AddressImportTableImportIdentifier
   {

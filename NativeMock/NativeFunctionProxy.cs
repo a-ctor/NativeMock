@@ -2,6 +2,9 @@ namespace NativeMock
 {
   using System;
 
+  /// <summary>
+  /// Represents a proxy method that was generated as a replacement for a native method.
+  /// </summary>
   internal class NativeFunctionProxy
   {
     public NativeFunctionIdentifier Name { get; }

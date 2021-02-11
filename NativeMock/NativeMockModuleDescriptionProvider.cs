@@ -3,6 +3,7 @@ namespace NativeMock
   using System;
   using System.Reflection;
 
+  /// <inheritdoc />
   internal class NativeMockModuleDescriptionProvider : INativeMockModuleDescriptionProvider
   {
     /// <inheritdoc />

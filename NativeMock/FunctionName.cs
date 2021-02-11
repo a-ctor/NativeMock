@@ -2,6 +2,10 @@ namespace NativeMock
 {
   using System;
 
+  /// <summary>
+  /// Represents the name of an imported/exported function in the PE format, whose value can either be an integer or a
+  /// string.
+  /// </summary>
   internal readonly struct FunctionName
   {
     private readonly nint _ordinalValue;

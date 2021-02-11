@@ -6,6 +6,9 @@ namespace NativeMock
   using System.Reflection;
   using System.Reflection.Emit;
 
+  /// <summary>
+  /// Provides methods for dynamically generating delegate types from a <see cref="MethodInfo" />.
+  /// </summary>
   internal class DelegateGenerator
   {
     private const TypeAttributes c_classTypeAttributes = TypeAttributes.Class | TypeAttributes.Public | TypeAttributes.Sealed | TypeAttributes.AutoClass | TypeAttributes.AnsiClass;
@@ -27,6 +30,9 @@ namespace NativeMock
       _moduleBuilder = assemblyBuilder.DefineDynamicModule (moduleName);
     }
 
+    /// <summary>
+    /// Creates a delegate type using the specified <paramref name="methodInfo" />, retaining any applied custom attributes.
+    /// </summary>
     public Type CreateDelegateType (MethodInfo methodInfo)
     {
       var returnParameter = methodInfo.ReturnParameter;

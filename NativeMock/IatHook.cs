@@ -4,6 +4,9 @@ namespace NativeMock
   using System.Diagnostics;
   using System.Runtime.InteropServices;
 
+  /// <summary>
+  /// Provides methods for hooking imported functions by modifying the address import table of the module's PE header.
+  /// </summary>
   internal static class IatHook
   {
     private const nint c_addressOfNewExeHeaderFieldOffset = 0x3c;
@@ -15,6 +18,18 @@ namespace NativeMock
     [DllImport ("kernel32.dll")]
     private static extern bool VirtualProtect (IntPtr lpAddress, nint dwSize, uint flNewProtect, out uint lpflOldProtect);
 
+    /// <summary>
+    /// Creates a hook for an imported function using <paramref name="redirect" />
+    /// </summary>
+    /// <typeparam name="TDelegate">The delegate type describing the signature of the target function.</typeparam>
+    /// <param name="module">The target module whose imported function should be hooked.</param>
+    /// <param name="targetModuleName">The module name (e.g. kernel32.dll) of the module containing the function to be hooked.</param>
+    /// <param name="targetFunctionName">The name of the function to be hooked.</param>
+    /// <param name="redirect">The delegate that will be called instead of the original function.</param>
+    /// <returns>
+    /// Returns a <see cref="HookedFunction{TDelegate}" /> which contains the original function that has been replaced
+    /// by the hook.
+    /// </returns>
     public static unsafe HookedFunction<TDelegate> Create<TDelegate> (ProcessModule module, string targetModuleName, FunctionName targetFunctionName, TDelegate redirect)
       where TDelegate : Delegate
     {

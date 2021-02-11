@@ -7,6 +7,9 @@ namespace NativeMock
   using System.Reflection;
   using System.Threading;
 
+  /// <summary>
+  /// Provides methods for registering mock interface and mocking them during tests.
+  /// </summary>
   public static class NativeMockRegistry
   {
     private delegate IntPtr GetProcAddressDelegate (IntPtr hModule, string procName);
@@ -36,6 +39,14 @@ namespace NativeMock
 
     private static readonly ConcurrentDictionary<Type, NativeMockInterfaceDescription> s_registeredInterfaces = new();
 
+    /// <summary>
+    /// Initializes the native mock infrastructure. Should be called as early as possible.
+    /// </summary>
+    /// <remarks>
+    /// This method is usually called automatically using a module initializer but it should be called explicitly at the start
+    /// of the application.
+    /// Native methods that have been jitted before the initialization is completed cannot be mocked.
+    /// </remarks>
     public static void Initialize()
     {
       if (s_initialized)
@@ -58,6 +69,12 @@ namespace NativeMock
       }
     }
 
+    /// <summary>
+    /// Clears all mocks that currently registered.
+    /// </summary>
+    /// <remarks>
+    /// This function operations only in the current thread/task control flow.
+    /// </remarks>
     public static void ClearMocks()
     {
       CheckInitialized();
@@ -65,6 +82,12 @@ namespace NativeMock
       s_nativeMockCallbackRegistry.Value?.Clear();
     }
 
+    /// <summary>
+    /// Registers an <paramref name="implementation" /> for a specific mock interface <typeparamref name="TInterface" />.
+    /// </summary>
+    /// <remarks>
+    /// This function operations only in the current thread/task control flow.
+    /// </remarks>
     public static void Mock<TInterface> (TInterface implementation)
     {
       if (implementation == null)
@@ -82,6 +105,14 @@ namespace NativeMock
       }
     }
 
+    /// <summary>
+    /// Registers a specific mock interface <typeparamref name="TInterface" /> for future mocking. Should be called as early as
+    /// possible.
+    /// </summary>
+    /// <remarks>
+    /// This method should be called early in the application lifecycle and for each native mock interface that will be used.
+    /// Native methods that have been jitted before a containing interface is registered cannot be mocked.
+    /// </remarks>
     public static void Register<TInterface>()
     {
       var interfaceType = typeof(TInterface);

@@ -4,6 +4,9 @@ namespace NativeMock
   using System.Reflection;
   using System.Runtime.ExceptionServices;
 
+  /// <summary>
+  /// Represents the callback from a native mock a "weakly-typed" unicast delegate (target + methodInfo).
+  /// </summary>
   internal readonly struct NativeMockCallback
   {
     private readonly object? _target;

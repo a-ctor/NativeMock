@@ -3,6 +3,10 @@ namespace NativeMock
   using System;
   using System.Collections.Concurrent;
 
+  /// <summary>
+  /// Provides a thread-safe registry for <see cref="NativeMockCallback" />s instances that can be resolved using their
+  /// <see cref="NativeFunctionIdentifier" />.
+  /// </summary>
   internal class NativeMockCallbackRegistry
   {
     private readonly ConcurrentDictionary<NativeFunctionIdentifier, NativeMockCallback> _registeredCallbacks = new();
@@ -31,6 +35,9 @@ namespace NativeMock
       _registeredCallbacks.TryRemove (nativeFunctionIdentifier, out _);
     }
 
+    /// <exception cref="NativeFunctionNotMockedException">
+    /// No mock was registerd for the function specified by <paramref name="nativeFunctionIdentifier" />.
+    /// </exception>
     public object? Invoke (NativeFunctionIdentifier nativeFunctionIdentifier, object?[] args)
     {
       if (nativeFunctionIdentifier.IsInvalid)

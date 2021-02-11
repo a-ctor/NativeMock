@@ -7,6 +7,9 @@ namespace NativeMock
   using System.Reflection.Emit;
   using System.Runtime.InteropServices;
 
+  /// <summary>
+  /// Provides methods for generating <see cref="NativeFunctionProxy" />s for a specific native function.
+  /// </summary>
   internal class NativeFunctionProxyFactory
   {
     // IMPORTANT: when changing the following lines the IL generation has to be fixed as well

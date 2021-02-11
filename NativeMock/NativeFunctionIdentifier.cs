@@ -2,6 +2,9 @@ namespace NativeMock
 {
   using System;
 
+  /// <summary>
+  /// Represents a native function using its name and an optional containing module.
+  /// </summary>
   internal readonly struct NativeFunctionIdentifier : IEquatable<NativeFunctionIdentifier>
   {
     public string? ModuleName { get; }

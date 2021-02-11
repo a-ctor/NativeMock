@@ -4,6 +4,9 @@ namespace NativeMock
   using System.Collections.Concurrent;
   using System.Collections.Immutable;
 
+  /// <summary>
+  /// Decorates an inner <see cref="IPInvokeMemberProvider" /> by caching results in a thread-safe manner.
+  /// </summary>
   internal class CachingPInvokeMemberProviderDecorator : IPInvokeMemberProvider
   {
     private readonly IPInvokeMemberProvider _innerPInvokeMemberProvider;

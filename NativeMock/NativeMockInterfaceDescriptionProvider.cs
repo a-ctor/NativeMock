@@ -5,6 +5,7 @@ namespace NativeMock
   using System.Linq;
   using System.Reflection;
 
+  /// <inheritdoc />
   internal class NativeMockInterfaceDescriptionProvider : INativeMockInterfaceDescriptionProvider
   {
     private readonly INativeMockModuleDescriptionProvider _nativeMockModuleDescriptionProvider;

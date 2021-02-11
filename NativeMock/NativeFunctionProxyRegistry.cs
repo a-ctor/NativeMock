@@ -4,6 +4,10 @@ namespace NativeMock
   using System.Collections.Concurrent;
   using System.Threading;
 
+  /// <summary>
+  /// Provides a thread-safe registry for <see cref="NativeMockRegistry" /> instances that can be resolved using their
+  /// <see cref="NativeFunctionIdentifier" />.
+  /// </summary>
   internal class NativeFunctionProxyRegistry
   {
     private class Basket

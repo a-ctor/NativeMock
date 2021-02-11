@@ -6,6 +6,7 @@ namespace NativeMock
   using System.Reflection;
   using System.Runtime.InteropServices;
 
+  /// <inheritdoc />
   internal class PInvokeMemberProvider : IPInvokeMemberProvider
   {
     private const BindingFlags c_pInvokeBindingFlags = BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static;

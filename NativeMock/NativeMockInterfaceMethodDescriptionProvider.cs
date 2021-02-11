@@ -4,6 +4,7 @@ namespace NativeMock
   using System.Linq;
   using System.Reflection;
 
+  /// <inheritdoc />
   internal class NativeMockInterfaceMethodDescriptionProvider : INativeMockInterfaceMethodDescriptionProvider
   {
     private readonly IPInvokeMemberProvider _pInvokeMemberProvider;

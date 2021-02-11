@@ -5,6 +5,9 @@ namespace NativeMock
   using System.ComponentModel;
   using System.Runtime.InteropServices;
 
+  /// <summary>
+  /// Provides methods for resolving native module names from their base address.
+  /// </summary>
   internal class ModuleNameResolver
   {
     [DllImport ("Kernel32.dll", SetLastError = true)]
