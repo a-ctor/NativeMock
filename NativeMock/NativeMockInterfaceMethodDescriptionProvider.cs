@@ -3,6 +3,7 @@ namespace NativeMock
   using System;
   using System.Linq;
   using System.Reflection;
+  using System.Text;
 
   /// <inheritdoc />
   internal class NativeMockInterfaceMethodDescriptionProvider : INativeMockInterfaceMethodDescriptionProvider
@@ -43,7 +44,66 @@ namespace NativeMock
       if (pInvokeMember == null)
         throw new InvalidOperationException ($"Cannot find the P/Invoke method '{functionName}' on the type '{declaringType}'.");
 
-      return pInvokeMember.Method;
+      var resolvedMethod = pInvokeMember.Method;
+      EnsureMethodIsCompatible (originalMethod, resolvedMethod);
+
+      return resolvedMethod;
+    }
+
+    private void EnsureMethodIsCompatible (MethodInfo original, MethodInfo declaration)
+    {
+      var originalParameters = original.GetParameters();
+      var declarationParameters = declaration.GetParameters();
+      if (originalParameters.Length != declarationParameters.Length)
+        throw new NativeMockDeclarationMismatchException (original, declaration, "The parameter count differs.");
+
+      var originalReturnParameter = original.ReturnParameter;
+      var declarationReturnParameter = declaration.ReturnParameter;
+      if (!IsParameterEqual (originalReturnParameter, declarationReturnParameter))
+      {
+        throw new NativeMockDeclarationMismatchException (
+          original,
+          declaration,
+          $"The return type differs ({FormatComparison (originalReturnParameter, declarationReturnParameter)}).");
+      }
+
+      for (var i = 0; i < originalParameters.Length; i++)
+      {
+        var originalParameter = originalParameters[i];
+        var declarationParameter = declarationParameters[i];
+        if (!IsParameterEqual (originalParameter, declarationParameter))
+        {
+          throw new NativeMockDeclarationMismatchException (
+            original,
+            declaration,
+            $"The return type differs ({FormatComparison (originalParameter, declarationParameter)}).");
+        }
+      }
+    }
+
+    private bool IsParameterEqual (ParameterInfo original, ParameterInfo declaration)
+    {
+      return original.ParameterType == declaration.ParameterType
+             && original.IsIn == declaration.IsIn
+             && original.IsOut == declaration.IsOut;
+    }
+
+    private string FormatComparison (ParameterInfo original, ParameterInfo declaration)
+    {
+      return $"'{FormatParameter (original)}' vs '{FormatParameter (declaration)}'";
+    }
+
+    private string FormatParameter (ParameterInfo parameter)
+    {
+      var stringBuilder = new StringBuilder();
+
+      if (parameter.IsIn)
+        stringBuilder.Append ("in ");
+      if (parameter.IsOut)
+        stringBuilder.Append ("out ");
+      stringBuilder.Append (parameter.ParameterType);
+
+      return stringBuilder.ToString();
     }
   }
 }

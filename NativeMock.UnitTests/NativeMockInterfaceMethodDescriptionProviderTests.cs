@@ -221,6 +221,122 @@ namespace NativeMock.UnitTests
       Assert.That (interfaceDescription.StubTargetMethod, Is.EqualTo (classMethod));
     }
 
+    private interface IMismatchInterface
+    {
+      [NativeMockCallback (nameof(MismatchInterface.ParameterCountMismatch))]
+      void ParameterCountMismatch();
+
+      [NativeMockCallback (nameof(MismatchInterface.ReturnTypeMismatch))]
+      void ReturnTypeMismatch();
+
+      [NativeMockCallback (nameof(MismatchInterface.ReturnTypeRefMismatch))]
+      int ReturnTypeRefMismatch();
+
+      [NativeMockCallback (nameof(MismatchInterface.ParameterMismatch))]
+      void ParameterMismatch (string a);
+
+      [NativeMockCallback (nameof(MismatchInterface.ParameterInModifierMismatch))]
+      void ParameterInModifierMismatch (in string a);
+
+      [NativeMockCallback (nameof(MismatchInterface.ParameterRefModifierMismatch))]
+      void ParameterRefModifierMismatch (ref string a);
+    }
+
+    private class MismatchInterface
+    {
+      [DllImport (FakeDllNames.Dll1)]
+      public static extern void ParameterCountMismatch (int a);
+
+      [DllImport (FakeDllNames.Dll1)]
+      public static extern int ReturnTypeMismatch();
+
+      [DllImport (FakeDllNames.Dll1)]
+      public static extern ref int ReturnTypeRefMismatch();
+
+      [DllImport (FakeDllNames.Dll1)]
+      public static extern void ParameterMismatch (int a);
+
+      [DllImport (FakeDllNames.Dll1)]
+      public static extern void ParameterInModifierMismatch (ref string a);
+
+      [DllImport (FakeDllNames.Dll1)]
+      public static extern void ParameterRefModifierMismatch (in string a);
+    }
+
+    [Test]
+    public void ParameterCountMismatchTest()
+    {
+      var interfaceMethod = GetInterfaceMethod<IMismatchInterface> (e => e.ParameterCountMismatch());
+
+      Assert.That (
+        () => _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (
+          interfaceMethod,
+          typeof(MismatchInterface)),
+        Throws.TypeOf<NativeMockDeclarationMismatchException>());
+    }
+
+    [Test]
+    public void ReturnTypeMismatchTest()
+    {
+      var interfaceMethod = GetInterfaceMethod<IMismatchInterface> (e => e.ReturnTypeMismatch());
+
+      Assert.That (
+        () => _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (
+          interfaceMethod,
+          typeof(MismatchInterface)),
+        Throws.TypeOf<NativeMockDeclarationMismatchException>());
+    }
+
+    [Test]
+    public void ReturnTypeRefMismatchTest()
+    {
+      var interfaceMethod = GetInterfaceMethod<IMismatchInterface> (e => e.ReturnTypeRefMismatch());
+
+      Assert.That (
+        () => _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (
+          interfaceMethod,
+          typeof(MismatchInterface)),
+        Throws.TypeOf<NativeMockDeclarationMismatchException>());
+    }
+
+    [Test]
+    public void ParameterMismatchTest()
+    {
+      var interfaceMethod = GetInterfaceMethod<IMismatchInterface> (e => e.ParameterMismatch (string.Empty));
+
+      Assert.That (
+        () => _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (
+          interfaceMethod,
+          typeof(MismatchInterface)),
+        Throws.TypeOf<NativeMockDeclarationMismatchException>());
+    }
+
+    [Test]
+    public void ParameterInModifierMismatchTest()
+    {
+      var value = string.Empty;
+      var interfaceMethod = GetInterfaceMethod<IMismatchInterface> (e => e.ParameterInModifierMismatch (in value));
+
+      Assert.That (
+        () => _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (
+          interfaceMethod,
+          typeof(MismatchInterface)),
+        Throws.TypeOf<NativeMockDeclarationMismatchException>());
+    }
+
+    [Test]
+    public void ParameterRefModifierMismatchTest()
+    {
+      var value = string.Empty;
+      var interfaceMethod = GetInterfaceMethod<IMismatchInterface> (e => e.ParameterRefModifierMismatch (ref value));
+
+      Assert.That (
+        () => _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (
+          interfaceMethod,
+          typeof(MismatchInterface)),
+        Throws.TypeOf<NativeMockDeclarationMismatchException>());
+    }
+
     private MethodInfo GetInterfaceMethod<T> (Expression<Action<T>> lambdaExpression) => ((MethodCallExpression) lambdaExpression.Body).Method;
 
     private MethodInfo GetClassMethod (Action action) => action.Method;
