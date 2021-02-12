@@ -50,8 +50,11 @@ namespace NativeMock.UnitTests
     {
       var pInvokeMembers = _pInvokeMemberProvider.GetPInvokeMembers (typeof(NormalPInvokeMember));
 
+      var nativeFunctionIdentifier = new NativeFunctionIdentifier (FakeDllNames.Dll1, "Test");
+      var expectedPInvokeMember = new PInvokeMember (nativeFunctionIdentifier, GetClassMethod (NormalPInvokeMember.Test));
+
       Assert.That (pInvokeMembers.Length, Is.EqualTo (1));
-      Assert.That (pInvokeMembers[0], Is.EqualTo (new PInvokeMember ("Test", GetClassMethod (NormalPInvokeMember.Test))));
+      Assert.That (pInvokeMembers[0], Is.EqualTo (expectedPInvokeMember));
     }
 
     private class RenamedPInvokeMember
@@ -65,8 +68,11 @@ namespace NativeMock.UnitTests
     {
       var pInvokeMembers = _pInvokeMemberProvider.GetPInvokeMembers (typeof(RenamedPInvokeMember));
 
+      var nativeFunctionIdentifier = new NativeFunctionIdentifier (FakeDllNames.Dll1, "Renamed");
+      var expectedPInvokeMember = new PInvokeMember (nativeFunctionIdentifier, GetClassMethod (RenamedPInvokeMember.Test));
+
       Assert.That (pInvokeMembers.Length, Is.EqualTo (1));
-      Assert.That (pInvokeMembers[0], Is.EqualTo (new PInvokeMember ("Renamed", GetClassMethod (RenamedPInvokeMember.Test))));
+      Assert.That (pInvokeMembers[0], Is.EqualTo (expectedPInvokeMember));
     }
 
     private MethodInfo GetClassMethod (Action action) => action.Method;

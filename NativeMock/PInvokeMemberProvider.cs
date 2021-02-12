@@ -2,32 +2,36 @@ namespace NativeMock
 {
   using System;
   using System.Collections.Immutable;
-  using System.Linq;
   using System.Reflection;
   using System.Runtime.InteropServices;
 
   /// <inheritdoc />
   internal class PInvokeMemberProvider : IPInvokeMemberProvider
   {
-    private const BindingFlags c_pInvokeBindingFlags = BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static;
-
     /// <inheritdoc />
     public ImmutableArray<PInvokeMember> GetPInvokeMembers (Type type)
     {
       if (type == null)
         throw new ArgumentNullException (nameof(type));
 
-      return type.GetMethods (c_pInvokeBindingFlags)
-        .Where (m => (m.Attributes & MethodAttributes.PinvokeImpl) != 0)
-        .Select (ToPInvokeMember)
-        .ToImmutableArray();
-    }
+      var resultBuilder = ImmutableArray.CreateBuilder<PInvokeMember>();
+      foreach (var method in type.GetRuntimeMethods())
+      {
+        var dllImportAttribute = method.GetCustomAttribute<DllImportAttribute>();
+        if (dllImportAttribute == null)
+          continue;
 
-    private PInvokeMember ToPInvokeMember (MethodInfo method)
-    {
-      var dllImportAttribute = method.GetCustomAttribute<DllImportAttribute>();
-      var name = dllImportAttribute?.EntryPoint ?? method.Name;
-      return new PInvokeMember (name, method);
+        if ((method.Attributes & MethodAttributes.PinvokeImpl) == 0 || !method.IsStatic)
+          continue;
+
+        var nativeFunctionIdentifier = new NativeFunctionIdentifier (
+          dllImportAttribute.Value,
+          dllImportAttribute.EntryPoint ?? method.Name);
+
+        resultBuilder.Add (new PInvokeMember (nativeFunctionIdentifier, method));
+      }
+
+      return resultBuilder.ToImmutable();
     }
   }
 }

@@ -40,7 +40,7 @@ namespace NativeMock
         return originalMethod;
 
       var pInvokeMembers = _pInvokeMemberProvider.GetPInvokeMembers (declaringType);
-      var pInvokeMember = pInvokeMembers.FirstOrDefault (m => m.Name == functionName);
+      var pInvokeMember = pInvokeMembers.FirstOrDefault (m => m.Name.FunctionName == functionName);
       if (pInvokeMember == null)
         throw new InvalidOperationException ($"Cannot find the P/Invoke method '{functionName}' on the type '{declaringType}'.");
 
