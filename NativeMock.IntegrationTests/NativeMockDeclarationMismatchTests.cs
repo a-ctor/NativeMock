@@ -8,16 +8,18 @@ namespace NativeMock.IntegrationTests
   {
     private const string c_nonExistDllName = "noexist.dll";
 
-    public class ReturnType
+    private class ReturnType
     {
       [DllImport (c_nonExistDllName)]
+      // ReSharper disable once UnusedMember.Local
       public static extern int Test();
     }
 
     [NativeMockModule (c_nonExistDllName)]
-    [NativeMockInterface (DeclaringType = typeof(ReturnType))]
-    public interface IReturnType
+    [NativeMockInterface]
+    private interface IReturnType
     {
+      [NativeMockCallback (DeclaringType = typeof(ReturnType))]
       void Test();
     }
 

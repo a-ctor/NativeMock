@@ -1,4 +1,4 @@
-namespace NativeMock
+namespace NativeMock.IntegrationTests
 {
   using System.Runtime.CompilerServices;
 
@@ -8,6 +8,7 @@ namespace NativeMock
     public static void Initialize()
     {
       NativeMockRegistry.Initialize();
+      NativeMockRegistry.AutoRegister (typeof(ModuleInitializer).Assembly);
     }
   }
 }

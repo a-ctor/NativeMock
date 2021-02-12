@@ -40,6 +40,35 @@ namespace NativeMock
     private static readonly ConcurrentDictionary<Type, NativeMockInterfaceDescription> s_registeredInterfaces = new();
 
     /// <summary>
+    /// Automatically registers all suitable native mock interfaces from the specified <paramref name="assembly" />.
+    /// </summary>
+    /// <remarks>
+    /// A native mock interface is considered suitable if:
+    /// <list type="bullet">
+    ///   <item>
+    ///     <term>It is annotated with a <see cref="NativeMockInterfaceAttribute" /></term>
+    ///   </item>
+    ///   <item>
+    ///     <term>and its visibility is 'public'.</term>
+    ///   </item>
+    /// </list>
+    /// </remarks>
+    public static void AutoRegister (Assembly assembly)
+    {
+      foreach (var type in assembly.DefinedTypes)
+      {
+        if (!type.IsInterface || !type.IsPublic)
+          continue;
+
+        var nativeMockInterfaceAttribute = type.GetCustomAttribute<NativeMockInterfaceAttribute>();
+        if (nativeMockInterfaceAttribute == null)
+          continue;
+
+        Register (type);
+      }
+    }
+
+    /// <summary>
     /// Initializes the native mock infrastructure. Should be called as early as possible.
     /// </summary>
     /// <remarks>
@@ -116,6 +145,24 @@ namespace NativeMock
     public static void Register<TInterface>()
     {
       var interfaceType = typeof(TInterface);
+      if (!interfaceType.IsInterface)
+        throw new ArgumentException ("The specified type parameter must be a interface.");
+
+      CheckInitialized();
+
+      Register (interfaceType);
+    }
+
+    /// <summary>
+    /// Registers a specific mock interface <paramref name="interfaceType" /> for future mocking. Should be called as early as
+    /// possible.
+    /// </summary>
+    /// <remarks>
+    /// This method should be called early in the application lifecycle and for each native mock interface that will be used.
+    /// Native methods that have been jitted before a containing interface is registered cannot be mocked.
+    /// </remarks>
+    public static void Register (Type interfaceType)
+    {
       if (!interfaceType.IsInterface)
         throw new ArgumentException ("The specified type parameter must be a interface.");
 

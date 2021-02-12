@@ -2,6 +2,7 @@ namespace NativeMock.IntegrationTests.Infrastructure
 {
   using System.Runtime.InteropServices;
 
+  [NativeMockInterface]
   public interface IFakeNativeApi
   {
     void NmEmpty();
