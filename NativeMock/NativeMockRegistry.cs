@@ -26,9 +26,11 @@ namespace NativeMock
     private static readonly object s_initializedLock = new();
     private static bool s_initialized;
 
+    private static readonly INativeMockModuleDescriptionProvider s_nativeMockModuleDescriptionProvider = new NativeMockModuleDescriptionProvider();
+
     private static readonly INativeMockInterfaceDescriptionProvider s_nativeMockInterfaceDescriptionProvider = new NativeMockInterfaceDescriptionProvider (
-      new NativeMockModuleDescriptionProvider(),
-      new NativeMockInterfaceMethodDescriptionProvider (new CachingPInvokeMemberProviderDecorator (new PInvokeMemberProvider())));
+      s_nativeMockModuleDescriptionProvider,
+      new NativeMockInterfaceMethodDescriptionProvider (new CachingPInvokeMemberProviderDecorator (new PInvokeMemberProvider()), s_nativeMockModuleDescriptionProvider));
 
     private static readonly DelegateGenerator s_delegateGenerator = new (new AssemblyName (c_assemblyName), c_moduleName);
     private static readonly NativeFunctionProxyFactory s_nativeFunctionProxyFactory = new (OnNativeHookCalled);
@@ -129,7 +131,7 @@ namespace NativeMock
       var nativeMockCallbackRegistry = s_nativeMockCallbackRegistry.Value ??= new NativeMockCallbackRegistry();
       foreach (var interfaceMethod in interfaceDescription.Methods)
       {
-        var nativeFunctionIdentifier = interfaceDescription.CreateNativeFunctionIdentifier (interfaceMethod);
+        var nativeFunctionIdentifier = interfaceMethod.CreateNativeFunctionIdentifier();
         nativeMockCallbackRegistry.Register (nativeFunctionIdentifier, interfaceMethod.CreateCallback (implementation));
       }
     }
@@ -178,7 +180,7 @@ namespace NativeMock
         foreach (var interfaceMethod in interfaceDescription.Methods)
         {
           var delegateType = s_delegateGenerator.CreateDelegateType (interfaceMethod.StubTargetMethod);
-          var nativeFunctionIdentifier = interfaceDescription.CreateNativeFunctionIdentifier (interfaceMethod);
+          var nativeFunctionIdentifier = interfaceMethod.CreateNativeFunctionIdentifier();
           var nativeFunctionProxy = s_nativeFunctionProxyFactory.CreateNativeFunctionProxy (nativeFunctionIdentifier, delegateType);
           s_nativeFunctionProxyRegistry.Register (nativeFunctionProxy);
         }

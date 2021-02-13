@@ -31,16 +31,14 @@ namespace NativeMock
       if (methods.Length == 0)
         throw new InvalidOperationException ("The specified interface type has no methods.");
 
-      var nativeMockModuleDescription = _nativeMockModuleDescriptionProvider.GetMockModuleDescription (interfaceType);
-
-      var nativeMockInterfaceAttribute = interfaceType.GetCustomAttribute<NativeMockInterfaceAttribute>();
-      var defaultDeclaringType = nativeMockInterfaceAttribute?.DeclaringType;
+      var defaultDeclaringType = interfaceType.GetCustomAttribute<NativeMockInterfaceAttribute>()?.DeclaringType;
+      var defaultModuleDescription = _nativeMockModuleDescriptionProvider.GetMockModuleDescriptionForType (interfaceType);
 
       var methodDescriptions = methods
-        .Select (method => _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (method, defaultDeclaringType))
+        .Select (method => _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (method, defaultDeclaringType, defaultModuleDescription))
         .ToImmutableArray();
 
-      return new NativeMockInterfaceDescription (interfaceType, nativeMockModuleDescription, methodDescriptions);
+      return new NativeMockInterfaceDescription (interfaceType, methodDescriptions);
     }
   }
 }

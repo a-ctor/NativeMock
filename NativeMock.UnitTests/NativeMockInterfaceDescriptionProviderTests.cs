@@ -58,18 +58,17 @@ namespace NativeMock.UnitTests
     {
       var nativeMockModuleDescription = new NativeMockModuleDescription ("Test");
       _moduleDescriptionProviderMock
-        .Setup (m => m.GetMockModuleDescription (typeof(ISimple)))
+        .Setup (m => m.GetMockModuleDescriptionForType (typeof(ISimple)))
         .Returns (nativeMockModuleDescription);
 
       var method = typeof(ISimple).GetMethod ("Test")!;
-      var methodDescription = new NativeMockInterfaceMethodDescription ("Test", method!, method!);
-      _interfaceMethodDescriptionProviderMock.Setup (m => m.GetMockInterfaceDescription (method, null)).Returns (methodDescription);
+      var methodDescription = new NativeMockInterfaceMethodDescription ("Test", nativeMockModuleDescription, method!, method!);
+      _interfaceMethodDescriptionProviderMock.Setup (m => m.GetMockInterfaceDescription (method, null, nativeMockModuleDescription)).Returns (methodDescription);
 
       var nativeMockInterfaceDescription = _nativeMockInterfaceDescriptionProvider.GetMockInterfaceDescription (typeof(ISimple));
 
       Assert.That (nativeMockInterfaceDescription, Is.Not.Null);
       Assert.That (nativeMockInterfaceDescription.InterfaceType, Is.SameAs (typeof(ISimple)));
-      Assert.That (nativeMockInterfaceDescription.Module, Is.EqualTo (nativeMockModuleDescription));
       Assert.That (nativeMockInterfaceDescription.Methods.Length, Is.EqualTo (1));
       Assert.That (nativeMockInterfaceDescription.Methods[0], Is.EqualTo (methodDescription));
 
@@ -87,15 +86,14 @@ namespace NativeMock.UnitTests
     public void CorrectlyMapsInterfaceMethod2Test()
     {
       var method = typeof(ISimple2).GetMethod ("Test")!;
-      _moduleDescriptionProviderMock.Setup (e => e.GetMockModuleDescription (typeof(ISimple2))).Returns ((NativeMockModuleDescription) null);
-      var methodDescription = new NativeMockInterfaceMethodDescription ("Test", method!, method!);
-      _interfaceMethodDescriptionProviderMock.Setup (m => m.GetMockInterfaceDescription (method, typeof(int))).Returns (methodDescription);
+      _moduleDescriptionProviderMock.Setup (e => e.GetMockModuleDescriptionForType (typeof(ISimple2))).Returns ((NativeMockModuleDescription) null);
+      var methodDescription = new NativeMockInterfaceMethodDescription ("Test", null, method!, method!);
+      _interfaceMethodDescriptionProviderMock.Setup (m => m.GetMockInterfaceDescription (method, typeof(int), null)).Returns (methodDescription);
 
       var nativeMockInterfaceDescription = _nativeMockInterfaceDescriptionProvider.GetMockInterfaceDescription (typeof(ISimple2));
 
       Assert.That (nativeMockInterfaceDescription, Is.Not.Null);
       Assert.That (nativeMockInterfaceDescription.InterfaceType, Is.SameAs (typeof(ISimple2)));
-      Assert.That (nativeMockInterfaceDescription.Module, Is.Null);
       Assert.That (nativeMockInterfaceDescription.Methods.Length, Is.EqualTo (1));
       Assert.That (nativeMockInterfaceDescription.Methods[0], Is.EqualTo (methodDescription));
 

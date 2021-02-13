@@ -7,7 +7,7 @@ namespace NativeMock
   internal class NativeMockModuleDescriptionProvider : INativeMockModuleDescriptionProvider
   {
     /// <inheritdoc />
-    public NativeMockModuleDescription? GetMockModuleDescription (Type interfaceType)
+    public NativeMockModuleDescription? GetMockModuleDescriptionForType (Type interfaceType)
     {
       if (interfaceType == null)
         throw new ArgumentNullException (nameof(interfaceType));
@@ -15,10 +15,24 @@ namespace NativeMock
         throw new InvalidOperationException ("The specified type must be an interface.");
 
       var nativeMockModuleAttribute = interfaceType.GetCustomAttribute<NativeMockModuleAttribute>();
-      if (nativeMockModuleAttribute == null)
-        return null;
+      return CreateForAttribute (nativeMockModuleAttribute);
+    }
 
-      return new NativeMockModuleDescription (nativeMockModuleAttribute.ModuleName);
+    /// <inheritdoc />
+    public NativeMockModuleDescription? GetMockModuleDescriptionForMethod (MethodInfo method)
+    {
+      if (method == null)
+        throw new ArgumentNullException (nameof(method));
+
+      var nativeMockModuleAttribute = method.GetCustomAttribute<NativeMockModuleAttribute>();
+      return CreateForAttribute (nativeMockModuleAttribute);
+    }
+
+    private NativeMockModuleDescription? CreateForAttribute (NativeMockModuleAttribute? nativeMockModuleAttribute)
+    {
+      return nativeMockModuleAttribute != null
+        ? new NativeMockModuleDescription (nativeMockModuleAttribute.ModuleName)
+        : null;
     }
   }
 }

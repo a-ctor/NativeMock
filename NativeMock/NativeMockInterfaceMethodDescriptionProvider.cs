@@ -9,27 +9,32 @@ namespace NativeMock
   internal class NativeMockInterfaceMethodDescriptionProvider : INativeMockInterfaceMethodDescriptionProvider
   {
     private readonly IPInvokeMemberProvider _pInvokeMemberProvider;
+    private readonly INativeMockModuleDescriptionProvider _mockModuleDescriptionProvider;
 
-    public NativeMockInterfaceMethodDescriptionProvider (IPInvokeMemberProvider pInvokeMemberProvider)
+    public NativeMockInterfaceMethodDescriptionProvider (IPInvokeMemberProvider pInvokeMemberProvider, INativeMockModuleDescriptionProvider mockModuleDescriptionProvider)
     {
       if (pInvokeMemberProvider == null)
         throw new ArgumentNullException (nameof(pInvokeMemberProvider));
 
       _pInvokeMemberProvider = pInvokeMemberProvider;
+      _mockModuleDescriptionProvider = mockModuleDescriptionProvider;
     }
 
     /// <inheritdoc />
-    public NativeMockInterfaceMethodDescription GetMockInterfaceDescription (MethodInfo method, Type? defaultDeclaringType)
+    public NativeMockInterfaceMethodDescription GetMockInterfaceDescription (MethodInfo method, Type? defaultDeclaringType, NativeMockModuleDescription? defaultModuleDescription)
     {
       if (method == null)
         throw new ArgumentNullException (nameof(method));
 
       var nativeMockCallbackAttribute = method.GetCustomAttribute<NativeMockCallbackAttribute>();
+      var nativeMockModuleDescription = _mockModuleDescriptionProvider.GetMockModuleDescriptionForMethod (method);
 
       var functionName = nativeMockCallbackAttribute?.Name ?? method.Name;
       var declaringType = nativeMockCallbackAttribute?.DeclaringType ?? defaultDeclaringType;
+      var moduleDescription = nativeMockModuleDescription ?? defaultModuleDescription;
       return new NativeMockInterfaceMethodDescription (
         functionName,
+        moduleDescription,
         method,
         ResolveMethod (method, functionName, declaringType));
     }
