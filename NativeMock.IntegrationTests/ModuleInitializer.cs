@@ -8,9 +8,7 @@ namespace NativeMock.IntegrationTests
     public static void Initialize()
     {
       NativeMockRegistry.Initialize();
-      NativeMockRegistry.AutoRegister (typeof(ModuleInitializer).Assembly);
-
-      NativeMockRegistry.Register<ModuleOverrideTests.IModuleOverride>();
+      NativeMockRegistry.AutoRegister (typeof(ModuleInitializer).Assembly, AutoRegisterSearchBehavior.IncludeNestedTypes);
     }
   }
 }

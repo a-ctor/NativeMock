@@ -26,6 +26,9 @@ namespace NativeMock
     private static readonly object s_initializedLock = new();
     private static bool s_initialized;
 
+    private static readonly INativeMockInterfaceIdentifier s_nativeMockInterfaceIdentifier = new PublicTypesOnlyNativeMockInterfaceIdentifierDecorator (new NativeMockInterfaceIdentifier());
+    private static readonly INativeMockInterfaceLocatorFactory s_nativeMockInterfaceLocatorFactory = new NativeMockInterfaceLocatorFactory (s_nativeMockInterfaceIdentifier);
+
     private static readonly INativeMockModuleDescriptionProvider s_nativeMockModuleDescriptionProvider = new NativeMockModuleDescriptionProvider();
 
     private static readonly INativeMockInterfaceDescriptionProvider s_nativeMockInterfaceDescriptionProvider = new NativeMockInterfaceDescriptionProvider (
@@ -55,19 +58,14 @@ namespace NativeMock
     ///   </item>
     /// </list>
     /// </remarks>
-    public static void AutoRegister (Assembly assembly)
+    public static void AutoRegister (Assembly assembly, AutoRegisterSearchBehavior autoRegisterSearchBehavior = AutoRegisterSearchBehavior.TopLevelTypesOnly)
     {
-      foreach (var type in assembly.DefinedTypes)
-      {
-        if (!type.IsInterface || !type.IsPublic)
-          continue;
+      if (assembly == null)
+        throw new ArgumentNullException (nameof(assembly));
 
-        var nativeMockInterfaceAttribute = type.GetCustomAttribute<NativeMockInterfaceAttribute>();
-        if (nativeMockInterfaceAttribute == null)
-          continue;
-
+      var nativeMockInterfaceLocator = s_nativeMockInterfaceLocatorFactory.CreateMockInterfaceLocator (autoRegisterSearchBehavior);
+      foreach (var type in nativeMockInterfaceLocator.LocateNativeMockInterfaces (assembly))
         Register (type);
-      }
     }
 
     /// <summary>
@@ -173,7 +171,7 @@ namespace NativeMock
       lock (s_nativeFunctionProxyRegistry)
       {
         if (s_registeredInterfaces.ContainsKey (interfaceType))
-          throw new InvalidOperationException ("The specified type is already registered.");
+          throw new InvalidOperationException ($"The specified type '{interfaceType}' is already registered.");
 
         var interfaceDescription = s_nativeMockInterfaceDescriptionProvider.GetMockInterfaceDescription (interfaceType);
 
