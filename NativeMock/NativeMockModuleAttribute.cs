@@ -5,7 +5,7 @@ namespace NativeMock
   /// <summary>
   /// Applies the mock interface only to the specified module.
   /// </summary>
-  [AttributeUsage (AttributeTargets.Interface | AttributeTargets.Method)]
+  [AttributeUsage (AttributeTargets.Interface)]
   public class NativeMockModuleAttribute : Attribute
   {
     public string ModuleName { get; }

@@ -1,7 +1,6 @@
 namespace NativeMock.UnitTests
 {
   using System;
-  using System.Reflection;
   using System.Text;
   using NUnit.Framework;
 
@@ -55,44 +54,6 @@ namespace NativeMock.UnitTests
 
       Assert.That (nativeMockModuleDescription, Is.Not.Null);
       Assert.That (nativeMockModuleDescription.Name, Is.EqualTo ("A"));
-    }
-
-    [Test]
-    public void GetMockModuleDescriptionForMethod_ThrowsOnNullTest()
-    {
-      Assert.That (() => _nativeMockInterfaceDescriptionProvider.GetMockModuleDescriptionForMethod (null!), Throws.ArgumentNullException);
-    }
-
-    private static void NonAnnotatedMethod()
-    {
-    }
-
-    [Test]
-    public void GetMockModuleDescriptionForMethod_ReturnsNullWithoutAnnotationTest()
-    {
-      var nativeMockModuleDescription = _nativeMockInterfaceDescriptionProvider.GetMockModuleDescriptionForMethod (GetMethod (nameof(NonAnnotatedMethod)));
-
-      Assert.That (nativeMockModuleDescription, Is.Null);
-    }
-
-    [NativeMockModule ("A")]
-    private static void AnnotatedMethod()
-    {
-    }
-
-    [Test]
-    public void GetMockModuleDescriptionForMethod_ModuleScopedTest()
-    {
-      var nativeMockModuleDescription = _nativeMockInterfaceDescriptionProvider.GetMockModuleDescriptionForMethod (GetMethod (nameof(AnnotatedMethod)));
-
-      Assert.That (nativeMockModuleDescription, Is.Not.Null);
-      Assert.That (nativeMockModuleDescription.Name, Is.EqualTo ("A"));
-    }
-
-    private MethodInfo GetMethod (string name)
-    {
-      var method = typeof(NativeMockModuleDescriptionProviderTests).GetMethod (name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
-      return method ?? throw new InvalidOperationException();
     }
   }
 }

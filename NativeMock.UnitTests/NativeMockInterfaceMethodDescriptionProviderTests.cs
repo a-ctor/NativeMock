@@ -64,7 +64,7 @@ namespace NativeMock.UnitTests
     [SetUp]
     public void SetUp()
     {
-      _nativeMockInterfaceMethodDescriptionProvider = new NativeMockInterfaceMethodDescriptionProvider (new PInvokeMemberProvider(), new NativeMockModuleDescriptionProvider());
+      _nativeMockInterfaceMethodDescriptionProvider = new NativeMockInterfaceMethodDescriptionProvider (new PInvokeMemberProvider());
     }
 
     [Test]
@@ -350,44 +350,6 @@ namespace NativeMock.UnitTests
           typeof(MismatchInterface),
           null),
         Throws.TypeOf<NativeMockDeclarationMismatchException>());
-    }
-
-    private interface IModuleDefinition
-    {
-      [NativeMockModule ("asd.dll")]
-      [NativeMockCallback]
-      void ModuleDefinition();
-
-      [NativeMockModule ("asd.dll")]
-      [NativeMockCallback]
-      void ModuleDefinitionOverride();
-    }
-
-    [Test]
-    public void ModuleDefinitionTest()
-    {
-      var method = GetInterfaceMethod<IModuleDefinition> (e => e.ModuleDefinition());
-      var interfaceDescription = _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (method, null, null);
-
-      Assert.That (interfaceDescription, Is.Not.Null);
-      Assert.That (interfaceDescription.FunctionName, Is.EqualTo ("ModuleDefinition"));
-      Assert.That (interfaceDescription.Module, Is.EqualTo (new NativeMockModuleDescription ("asd.dll")));
-      Assert.That (interfaceDescription.InterfaceMethod, Is.EqualTo (method));
-      Assert.That (interfaceDescription.StubTargetMethod, Is.EqualTo (method));
-    }
-
-    [Test]
-    public void ModuleDefinitionOverrideTest()
-    {
-      var method = GetInterfaceMethod<IModuleDefinition> (e => e.ModuleDefinitionOverride());
-      var defaultModuleDescription = new NativeMockModuleDescription ("other.dll");
-      var interfaceDescription = _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (method, null, defaultModuleDescription);
-
-      Assert.That (interfaceDescription, Is.Not.Null);
-      Assert.That (interfaceDescription.FunctionName, Is.EqualTo ("ModuleDefinitionOverride"));
-      Assert.That (interfaceDescription.Module, Is.EqualTo (new NativeMockModuleDescription ("asd.dll")));
-      Assert.That (interfaceDescription.InterfaceMethod, Is.EqualTo (method));
-      Assert.That (interfaceDescription.StubTargetMethod, Is.EqualTo (method));
     }
 
     private MethodInfo GetInterfaceMethod<T> (Expression<Action<T>> lambdaExpression) => ((MethodCallExpression) lambdaExpression.Body).Method;

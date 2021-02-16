@@ -15,21 +15,6 @@ namespace NativeMock
         throw new InvalidOperationException ("The specified type must be an interface.");
 
       var nativeMockModuleAttribute = interfaceType.GetCustomAttribute<NativeMockModuleAttribute>();
-      return CreateForAttribute (nativeMockModuleAttribute);
-    }
-
-    /// <inheritdoc />
-    public NativeMockModuleDescription? GetMockModuleDescriptionForMethod (MethodInfo method)
-    {
-      if (method == null)
-        throw new ArgumentNullException (nameof(method));
-
-      var nativeMockModuleAttribute = method.GetCustomAttribute<NativeMockModuleAttribute>();
-      return CreateForAttribute (nativeMockModuleAttribute);
-    }
-
-    private NativeMockModuleDescription? CreateForAttribute (NativeMockModuleAttribute? nativeMockModuleAttribute)
-    {
       return nativeMockModuleAttribute != null
         ? new NativeMockModuleDescription (nativeMockModuleAttribute.ModuleName)
         : null;
