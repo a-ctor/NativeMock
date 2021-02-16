@@ -1,6 +1,7 @@
 namespace NativeMock.UnitTests
 {
   using System;
+  using System.Collections.Immutable;
   using System.Text;
   using NUnit.Framework;
 
@@ -16,18 +17,18 @@ namespace NativeMock.UnitTests
     }
 
     [Test]
-    public void GetMockModuleDescriptionForType_ThrowsOnNonInterfaceTest()
+    public void ThrowsOnNonInterfaceTest()
     {
-      Assert.That (() => _nativeMockInterfaceDescriptionProvider.GetMockModuleDescriptionForType (typeof(int)), Throws.TypeOf<InvalidOperationException>());
-      Assert.That (() => _nativeMockInterfaceDescriptionProvider.GetMockModuleDescriptionForType (typeof(ConsoleColor)), Throws.TypeOf<InvalidOperationException>());
-      Assert.That (() => _nativeMockInterfaceDescriptionProvider.GetMockModuleDescriptionForType (typeof(StringBuilder)), Throws.TypeOf<InvalidOperationException>());
-      Assert.That (() => _nativeMockInterfaceDescriptionProvider.GetMockModuleDescriptionForType (typeof(Action)), Throws.TypeOf<InvalidOperationException>());
+      Assert.That (() => _nativeMockInterfaceDescriptionProvider.GetMockModuleDescription (typeof(int)), Throws.TypeOf<InvalidOperationException>());
+      Assert.That (() => _nativeMockInterfaceDescriptionProvider.GetMockModuleDescription (typeof(ConsoleColor)), Throws.TypeOf<InvalidOperationException>());
+      Assert.That (() => _nativeMockInterfaceDescriptionProvider.GetMockModuleDescription (typeof(StringBuilder)), Throws.TypeOf<InvalidOperationException>());
+      Assert.That (() => _nativeMockInterfaceDescriptionProvider.GetMockModuleDescription (typeof(Action)), Throws.TypeOf<InvalidOperationException>());
     }
 
     [Test]
-    public void GetMockModuleDescriptionForType_ThrowsOnNullTest()
+    public void ThrowsOnNullTest()
     {
-      Assert.That (() => _nativeMockInterfaceDescriptionProvider.GetMockModuleDescriptionForType (null!), Throws.ArgumentNullException);
+      Assert.That (() => _nativeMockInterfaceDescriptionProvider.GetMockModuleDescription (null!), Throws.ArgumentNullException);
     }
 
     private interface IEmpty
@@ -35,11 +36,11 @@ namespace NativeMock.UnitTests
     }
 
     [Test]
-    public void GetMockModuleDescriptionForType_ReturnsNullWithoutAnnotationTest()
+    public void ReturnsNullWithoutAnnotationTest()
     {
-      var nativeMockModuleDescription = _nativeMockInterfaceDescriptionProvider.GetMockModuleDescriptionForType (typeof(IEmpty));
+      var nativeMockModuleDescriptions = _nativeMockInterfaceDescriptionProvider.GetMockModuleDescription (typeof(IEmpty));
 
-      Assert.That (nativeMockModuleDescription, Is.Null);
+      Assert.That (nativeMockModuleDescriptions, Is.EqualTo (ImmutableArray<NativeMockModuleDescription>.Empty));
     }
 
     [NativeMockModule ("A")]
@@ -48,12 +49,28 @@ namespace NativeMock.UnitTests
     }
 
     [Test]
-    public void GetMockModuleDescriptionForType_ModuleScopedTest()
+    public void ModuleScopedTest()
     {
-      var nativeMockModuleDescription = _nativeMockInterfaceDescriptionProvider.GetMockModuleDescriptionForType (typeof(IModuleScoped));
+      var nativeMockModuleDescriptions = _nativeMockInterfaceDescriptionProvider.GetMockModuleDescription (typeof(IModuleScoped));
 
-      Assert.That (nativeMockModuleDescription, Is.Not.Null);
-      Assert.That (nativeMockModuleDescription.Name, Is.EqualTo ("A"));
+      Assert.That (nativeMockModuleDescriptions.Length, Is.EqualTo (1));
+      Assert.That (nativeMockModuleDescriptions[0].Name, Is.EqualTo ("A"));
+    }
+
+    [NativeMockModule ("A")]
+    [NativeMockModule ("B")]
+    private interface IDoubleModuleScoped
+    {
+    }
+
+    [Test]
+    public void DoubleModuleScopedTest()
+    {
+      var nativeMockModuleDescriptions = _nativeMockInterfaceDescriptionProvider.GetMockModuleDescription (typeof(IDoubleModuleScoped));
+
+      Assert.That (nativeMockModuleDescriptions.Length, Is.EqualTo (2));
+      Assert.That (nativeMockModuleDescriptions[0].Name, Is.EqualTo ("A"));
+      Assert.That (nativeMockModuleDescriptions[1].Name, Is.EqualTo ("B"));
     }
   }
 }

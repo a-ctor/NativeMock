@@ -1,6 +1,7 @@
 namespace NativeMock.UnitTests
 {
   using System;
+  using System.Collections.Immutable;
   using System.Text;
   using Moq;
   using NUnit.Framework;
@@ -56,10 +57,10 @@ namespace NativeMock.UnitTests
     [Test]
     public void CorrectlyMapsInterfaceMethodTest()
     {
-      var nativeMockModuleDescription = new NativeMockModuleDescription ("Test");
+      var nativeMockModuleDescriptions = ImmutableArray<NativeMockModuleDescription>.Empty.Add (new NativeMockModuleDescription ("Test"));
       _moduleDescriptionProviderMock
-        .Setup (m => m.GetMockModuleDescriptionForType (typeof(ISimple)))
-        .Returns (nativeMockModuleDescription);
+        .Setup (m => m.GetMockModuleDescription (typeof(ISimple)))
+        .Returns (nativeMockModuleDescriptions);
 
       var method = typeof(ISimple).GetMethod ("Test")!;
       var methodDescription = new NativeMockInterfaceMethodDescription (new NativeFunctionIdentifier ("Test", "Test"), method!, method!);
@@ -86,7 +87,7 @@ namespace NativeMock.UnitTests
     public void CorrectlyMapsInterfaceMethod2Test()
     {
       var method = typeof(ISimple2).GetMethod ("Test")!;
-      _moduleDescriptionProviderMock.Setup (e => e.GetMockModuleDescriptionForType (typeof(ISimple2))).Returns ((NativeMockModuleDescription) null);
+      _moduleDescriptionProviderMock.Setup (e => e.GetMockModuleDescription (typeof(ISimple2))).Returns (ImmutableArray<NativeMockModuleDescription>.Empty);
       var methodDescription = new NativeMockInterfaceMethodDescription (new NativeFunctionIdentifier ("Test"), method!, method!);
       _interfaceMethodDescriptionProviderMock.Setup (m => m.GetMockInterfaceDescription (method, typeof(int), null)).Returns (methodDescription);
 
