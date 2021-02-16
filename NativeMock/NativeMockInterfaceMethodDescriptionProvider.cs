@@ -35,20 +35,23 @@ namespace NativeMock
       return new NativeMockInterfaceMethodDescription (
         name,
         method,
-        ResolveMethod (method, functionName, declaringType));
+        ResolveMethod (method, name, declaringType));
     }
 
-    private MethodInfo ResolveMethod (MethodInfo originalMethod, string functionName, Type? declaringType)
+    private MethodInfo ResolveMethod (MethodInfo originalMethod, NativeFunctionIdentifier name, Type? declaringType)
     {
       if (declaringType == null)
         return originalMethod;
 
       var pInvokeMembers = _pInvokeMemberProvider.GetPInvokeMembers (declaringType);
-      var pInvokeMember = pInvokeMembers.FirstOrDefault (m => m.Name.FunctionName == functionName);
-      if (pInvokeMember == null)
-        throw new InvalidOperationException ($"Cannot find the P/Invoke method '{functionName}' on the type '{declaringType}'.");
+      var targetPInvokeMember = name.ModuleName == null
+        ? pInvokeMembers.FirstOrDefault (e => e.Name.FunctionName == name.FunctionName)
+        : pInvokeMembers.FirstOrDefault (e => e.Name == name);
 
-      var resolvedMethod = pInvokeMember.Method;
+      if (targetPInvokeMember == null)
+        throw new InvalidOperationException ($"Cannot find the P/Invoke method '{name}' on the type '{declaringType}'.");
+
+      var resolvedMethod = targetPInvokeMember.Method;
       EnsureMethodIsCompatible (originalMethod, resolvedMethod);
 
       return resolvedMethod;
