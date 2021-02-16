@@ -128,10 +128,7 @@ namespace NativeMock
 
       var nativeMockCallbackRegistry = s_nativeMockCallbackRegistry.Value ??= new NativeMockCallbackRegistry();
       foreach (var interfaceMethod in interfaceDescription.Methods)
-      {
-        var nativeFunctionIdentifier = interfaceMethod.CreateNativeFunctionIdentifier();
-        nativeMockCallbackRegistry.Register (nativeFunctionIdentifier, interfaceMethod.CreateCallback (implementation));
-      }
+        nativeMockCallbackRegistry.Register (interfaceMethod.Name, interfaceMethod.CreateCallback (implementation));
     }
 
     /// <summary>
@@ -178,8 +175,7 @@ namespace NativeMock
         foreach (var interfaceMethod in interfaceDescription.Methods)
         {
           var delegateType = s_delegateGenerator.CreateDelegateType (interfaceMethod.StubTargetMethod);
-          var nativeFunctionIdentifier = interfaceMethod.CreateNativeFunctionIdentifier();
-          var nativeFunctionProxy = s_nativeFunctionProxyFactory.CreateNativeFunctionProxy (nativeFunctionIdentifier, delegateType);
+          var nativeFunctionProxy = s_nativeFunctionProxyFactory.CreateNativeFunctionProxy (interfaceMethod.Name, delegateType);
           s_nativeFunctionProxyRegistry.Register (nativeFunctionProxy);
         }
 

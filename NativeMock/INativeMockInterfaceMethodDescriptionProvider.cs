@@ -9,6 +9,6 @@ namespace NativeMock
   /// </summary>
   internal interface INativeMockInterfaceMethodDescriptionProvider
   {
-    NativeMockInterfaceMethodDescription GetMockInterfaceDescription (MethodInfo method, Type? defaultDeclaringType, NativeMockModuleDescription? defaultModuleDescription);
+    NativeMockInterfaceMethodDescription GetMockInterfaceDescription (MethodInfo method, Type? defaultDeclaringType, string? defaultModuleName);
   }
 }

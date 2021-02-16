@@ -80,8 +80,7 @@ namespace NativeMock.UnitTests
       var interfaceDescription = _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (method, null, null);
 
       Assert.That (interfaceDescription, Is.Not.Null);
-      Assert.That (interfaceDescription.FunctionName, Is.EqualTo (method.Name));
-      Assert.That (interfaceDescription.Module, Is.Null);
+      Assert.That (interfaceDescription.Name, Is.EqualTo (new NativeFunctionIdentifier (method.Name)));
       Assert.That (interfaceDescription.InterfaceMethod, Is.EqualTo (method));
       Assert.That (interfaceDescription.StubTargetMethod, Is.EqualTo (method));
     }
@@ -93,8 +92,7 @@ namespace NativeMock.UnitTests
       var interfaceDescription = _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (method, null, null);
 
       Assert.That (interfaceDescription, Is.Not.Null);
-      Assert.That (interfaceDescription.FunctionName, Is.EqualTo (method.Name));
-      Assert.That (interfaceDescription.Module, Is.Null);
+      Assert.That (interfaceDescription.Name, Is.EqualTo (new NativeFunctionIdentifier (method.Name)));
       Assert.That (interfaceDescription.InterfaceMethod, Is.EqualTo (method));
       Assert.That (interfaceDescription.StubTargetMethod, Is.EqualTo (method));
     }
@@ -106,8 +104,7 @@ namespace NativeMock.UnitTests
       var interfaceDescription = _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (method, null, null);
 
       Assert.That (interfaceDescription, Is.Not.Null);
-      Assert.That (interfaceDescription.FunctionName, Is.EqualTo ("Test"));
-      Assert.That (interfaceDescription.Module, Is.Null);
+      Assert.That (interfaceDescription.Name, Is.EqualTo (new NativeFunctionIdentifier ("Test")));
       Assert.That (interfaceDescription.InterfaceMethod, Is.EqualTo (method));
       Assert.That (interfaceDescription.StubTargetMethod, Is.EqualTo (method));
     }
@@ -134,8 +131,7 @@ namespace NativeMock.UnitTests
       var interfaceDescription = _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (interfaceMethod, null, null);
 
       Assert.That (interfaceDescription, Is.Not.Null);
-      Assert.That (interfaceDescription.FunctionName, Is.EqualTo ("PublicDeclarationElsewhere"));
-      Assert.That (interfaceDescription.Module, Is.Null);
+      Assert.That (interfaceDescription.Name, Is.EqualTo (new NativeFunctionIdentifier ("PublicDeclarationElsewhere")));
       Assert.That (interfaceDescription.InterfaceMethod, Is.EqualTo (interfaceMethod));
       Assert.That (interfaceDescription.StubTargetMethod, Is.EqualTo (classMethod));
     }
@@ -148,8 +144,7 @@ namespace NativeMock.UnitTests
       var interfaceDescription = _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (interfaceMethod, null, null);
 
       Assert.That (interfaceDescription, Is.Not.Null);
-      Assert.That (interfaceDescription.FunctionName, Is.EqualTo ("PrivateDeclarationElsewhere"));
-      Assert.That (interfaceDescription.Module, Is.Null);
+      Assert.That (interfaceDescription.Name, Is.EqualTo (new NativeFunctionIdentifier ("PrivateDeclarationElsewhere")));
       Assert.That (interfaceDescription.InterfaceMethod, Is.EqualTo (interfaceMethod));
       Assert.That (interfaceDescription.StubTargetMethod, Is.EqualTo (classMethod));
     }
@@ -162,8 +157,7 @@ namespace NativeMock.UnitTests
       var interfaceDescription = _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (interfaceMethod, null, null);
 
       Assert.That (interfaceDescription, Is.Not.Null);
-      Assert.That (interfaceDescription.FunctionName, Is.EqualTo ("RealRenamedDeclarationElsewhere"));
-      Assert.That (interfaceDescription.Module, Is.Null);
+      Assert.That (interfaceDescription.Name, Is.EqualTo (new NativeFunctionIdentifier ("RealRenamedDeclarationElsewhere")));
       Assert.That (interfaceDescription.InterfaceMethod, Is.EqualTo (interfaceMethod));
       Assert.That (interfaceDescription.StubTargetMethod, Is.EqualTo (classMethod));
     }
@@ -176,8 +170,7 @@ namespace NativeMock.UnitTests
       var interfaceDescription = _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (interfaceMethod, null, null);
 
       Assert.That (interfaceDescription, Is.Not.Null);
-      Assert.That (interfaceDescription.FunctionName, Is.EqualTo ("VirtualRenamedDeclarationElsewhere"));
-      Assert.That (interfaceDescription.Module, Is.Null);
+      Assert.That (interfaceDescription.Name, Is.EqualTo (new NativeFunctionIdentifier ("VirtualRenamedDeclarationElsewhere")));
       Assert.That (interfaceDescription.InterfaceMethod, Is.EqualTo (interfaceMethod));
       Assert.That (interfaceDescription.StubTargetMethod, Is.EqualTo (classMethod));
     }
@@ -210,8 +203,7 @@ namespace NativeMock.UnitTests
       var interfaceDescription = _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (interfaceMethod, typeof(Test2), null);
 
       Assert.That (interfaceDescription, Is.Not.Null);
-      Assert.That (interfaceDescription.FunctionName, Is.EqualTo ("InheritDeclaringType"));
-      Assert.That (interfaceDescription.Module, Is.Null);
+      Assert.That (interfaceDescription.Name, Is.EqualTo (new NativeFunctionIdentifier ("InheritDeclaringType")));
       Assert.That (interfaceDescription.InterfaceMethod, Is.EqualTo (interfaceMethod));
       Assert.That (interfaceDescription.StubTargetMethod, Is.EqualTo (classMethod));
     }
@@ -224,8 +216,7 @@ namespace NativeMock.UnitTests
       var interfaceDescription = _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (interfaceMethod, typeof(Test2), null);
 
       Assert.That (interfaceDescription, Is.Not.Null);
-      Assert.That (interfaceDescription.FunctionName, Is.EqualTo ("OverrideDeclaringType"));
-      Assert.That (interfaceDescription.Module, Is.Null);
+      Assert.That (interfaceDescription.Name, Is.EqualTo (new NativeFunctionIdentifier ("OverrideDeclaringType")));
       Assert.That (interfaceDescription.InterfaceMethod, Is.EqualTo (interfaceMethod));
       Assert.That (interfaceDescription.StubTargetMethod, Is.EqualTo (classMethod));
     }

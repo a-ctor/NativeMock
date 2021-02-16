@@ -35,7 +35,7 @@ namespace NativeMock
       var defaultModuleDescription = _nativeMockModuleDescriptionProvider.GetMockModuleDescriptionForType (interfaceType);
 
       var methodDescriptions = methods
-        .Select (method => _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (method, defaultDeclaringType, defaultModuleDescription))
+        .Select (method => _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (method, defaultDeclaringType, defaultModuleDescription?.Name))
         .ToImmutableArray();
 
       return new NativeMockInterfaceDescription (interfaceType, methodDescriptions);
