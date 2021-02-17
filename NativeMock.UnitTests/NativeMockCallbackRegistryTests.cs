@@ -89,17 +89,17 @@ namespace NativeMock.UnitTests
     }
 
     [Test]
-    public void InvokeThrowsOnNullArgumentTest()
+    public void TryInvokeThrowsOnNullArgumentTest()
     {
       var nativeFunctionIdentifier = new NativeFunctionIdentifier ("a");
       var emptyArguments = Array.Empty<object>();
 
-      Assert.That (() => _nativeMockCallbackRegistry.Invoke (default, emptyArguments), Throws.ArgumentNullException);
-      Assert.That (() => _nativeMockCallbackRegistry.Invoke (nativeFunctionIdentifier, null!), Throws.ArgumentNullException);
+      Assert.That (() => _nativeMockCallbackRegistry.TryInvoke (default, emptyArguments, out _), Throws.ArgumentNullException);
+      Assert.That (() => _nativeMockCallbackRegistry.TryInvoke (nativeFunctionIdentifier, null!, out _), Throws.ArgumentNullException);
     }
 
     [Test]
-    public void InvokeTest()
+    public void TryInvokeTest()
     {
       var nativeFunctionIdentifier = new NativeFunctionIdentifier ("a");
 
@@ -108,16 +108,17 @@ namespace NativeMock.UnitTests
       var nativeMockCallback = new NativeMockCallback (actionMock.Object.Target, actionMock.Object.Method);
 
       _nativeMockCallbackRegistry.Register (nativeFunctionIdentifier, nativeMockCallback);
-      Assert.That (_nativeMockCallbackRegistry.Invoke (nativeFunctionIdentifier, new object[] {"abc"}), Is.EqualTo (34));
+      Assert.That (_nativeMockCallbackRegistry.TryInvoke (nativeFunctionIdentifier, new object[] {"abc"}, out var result), Is.True);
+      Assert.That (result, Is.EqualTo (34));
       actionMock.VerifyAll();
     }
 
     [Test]
-    public void InvokeThrowsWhenNotMockIsFoundTest()
+    public void TryInvokeReturnsFalseNotMockIsFoundTest()
     {
       var nativeFunctionIdentifier = new NativeFunctionIdentifier ("a");
 
-      Assert.That (() => _nativeMockCallbackRegistry.Invoke (nativeFunctionIdentifier, Array.Empty<object>()), Throws.TypeOf<NativeFunctionNotMockedException>());
+      Assert.That (() => _nativeMockCallbackRegistry.TryInvoke (nativeFunctionIdentifier, Array.Empty<object>(), out _), Is.False);
     }
   }
 }

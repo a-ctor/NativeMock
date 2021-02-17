@@ -15,7 +15,14 @@ namespace NativeMock
 
     public IntPtr NativePtr { get; }
 
-    public NativeFunctionProxy (NativeFunctionIdentifier name, Type delegateType, Delegate @delegate, IntPtr nativePtr)
+    public Func<object> DefaultStub { get; }
+
+    public NativeFunctionProxy (
+      NativeFunctionIdentifier name,
+      Type delegateType,
+      Delegate @delegate,
+      IntPtr nativePtr,
+      Func<object> defaultStub)
     {
       if (name.IsInvalid)
         throw new ArgumentNullException (nameof(name));
@@ -27,11 +34,14 @@ namespace NativeMock
         throw new ArgumentException ("Must be a delegate type.", nameof(delegateType));
       if (!@delegate.GetType().IsAssignableTo (delegateType))
         throw new ArgumentException ("Must be assignable to the specified delegate type.");
+      if (defaultStub == null)
+        throw new ArgumentNullException (nameof(defaultStub));
 
       Name = name;
       DelegateType = delegateType;
       Delegate = @delegate;
       NativePtr = nativePtr;
+      DefaultStub = defaultStub;
     }
   }
 }

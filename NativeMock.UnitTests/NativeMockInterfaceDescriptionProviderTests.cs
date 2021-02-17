@@ -63,8 +63,12 @@ namespace NativeMock.UnitTests
         .Returns (nativeMockModuleDescriptions);
 
       var method = typeof(ISimple).GetMethod ("Test")!;
-      var methodDescription = new NativeMockInterfaceMethodDescription (new NativeFunctionIdentifier ("Test", "Test"), method!, method!);
-      _interfaceMethodDescriptionProviderMock.Setup (m => m.GetMockInterfaceDescription (method, null, "Test")).Returns (methodDescription);
+      var methodDescription = new NativeMockInterfaceMethodDescription (
+        new NativeFunctionIdentifier ("Test", "Test"),
+        method!,
+        method!,
+        NativeMockBehavior.Default);
+      _interfaceMethodDescriptionProviderMock.Setup (m => m.GetMockInterfaceDescription (method, null, "Test", NativeMockBehavior.Default)).Returns (methodDescription);
 
       var nativeMockInterfaceDescription = _nativeMockInterfaceDescriptionProvider.GetMockInterfaceDescription (typeof(ISimple));
 
@@ -88,13 +92,46 @@ namespace NativeMock.UnitTests
     {
       var method = typeof(ISimple2).GetMethod ("Test")!;
       _moduleDescriptionProviderMock.Setup (e => e.GetMockModuleDescription (typeof(ISimple2))).Returns (ImmutableArray<NativeMockModuleDescription>.Empty);
-      var methodDescription = new NativeMockInterfaceMethodDescription (new NativeFunctionIdentifier ("Test"), method!, method!);
-      _interfaceMethodDescriptionProviderMock.Setup (m => m.GetMockInterfaceDescription (method, typeof(int), null)).Returns (methodDescription);
+      var methodDescription = new NativeMockInterfaceMethodDescription (
+        new NativeFunctionIdentifier ("Test"),
+        method!,
+        method!,
+        NativeMockBehavior.Default);
+      _interfaceMethodDescriptionProviderMock.Setup (m => m.GetMockInterfaceDescription (method, typeof(int), null, NativeMockBehavior.Default)).Returns (methodDescription);
 
       var nativeMockInterfaceDescription = _nativeMockInterfaceDescriptionProvider.GetMockInterfaceDescription (typeof(ISimple2));
 
       Assert.That (nativeMockInterfaceDescription, Is.Not.Null);
       Assert.That (nativeMockInterfaceDescription.InterfaceType, Is.SameAs (typeof(ISimple2)));
+      Assert.That (nativeMockInterfaceDescription.Methods.Length, Is.EqualTo (1));
+      Assert.That (nativeMockInterfaceDescription.Methods[0], Is.EqualTo (methodDescription));
+
+      _moduleDescriptionProviderMock.VerifyAll();
+      _interfaceMethodDescriptionProviderMock.VerifyAll();
+    }
+
+    [NativeMockInterface (Behavior = NativeMockBehavior.Strict)]
+    private interface IMockBehavior
+    {
+      void Test();
+    }
+
+    [Test]
+    public void CorrectlyMapsMockBehaviorTest()
+    {
+      var method = typeof(IMockBehavior).GetMethod ("Test")!;
+      _moduleDescriptionProviderMock.Setup (e => e.GetMockModuleDescription (typeof(IMockBehavior))).Returns (ImmutableArray<NativeMockModuleDescription>.Empty);
+      var methodDescription = new NativeMockInterfaceMethodDescription (
+        new NativeFunctionIdentifier ("Test"),
+        method!,
+        method!,
+        NativeMockBehavior.Strict);
+      _interfaceMethodDescriptionProviderMock.Setup (m => m.GetMockInterfaceDescription (method, null, null, NativeMockBehavior.Strict)).Returns (methodDescription);
+
+      var nativeMockInterfaceDescription = _nativeMockInterfaceDescriptionProvider.GetMockInterfaceDescription (typeof(IMockBehavior));
+
+      Assert.That (nativeMockInterfaceDescription, Is.Not.Null);
+      Assert.That (nativeMockInterfaceDescription.InterfaceType, Is.SameAs (typeof(IMockBehavior)));
       Assert.That (nativeMockInterfaceDescription.Methods.Length, Is.EqualTo (1));
       Assert.That (nativeMockInterfaceDescription.Methods[0], Is.EqualTo (methodDescription));
 

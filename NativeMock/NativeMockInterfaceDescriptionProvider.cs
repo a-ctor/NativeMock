@@ -32,13 +32,16 @@ namespace NativeMock
       if (methods.Length == 0)
         throw new InvalidOperationException ("The specified interface type has no methods.");
 
-      var defaultDeclaringType = interfaceType.GetCustomAttribute<NativeMockInterfaceAttribute>()?.DeclaringType;
+      var nativeMockInterfaceAttribute = interfaceType.GetCustomAttribute<NativeMockInterfaceAttribute>();
+      var defaultDeclaringType = nativeMockInterfaceAttribute?.DeclaringType;
+      var nativeMockBehavior = nativeMockInterfaceAttribute?.Behavior ?? NativeMockBehavior.Default;
+
       var defaultModuleDescriptions = _nativeMockModuleDescriptionProvider.GetMockModuleDescription (interfaceType);
 
       // With no module-attributes we create unscoped functions otherwise we create a new function for each module
       var methodDescriptionsEnumerable = defaultModuleDescriptions.IsEmpty
-        ? GetNativeMockInterfaceMethodDescriptions (methods, defaultDeclaringType, null)
-        : defaultModuleDescriptions.SelectMany (e => GetNativeMockInterfaceMethodDescriptions (methods, defaultDeclaringType, e));
+        ? GetNativeMockInterfaceMethodDescriptions (methods, defaultDeclaringType, null, nativeMockBehavior)
+        : defaultModuleDescriptions.SelectMany (e => GetNativeMockInterfaceMethodDescriptions (methods, defaultDeclaringType, e, nativeMockBehavior));
 
       return new NativeMockInterfaceDescription (interfaceType, methodDescriptionsEnumerable.ToImmutableArray());
     }
@@ -46,9 +49,10 @@ namespace NativeMock
     private IEnumerable<NativeMockInterfaceMethodDescription> GetNativeMockInterfaceMethodDescriptions (
       IEnumerable<MethodInfo> methods,
       Type? defaultDeclaringType,
-      NativeMockModuleDescription? defaultModule)
+      NativeMockModuleDescription? defaultModule,
+      NativeMockBehavior defaultNativeMockBehavior)
     {
-      return methods.Select (e => _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (e, defaultDeclaringType, defaultModule?.Name));
+      return methods.Select (e => _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (e, defaultDeclaringType, defaultModule?.Name, defaultNativeMockBehavior));
     }
   }
 }

@@ -38,7 +38,7 @@ namespace NativeMock
     /// <exception cref="NativeFunctionNotMockedException">
     /// No mock was registerd for the function specified by <paramref name="nativeFunctionIdentifier" />.
     /// </exception>
-    public object? Invoke (NativeFunctionIdentifier nativeFunctionIdentifier, object?[] args)
+    public bool TryInvoke (NativeFunctionIdentifier nativeFunctionIdentifier, object?[] args, out object? result)
     {
       if (nativeFunctionIdentifier.IsInvalid)
         throw new ArgumentNullException (nameof(nativeFunctionIdentifier));
@@ -46,9 +46,13 @@ namespace NativeMock
         throw new ArgumentNullException (nameof(args));
 
       if (!_registeredCallbacks.TryGetValue (nativeFunctionIdentifier, out var callback))
-        throw new NativeFunctionNotMockedException (nativeFunctionIdentifier.ToString());
+      {
+        result = default;
+        return false;
+      }
 
-      return callback.Invoke (args);
+      result = callback.Invoke (args);
+      return true;
     }
   }
 }

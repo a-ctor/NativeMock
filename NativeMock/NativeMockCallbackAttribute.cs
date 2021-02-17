@@ -40,6 +40,11 @@ namespace NativeMock
     public string? Name { get; }
 
     /// <summary>
+    /// Determines the behavior of the native function when it is called when no mock is set up.
+    /// </summary>
+    public NativeMockBehavior Behavior { get; set; } = NativeMockBehavior.Default;
+
+    /// <summary>
     /// The type that declares the specified native function, or <see langword="null" /> if the interface
     /// method's signature and attributes should be used to determine the native function's signature.
     /// </summary>

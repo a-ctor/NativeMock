@@ -19,6 +19,16 @@ namespace NativeMock
   public class NativeMockInterfaceAttribute : Attribute
   {
     /// <summary>
+    /// Determines the default <see cref="NativeMockBehavior" /> of the containing members.
+    /// </summary>
+    /// <remarks>
+    /// This setting can be overriden on a per-method basis using <see cref="NativeMockCallbackAttribute" />.
+    /// <see cref="NativeMockCallbackAttribute.Behavior" />.
+    /// </remarks>
+    /// <seealso cref="NativeMockCallbackAttribute.Behavior" />
+    public NativeMockBehavior Behavior { get; set; } = NativeMockBehavior.Default;
+
+    /// <summary>
     /// The type that declares that declares the native functions specified by this interface, or <see langword="null" /> if
     /// the mock interface's methods should be used to determine the signature of the native functions.
     /// </summary>
