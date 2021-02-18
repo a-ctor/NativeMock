@@ -9,39 +9,33 @@ namespace NativeMock
   {
     public NativeFunctionIdentifier Name { get; }
 
-    public Type DelegateType { get; }
+    public Type ProxyType { get; }
 
-    public Delegate Delegate { get; }
+    public Delegate Proxy { get; }
 
     public IntPtr NativePtr { get; }
 
-    public Func<object> DefaultStub { get; }
-
     public NativeFunctionProxy (
       NativeFunctionIdentifier name,
-      Type delegateType,
-      Delegate @delegate,
-      IntPtr nativePtr,
-      Func<object> defaultStub)
+      Type proxyType,
+      Delegate proxy,
+      IntPtr nativePtr)
     {
       if (name.IsInvalid)
         throw new ArgumentNullException (nameof(name));
-      if (delegateType == null)
-        throw new ArgumentNullException (nameof(delegateType));
-      if (@delegate == null)
-        throw new ArgumentNullException (nameof(@delegate));
-      if (!delegateType.IsAssignableTo (typeof(Delegate)))
-        throw new ArgumentException ("Must be a delegate type.", nameof(delegateType));
-      if (!@delegate.GetType().IsAssignableTo (delegateType))
+      if (proxyType == null)
+        throw new ArgumentNullException (nameof(proxyType));
+      if (proxy == null)
+        throw new ArgumentNullException (nameof(proxy));
+      if (!proxyType.IsAssignableTo (typeof(Delegate)))
+        throw new ArgumentException ("Must be a delegate type.", nameof(proxyType));
+      if (!proxy.GetType().IsAssignableTo (proxyType))
         throw new ArgumentException ("Must be assignable to the specified delegate type.");
-      if (defaultStub == null)
-        throw new ArgumentNullException (nameof(defaultStub));
 
       Name = name;
-      DelegateType = delegateType;
-      Delegate = @delegate;
+      ProxyType = proxyType;
+      Proxy = proxy;
       NativePtr = nativePtr;
-      DefaultStub = defaultStub;
     }
   }
 }

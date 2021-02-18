@@ -36,12 +36,11 @@ namespace NativeMock
       new NativeMockInterfaceMethodDescriptionProvider (new CachingPInvokeMemberProviderDecorator (new PInvokeMemberProvider())));
 
     private static readonly DelegateGenerator s_delegateGenerator = new (new AssemblyName (c_assemblyName), c_moduleName);
-    private static readonly NativeFunctionProxyFactory s_nativeFunctionProxyFactory = new (new NativeFunctionProxyCodeGenerator(), OnNativeHookCalled);
+    private static readonly NativeFunctionProxyFactory s_nativeFunctionProxyFactory = new (s_delegateGenerator, new NativeFunctionProxyCodeGenerator());
     private static readonly NativeFunctionProxyRegistry s_nativeFunctionProxyRegistry = new();
 
     private static readonly ModuleNameResolver s_moduleNameResolver = new();
-    private static readonly AsyncLocal<NativeMockCallbackRegistry> s_nativeMockCallbackRegistry = new();
-    private static readonly NativeMockBehaviorRegistry s_nativeMockBehaviorRegistry = new (NativeMockBehavior.Default);
+    private static readonly AsyncLocal<NativeMockSetupRegistry> s_nativeMockSetupRegistry = new();
 
     private static readonly ConcurrentDictionary<Type, NativeMockInterfaceDescription> s_registeredInterfaces = new();
 
@@ -109,7 +108,7 @@ namespace NativeMock
     {
       CheckInitialized();
 
-      s_nativeMockCallbackRegistry.Value?.Clear();
+      s_nativeMockSetupRegistry.Value?.Clear();
     }
 
     /// <summary>
@@ -119,17 +118,17 @@ namespace NativeMock
     /// This function operations only in the current thread/task control flow.
     /// </remarks>
     public static void Mock<TInterface> (TInterface implementation)
+      where TInterface : class
     {
       if (implementation == null)
         throw new ArgumentNullException (nameof(implementation));
-      if (!s_registeredInterfaces.TryGetValue (typeof(TInterface), out var interfaceDescription))
-        throw new InvalidOperationException ($"The specified type '{typeof(TInterface)}' was not registered.");
+      if (!s_registeredInterfaces.ContainsKey (typeof(TInterface)))
+        throw new InvalidOperationException ($"The specified mock interface '{typeof(TInterface)}' was not registered.");
 
       CheckInitialized();
 
-      var nativeMockCallbackRegistry = s_nativeMockCallbackRegistry.Value ??= new NativeMockCallbackRegistry();
-      foreach (var interfaceMethod in interfaceDescription.Methods)
-        nativeMockCallbackRegistry.Register (interfaceMethod.Name, interfaceMethod.CreateCallback (implementation));
+      var nativeMockSetupRegistry = s_nativeMockSetupRegistry.Value ??= new NativeMockSetupRegistry();
+      nativeMockSetupRegistry.Add (implementation);
     }
 
     /// <summary>
@@ -175,10 +174,8 @@ namespace NativeMock
 
         foreach (var interfaceMethod in interfaceDescription.Methods)
         {
-          var delegateType = s_delegateGenerator.CreateDelegateType (interfaceMethod.StubTargetMethod);
-          var nativeFunctionProxy = s_nativeFunctionProxyFactory.CreateNativeFunctionProxy (interfaceMethod.Name, delegateType);
+          var nativeFunctionProxy = s_nativeFunctionProxyFactory.CreateNativeFunctionProxy (interfaceMethod);
           s_nativeFunctionProxyRegistry.Register (nativeFunctionProxy);
-          s_nativeMockBehaviorRegistry.SetMockBehavior (interfaceMethod.Name, interfaceMethod.Behavior);
         }
 
         s_registeredInterfaces.TryAdd (interfaceType, interfaceDescription);
@@ -194,27 +191,10 @@ namespace NativeMock
              ?? s_getProcAddressHook.Original (module, functionName);
     }
 
-    private static object? OnNativeHookCalled (NativeFunctionIdentifier nativeFunctionIdentifier, object?[] args)
+    internal static T? GetMockObject<T>()
+      where T : class
     {
-      var nativeMockCallbackRegistry = s_nativeMockCallbackRegistry.Value ??= new NativeMockCallbackRegistry();
-      if (nativeMockCallbackRegistry.TryInvoke (nativeFunctionIdentifier, args, out var result))
-        return result;
-
-      var nativeFunctionProxy = s_nativeFunctionProxyRegistry.Resolve (nativeFunctionIdentifier);
-      if (nativeFunctionProxy == null)
-        throw new InvalidOperationException ($"OnNativeHookCalled was called but the specified mock '{nativeFunctionIdentifier}' does not exist.");
-
-      var mockBehavior = s_nativeMockBehaviorRegistry.GetMockBehavior (nativeFunctionIdentifier);
-      switch (mockBehavior)
-      {
-        case NativeMockBehavior.Default:
-        case NativeMockBehavior.Strict:
-          throw new NativeFunctionNotMockedException (nativeFunctionIdentifier.ToString());
-        case NativeMockBehavior.Loose:
-          return nativeFunctionProxy.DefaultStub();
-        default:
-          throw new ArgumentOutOfRangeException();
-      }
+      return s_nativeMockSetupRegistry.Value?.Get<T>();
     }
 
     private static void CheckInitialized()

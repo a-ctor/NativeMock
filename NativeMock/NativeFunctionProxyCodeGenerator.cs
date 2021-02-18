@@ -2,7 +2,6 @@ namespace NativeMock
 {
   using System;
   using System.Linq;
-  using System.Linq.Expressions;
   using System.Reflection;
   using System.Reflection.Emit;
 
@@ -11,126 +10,104 @@ namespace NativeMock
   /// </summary>
   internal class NativeFunctionProxyCodeGenerator
   {
-    // IMPORTANT: when changing the following lines the IL generation has to be fixed as well
-    private static readonly Expression<Func<NativeFunctionIdentifier>> s_nativeFunctionIdentifierConstructor1Expression =
-      () => new NativeFunctionIdentifier ("a");
+    private static readonly MethodInfo s_getMockObjectMethod;
+    private static readonly ConstructorInfo s_nativeFunctionNotMockedExceptionConstructor;
 
-    private static readonly Expression<Func<NativeFunctionIdentifier>> s_nativeFunctionIdentifierConstructor2Expression =
-      () => new NativeFunctionIdentifier ("a", "b");
-
-    private static readonly ConstructorInfo s_nativeFunctionIdentifierConstructor1Info =
-      ((NewExpression) s_nativeFunctionIdentifierConstructor1Expression.Body).Constructor!;
-
-    private static readonly ConstructorInfo s_nativeFunctionIdentifierConstructor2Info =
-      ((NewExpression) s_nativeFunctionIdentifierConstructor2Expression.Body).Constructor!;
+    static NativeFunctionProxyCodeGenerator()
+    {
+      s_getMockObjectMethod = typeof(NativeMockRegistry).GetMethod (nameof(NativeMockRegistry.GetMockObject), BindingFlags.Static | BindingFlags.NonPublic)!
+                              ?? throw new NotSupportedException ("NativeMockRegistry.GetMockObject could not be found.");
+      s_nativeFunctionNotMockedExceptionConstructor = typeof(NativeFunctionNotMockedException).GetConstructor (new[] {typeof(string)})
+                                                      ?? throw new NotSupportedException ("Constructor NativeFunctionNotMockedException(string) could not be found.");
+    }
 
     public NativeFunctionProxyCodeGenerator()
     {
     }
 
-    public Delegate CreateProxyMethod (NativeFunctionIdentifier name, Type nativeFunctionDelegateType, NativeFunctionHook proxyTarget)
+    public Delegate CreateProxyMethod (NativeMockInterfaceMethodDescription method, Type nativeFunctionDelegateType)
     {
-      if (name.IsInvalid)
-        throw new ArgumentNullException (nameof(name));
+      if (method == null)
+        throw new ArgumentNullException (nameof(method));
       if (nativeFunctionDelegateType == null)
         throw new ArgumentNullException (nameof(nativeFunctionDelegateType));
       if (!nativeFunctionDelegateType.IsSubclassOf (typeof(Delegate)))
         throw new ArgumentException ("The specified native function type must be a delegate", nameof(nativeFunctionDelegateType));
-      if (proxyTarget == null)
-        throw new ArgumentNullException (nameof(proxyTarget));
-      if (!proxyTarget.Method.IsStatic)
-        throw new ArgumentException ("The specified native call proxy must have a static target.");
 
-      var invokeMethod = nativeFunctionDelegateType.GetMethod ("Invoke");
-      var returnType = invokeMethod!.ReturnType;
-      var parameters = invokeMethod.GetParameters();
+      var interfaceMethod = method.InterfaceMethod;
+      var interfaceType = interfaceMethod.DeclaringType;
+      if (interfaceType == null)
+        throw new InvalidOperationException ("The specified method has not declaring type.");
+      if (!interfaceType.IsInterface)
+        throw new InvalidOperationException ("The specified method's declaring type is not an interface.");
+
+      var returnType = interfaceMethod.ReturnType;
+      var parameters = interfaceMethod.GetParameters();
       var parameterTypes = parameters.Select (e => e.ParameterType).ToArray();
 
-      var proxyMethod = new DynamicMethod ($"{name}_NativeFunctionProxy", returnType, parameterTypes);
+      var proxyMethod = new DynamicMethod ($"{method.Name}_NativeFunctionProxy", returnType, parameterTypes);
       var ilGenerator = proxyMethod.GetILGenerator();
 
-      if (name.ModuleName == null)
-      {
-        ilGenerator.Emit (OpCodes.Ldstr, name.FunctionName);
-        ilGenerator.Emit (OpCodes.Newobj, s_nativeFunctionIdentifierConstructor1Info);
-      }
-      else
-      {
-        ilGenerator.Emit (OpCodes.Ldstr, name.ModuleName);
-        ilGenerator.Emit (OpCodes.Ldstr, name.FunctionName);
-        ilGenerator.Emit (OpCodes.Newobj, s_nativeFunctionIdentifierConstructor2Info);
-      }
+      var noMockObjectLabel = ilGenerator.DefineLabel();
 
-      // Create an array for the parameters
-      ilGenerator.Emit (OpCodes.Ldc_I4, parameters.Length);
-      ilGenerator.Emit (OpCodes.Newarr, typeof(object));
+      var mockObjectLocal = ilGenerator.DeclareLocal (interfaceType);
 
-      // Put the function arguments into the array
-      for (var i = 0; i < parameters.Length; i++)
-      {
-        ilGenerator.Emit (OpCodes.Dup);
-        ilGenerator.Emit (OpCodes.Ldc_I4, i);
+      // var mockObject = NativeMockRegistry.GetMockObject<T>();
+      ilGenerator.Emit (OpCodes.Call, s_getMockObjectMethod.MakeGenericMethod (interfaceType));
+      ilGenerator.Emit (OpCodes.Stloc, mockObjectLocal);
+      ilGenerator.Emit (OpCodes.Ldloc, mockObjectLocal);
+
+      // if (mockObject != null) {
+      ilGenerator.Emit (OpCodes.Brfalse_S, noMockObjectLabel);
+
+      //   return mockObject.XXX(arg1, arg2, ...)
+      ilGenerator.Emit (OpCodes.Ldloc, mockObjectLocal);
+      for (short i = 0; i < parameters.Length; i++)
         ilGenerator.Emit (OpCodes.Ldarg, i);
-        if (parameterTypes[i].IsValueType)
-          ilGenerator.Emit (OpCodes.Box, parameterTypes[i]);
-        ilGenerator.Emit (OpCodes.Stelem_Ref);
-      }
+      ilGenerator.Emit (OpCodes.Callvirt, interfaceMethod);
+      ilGenerator.Emit (OpCodes.Ret);
+      // }
 
-      // Call the OnCall method
-      ilGenerator.Emit (OpCodes.Call, proxyTarget.Method);
+      // Throw an exception
+      ilGenerator.MarkLabel (noMockObjectLabel);
 
-      // Convert the result into the correct type
-      if (returnType == typeof(void))
+      // Create the no mock found handling code depending on the behavior
+      if (method.Behavior == NativeMockBehavior.Default || method.Behavior == NativeMockBehavior.Strict)
       {
-        ilGenerator.Emit (OpCodes.Pop);
+        // throw new NativeFunctionNotMockedException("XXX");
+        ilGenerator.Emit (OpCodes.Ldstr, method.Name.ToString());
+        ilGenerator.Emit (OpCodes.Newobj, s_nativeFunctionNotMockedExceptionConstructor);
+        ilGenerator.Emit (OpCodes.Throw);
       }
-      else if (returnType.IsValueType)
+      else if (method.Behavior == NativeMockBehavior.Loose)
       {
-        ilGenerator.Emit (OpCodes.Unbox_Any, returnType);
+        if (returnType == typeof(void))
+        {
+          // return;
+          ilGenerator.Emit (OpCodes.Ret);
+        }
+        else if (returnType.IsValueType)
+        {
+          // return default;
+          var resultLocal = ilGenerator.DeclareLocal (returnType);
+          ilGenerator.Emit (OpCodes.Ldloca_S, resultLocal);
+          ilGenerator.Emit (OpCodes.Initobj, returnType);
+          ilGenerator.Emit (OpCodes.Ldloc, resultLocal);
+          ilGenerator.Emit (OpCodes.Ret);
+        }
+        else
+        {
+          // return null;
+          ilGenerator.Emit (OpCodes.Ldnull);
+          ilGenerator.Emit (OpCodes.Ret);
+        }
       }
       else
       {
-        ilGenerator.Emit (OpCodes.Castclass, returnType);
+        throw new InvalidOperationException ($"Invalid native mock behavior '{method.Behavior}' specified.");
       }
-
-      // Return the result
-      ilGenerator.Emit (OpCodes.Ret);
 
       return proxyMethod.CreateDelegate (nativeFunctionDelegateType);
-    }
-
-    public Func<object> CreateDefaultStub (NativeFunctionIdentifier name, Type nativeFunctionDelegateType)
-    {
-      if (name.IsInvalid)
-        throw new ArgumentNullException (nameof(name));
-      if (nativeFunctionDelegateType == null)
-        throw new ArgumentNullException (nameof(nativeFunctionDelegateType));
-      if (nativeFunctionDelegateType == null)
-        throw new ArgumentNullException (nameof(nativeFunctionDelegateType));
-      if (!nativeFunctionDelegateType.IsSubclassOf (typeof(Delegate)))
-        throw new ArgumentException ("The specified native function type must be a delegate", nameof(nativeFunctionDelegateType));
-
-      var returnType = nativeFunctionDelegateType.GetMethod ("Invoke")!.ReturnType;
-
-      var stubMethod = new DynamicMethod ($"{name}_Stub", typeof(object), Array.Empty<Type>());
-      var ilGenerator = stubMethod.GetILGenerator();
-
-      if (returnType == typeof(void) || !returnType.IsValueType)
-      {
-        ilGenerator.Emit (OpCodes.Ldnull);
-      }
-      else
-      {
-        var local = ilGenerator.DeclareLocal (returnType);
-        ilGenerator.Emit (OpCodes.Ldloca_S, local);
-        ilGenerator.Emit (OpCodes.Initobj, returnType);
-        ilGenerator.Emit (OpCodes.Ldloc, local);
-        ilGenerator.Emit (OpCodes.Box, returnType);
-      }
-
-      ilGenerator.Emit (OpCodes.Ret);
-
-      return (Func<object>) stubMethod.CreateDelegate (typeof(Func<object>));
     }
   }
 }

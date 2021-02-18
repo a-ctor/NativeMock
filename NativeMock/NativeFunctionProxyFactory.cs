@@ -8,39 +8,34 @@ namespace NativeMock
   /// </summary>
   internal class NativeFunctionProxyFactory
   {
+    private readonly DelegateGenerator _delegateGenerator;
     private readonly NativeFunctionProxyCodeGenerator _nativeFunctionProxyCodeGenerator;
-    private readonly NativeFunctionHook _proxyTarget;
 
-    public NativeFunctionProxyFactory (NativeFunctionProxyCodeGenerator nativeFunctionProxyCodeGenerator, NativeFunctionHook proxyTarget)
+    public NativeFunctionProxyFactory (DelegateGenerator delegateGenerator, NativeFunctionProxyCodeGenerator nativeFunctionProxyCodeGenerator)
     {
-      if (proxyTarget == null)
-        throw new ArgumentNullException (nameof(proxyTarget));
-      if (!proxyTarget.Method.IsStatic)
-        throw new ArgumentException ("The specified native call proxy must have a static target.");
+      if (delegateGenerator == null)
+        throw new ArgumentNullException (nameof(delegateGenerator));
+      if (nativeFunctionProxyCodeGenerator == null)
+        throw new ArgumentNullException (nameof(nativeFunctionProxyCodeGenerator));
 
+      _delegateGenerator = delegateGenerator;
       _nativeFunctionProxyCodeGenerator = nativeFunctionProxyCodeGenerator;
-      _proxyTarget = proxyTarget;
     }
 
-    public NativeFunctionProxy CreateNativeFunctionProxy (NativeFunctionIdentifier name, Type nativeFunctionDelegateType)
+    public NativeFunctionProxy CreateNativeFunctionProxy (NativeMockInterfaceMethodDescription method)
     {
-      if (name.IsInvalid)
-        throw new ArgumentNullException (nameof(name));
-      if (nativeFunctionDelegateType == null)
-        throw new ArgumentNullException (nameof(nativeFunctionDelegateType));
-      if (!nativeFunctionDelegateType.IsSubclassOf (typeof(Delegate)))
-        throw new ArgumentException ("The specified native function type must be a delegate", nameof(nativeFunctionDelegateType));
+      if (method == null)
+        throw new ArgumentNullException (nameof(method));
 
-      var nativeFunctionDelegate = _nativeFunctionProxyCodeGenerator.CreateProxyMethod (name, nativeFunctionDelegateType, _proxyTarget);
-      var defaultStub = _nativeFunctionProxyCodeGenerator.CreateDefaultStub (name, nativeFunctionDelegateType);
-      var nativePtr = Marshal.GetFunctionPointerForDelegate (nativeFunctionDelegate);
+      var proxyType = _delegateGenerator.CreateDelegateType (method.StubTargetMethod);
+      var proxyMethod = _nativeFunctionProxyCodeGenerator.CreateProxyMethod (method, proxyType);
+      var nativePtr = Marshal.GetFunctionPointerForDelegate (proxyMethod);
 
       return new NativeFunctionProxy (
-        name,
-        nativeFunctionDelegateType,
-        nativeFunctionDelegate,
-        nativePtr,
-        defaultStub);
+        method.Name,
+        proxyType,
+        proxyMethod,
+        nativePtr);
     }
   }
 }
