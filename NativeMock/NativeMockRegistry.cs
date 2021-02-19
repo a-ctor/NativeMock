@@ -29,10 +29,7 @@ namespace NativeMock
     private static readonly INativeMockInterfaceIdentifier s_nativeMockInterfaceIdentifier = new PublicTypesOnlyNativeMockInterfaceIdentifierDecorator (new NativeMockInterfaceIdentifier());
     private static readonly INativeMockInterfaceLocatorFactory s_nativeMockInterfaceLocatorFactory = new NativeMockInterfaceLocatorFactory (s_nativeMockInterfaceIdentifier);
 
-    private static readonly INativeMockModuleDescriptionProvider s_nativeMockModuleDescriptionProvider = new NativeMockModuleDescriptionProvider();
-
     private static readonly INativeMockInterfaceDescriptionProvider s_nativeMockInterfaceDescriptionProvider = new NativeMockInterfaceDescriptionProvider (
-      s_nativeMockModuleDescriptionProvider,
       new NativeMockInterfaceMethodDescriptionProvider (new CachingPInvokeMemberProviderDecorator (new PInvokeMemberProvider())));
 
     private static readonly DelegateGenerator s_delegateGenerator = new (new AssemblyName (c_assemblyName), c_moduleName);

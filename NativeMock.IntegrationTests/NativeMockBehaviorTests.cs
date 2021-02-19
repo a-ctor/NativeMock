@@ -12,8 +12,7 @@ namespace NativeMock.IntegrationTests
     // ReSharper disable UnusedType.Global
     // ReSharper disable UnusedMember.Global
 
-    [NativeMockModule ("kernel32.dll")]
-    [NativeMockInterface (DeclaringType = typeof(NativeMockBehavior))]
+    [NativeMockInterface ("kernel32.dll", DeclaringType = typeof(NativeMockBehavior))]
     public interface INativeMockBehavior
     {
       [NativeMockCallback (Behavior = NativeMock.NativeMockBehavior.Strict)]
@@ -123,8 +122,7 @@ namespace NativeMock.IntegrationTests
       mock.VerifyAll();
     }
 
-    [NativeMockModule (FakeDllNames.Dll1)]
-    [NativeMockInterface (Behavior = NativeMock.NativeMockBehavior.Loose, DeclaringType = typeof(NativeMockBehaviorOverride))]
+    [NativeMockInterface (FakeDllNames.Dll1, Behavior = NativeMock.NativeMockBehavior.Loose, DeclaringType = typeof(NativeMockBehaviorOverride))]
     public interface INativeMockBehaviorOverride
     {
       [NativeMockCallback]

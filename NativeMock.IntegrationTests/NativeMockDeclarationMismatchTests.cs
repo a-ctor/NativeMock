@@ -15,8 +15,7 @@ namespace NativeMock.IntegrationTests
       public static extern int Test();
     }
 
-    [NativeMockModule (c_nonExistDllName)]
-    [NativeMockInterface]
+    [NativeMockInterface (c_nonExistDllName)]
     private interface IReturnType
     {
       [NativeMockCallback (DeclaringType = typeof(ReturnType))]

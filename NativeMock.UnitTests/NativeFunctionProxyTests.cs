@@ -9,7 +9,7 @@ namespace NativeMock.UnitTests
     [Test]
     public void ThrowsOnNullArgumentTest()
     {
-      var nativeFunctionIdentifier = new NativeFunctionIdentifier ("a");
+      var nativeFunctionIdentifier = new NativeFunctionIdentifier ("a", "b");
       var delegateType = typeof(Action);
       var @delegate = new Action (() => { });
       var intPtr = new IntPtr (3);
@@ -22,7 +22,7 @@ namespace NativeMock.UnitTests
     [Test]
     public void DelegateAndTypeMustMatchTest()
     {
-      var nativeFunctionIdentifier = new NativeFunctionIdentifier ("a");
+      var nativeFunctionIdentifier = new NativeFunctionIdentifier ("a", "b");
       var intPtr = new IntPtr (3);
 
       Assert.That (() => new NativeFunctionProxy (nativeFunctionIdentifier, typeof(Action), new Func<int> (() => 1), intPtr), Throws.ArgumentException);
@@ -31,7 +31,7 @@ namespace NativeMock.UnitTests
     [Test]
     public void MustBeDelegateTest()
     {
-      var nativeFunctionIdentifier = new NativeFunctionIdentifier ("a");
+      var nativeFunctionIdentifier = new NativeFunctionIdentifier ("a", "b");
       var intPtr = new IntPtr (3);
 
       Assert.That (() => new NativeFunctionProxy (nativeFunctionIdentifier, typeof(int), new Func<int> (() => 1), intPtr), Throws.ArgumentException);

@@ -7,15 +7,13 @@ namespace NativeMock.IntegrationTests
 
   public class MultipleSameNamedImportsTests
   {
-    [NativeMockModule (FakeDllNames.Dll1)]
-    [NativeMockInterface (DeclaringType = typeof(MultipleSameNamedImports))]
+    [NativeMockInterface (FakeDllNames.Dll1, DeclaringType = typeof(MultipleSameNamedImports))]
     public interface IMultipleSameNamedImports1
     {
       void SameNamed();
     }
 
-    [NativeMockModule (FakeDllNames.Dll2)]
-    [NativeMockInterface (DeclaringType = typeof(MultipleSameNamedImports))]
+    [NativeMockInterface (FakeDllNames.Dll2, DeclaringType = typeof(MultipleSameNamedImports))]
     public interface IMultipleSameNamedImports2
     {
       void SameNamed (string value);
@@ -45,10 +43,10 @@ namespace NativeMock.IntegrationTests
     public void SameNamed2Test()
     {
       var mock = new Mock<IMultipleSameNamedImports2> (MockBehavior.Strict);
-      mock.Setup (e => e.SameNamed("asd"));
+      mock.Setup (e => e.SameNamed ("asd"));
       NativeMockRegistry.Mock (mock.Object);
 
-      MultipleSameNamedImports.SameNamed2("asd");
+      MultipleSameNamedImports.SameNamed2 ("asd");
       mock.VerifyAll();
     }
   }

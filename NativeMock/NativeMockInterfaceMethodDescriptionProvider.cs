@@ -20,20 +20,22 @@ namespace NativeMock
 
     /// <inheritdoc />
     public NativeMockInterfaceMethodDescription GetMockInterfaceDescription (
+      string moduleName,
       MethodInfo method,
       Type? defaultDeclaringType,
-      string? defaultModuleName,
       NativeMockBehavior defaultMockBehavior)
     {
+      if (moduleName == null)
+        throw new ArgumentNullException (nameof(moduleName));
+      if (string.IsNullOrWhiteSpace (moduleName))
+        throw new ArgumentException ("Module name cannot be empty.");
       if (method == null)
         throw new ArgumentNullException (nameof(method));
 
       var nativeMockCallbackAttribute = method.GetCustomAttribute<NativeMockCallbackAttribute>();
 
       var functionName = nativeMockCallbackAttribute?.Name ?? method.Name;
-      var name = defaultModuleName != null
-        ? new NativeFunctionIdentifier (defaultModuleName, functionName)
-        : new NativeFunctionIdentifier (functionName);
+      var name = new NativeFunctionIdentifier (moduleName, functionName);
       var nativeMockBehavior = nativeMockCallbackAttribute?.Behavior ?? NativeMockBehavior.Default;
       if (nativeMockBehavior == NativeMockBehavior.Default)
         nativeMockBehavior = defaultMockBehavior;
@@ -52,10 +54,8 @@ namespace NativeMock
         return originalMethod;
 
       var pInvokeMembers = _pInvokeMemberProvider.GetPInvokeMembers (declaringType);
-      var targetPInvokeMember = name.ModuleName == null
-        ? pInvokeMembers.FirstOrDefault (e => e.Name.FunctionName == name.FunctionName)
-        : pInvokeMembers.FirstOrDefault (e => e.Name == name);
 
+      var targetPInvokeMember = pInvokeMembers.FirstOrDefault (e => e.Name == name);
       if (targetPInvokeMember == null)
         throw new InvalidOperationException ($"Cannot find the P/Invoke method '{name}' on the type '{declaringType}'.");
 

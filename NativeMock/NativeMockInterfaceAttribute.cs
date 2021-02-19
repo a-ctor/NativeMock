@@ -1,18 +1,16 @@
 namespace NativeMock
 {
   using System;
+  using System.Runtime.InteropServices;
 
   /// <summary>
-  /// Marks the specified interface as a native mock interface and optionally sets default settings for containing mock
-  /// functions.
+  /// Marks the specified interface as a native mock interface and optionally sets default settings for containing native
+  /// function mocks.
   /// </summary>
   /// <remarks>
   /// All methods of an interface marked with the <see cref="NativeMockInterfaceAttribute" /> will be part of the mock
   /// interface.
   /// Their defaults can be overriden using the <see cref="NativeMockCallbackAttribute" />.
-  /// Without a <see cref="NativeMockModuleAttribute" /> applied to the interface, the methods will be matched using only
-  /// their name.
-  /// By applying a <see cref="NativeMockModuleAttribute" /> the mock interface is only used for the specified native module.
   /// </remarks>
   /// <seealso cref="NativeMockCallbackAttribute" />
   [AttributeUsage (AttributeTargets.Interface)]
@@ -39,8 +37,22 @@ namespace NativeMock
     /// <seealso cref="NativeMockCallbackAttribute.DeclaringType" />
     public Type? DeclaringType { get; set; }
 
-    public NativeMockInterfaceAttribute()
+    /// <summary>
+    /// The name of the module that should be mocked using this interface.
+    /// </summary>
+    /// <remarks>
+    /// The specified module must match the name specified in the <see cref="DllImportAttribute" />.
+    /// </remarks>
+    public string Module { get; }
+
+    public NativeMockInterfaceAttribute (string module)
     {
+      if (module == null)
+        throw new ArgumentNullException (nameof(module));
+      if (string.IsNullOrWhiteSpace (module))
+        throw new ArgumentException ("Module must not be empty.");
+
+      Module = module;
     }
   }
 }

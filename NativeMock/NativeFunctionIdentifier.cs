@@ -7,27 +7,22 @@ namespace NativeMock
   /// </summary>
   internal readonly struct NativeFunctionIdentifier : IEquatable<NativeFunctionIdentifier>
   {
-    public string? ModuleName { get; }
+    public string ModuleName { get; }
 
     public string FunctionName { get; }
 
     public bool IsInvalid => FunctionName == null!;
 
-    public NativeFunctionIdentifier (string functionName)
-    {
-      if (functionName == null)
-        throw new ArgumentNullException (nameof(functionName));
-
-      ModuleName = null;
-      FunctionName = functionName;
-    }
-
     public NativeFunctionIdentifier (string moduleName, string functionName)
     {
       if (moduleName == null)
         throw new ArgumentNullException (nameof(moduleName));
+      if (string.IsNullOrWhiteSpace (moduleName))
+        throw new ArgumentException ("Module name cannot be empty.");
       if (functionName == null)
         throw new ArgumentNullException (nameof(functionName));
+      if (string.IsNullOrWhiteSpace (functionName))
+        throw new ArgumentException ("Function name cannot be empty.");
 
       ModuleName = moduleName;
       FunctionName = functionName;
@@ -42,7 +37,7 @@ namespace NativeMock
     /// <inheritdoc />
     public override int GetHashCode()
     {
-      var moduleNameHashCode = ModuleName == null ? StringComparer.OrdinalIgnoreCase.GetHashCode() : StringComparer.OrdinalIgnoreCase.GetHashCode (ModuleName);
+      var moduleNameHashCode = ModuleName == null! ? StringComparer.OrdinalIgnoreCase.GetHashCode() : StringComparer.OrdinalIgnoreCase.GetHashCode (ModuleName);
       var functionNameHashCode = FunctionName == null! ? StringComparer.OrdinalIgnoreCase.GetHashCode() : StringComparer.OrdinalIgnoreCase.GetHashCode (FunctionName);
       return HashCode.Combine (moduleNameHashCode, functionNameHashCode);
     }
@@ -54,9 +49,7 @@ namespace NativeMock
     /// <inheritdoc />
     public override string ToString()
     {
-      return ModuleName != null
-        ? $"{ModuleName}+{FunctionName}"
-        : FunctionName;
+      return $"{ModuleName}+{FunctionName}";
     }
   }
 }

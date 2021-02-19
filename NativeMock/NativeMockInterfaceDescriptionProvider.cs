@@ -1,7 +1,6 @@
 namespace NativeMock
 {
   using System;
-  using System.Collections.Generic;
   using System.Collections.Immutable;
   using System.Linq;
   using System.Reflection;
@@ -9,14 +8,10 @@ namespace NativeMock
   /// <inheritdoc />
   internal class NativeMockInterfaceDescriptionProvider : INativeMockInterfaceDescriptionProvider
   {
-    private readonly INativeMockModuleDescriptionProvider _nativeMockModuleDescriptionProvider;
     private readonly INativeMockInterfaceMethodDescriptionProvider _nativeMockInterfaceMethodDescriptionProvider;
 
-    public NativeMockInterfaceDescriptionProvider (
-      INativeMockModuleDescriptionProvider nativeMockModuleDescriptionProvider,
-      INativeMockInterfaceMethodDescriptionProvider nativeMockInterfaceMethodDescriptionProvider)
+    public NativeMockInterfaceDescriptionProvider (INativeMockInterfaceMethodDescriptionProvider nativeMockInterfaceMethodDescriptionProvider)
     {
-      _nativeMockModuleDescriptionProvider = nativeMockModuleDescriptionProvider;
       _nativeMockInterfaceMethodDescriptionProvider = nativeMockInterfaceMethodDescriptionProvider;
     }
 
@@ -33,26 +28,22 @@ namespace NativeMock
         throw new InvalidOperationException ("The specified interface type has no methods.");
 
       var nativeMockInterfaceAttribute = interfaceType.GetCustomAttribute<NativeMockInterfaceAttribute>();
-      var defaultDeclaringType = nativeMockInterfaceAttribute?.DeclaringType;
-      var nativeMockBehavior = nativeMockInterfaceAttribute?.Behavior ?? NativeMockBehavior.Default;
+      if (nativeMockInterfaceAttribute == null)
+        throw new InvalidOperationException ("The specified interface does not have a NativeMockInterfaceAttribute applied.");
 
-      var defaultModuleDescriptions = _nativeMockModuleDescriptionProvider.GetMockModuleDescription (interfaceType);
+      var methodDescriptions = methods
+        .Select (
+          e =>
+          {
+            return _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (
+              nativeMockInterfaceAttribute.Module,
+              e,
+              nativeMockInterfaceAttribute.DeclaringType,
+              nativeMockInterfaceAttribute.Behavior);
+          })
+        .ToImmutableArray();
 
-      // With no module-attributes we create unscoped functions otherwise we create a new function for each module
-      var methodDescriptionsEnumerable = defaultModuleDescriptions.IsEmpty
-        ? GetNativeMockInterfaceMethodDescriptions (methods, defaultDeclaringType, null, nativeMockBehavior)
-        : defaultModuleDescriptions.SelectMany (e => GetNativeMockInterfaceMethodDescriptions (methods, defaultDeclaringType, e, nativeMockBehavior));
-
-      return new NativeMockInterfaceDescription (interfaceType, methodDescriptionsEnumerable.ToImmutableArray());
-    }
-
-    private IEnumerable<NativeMockInterfaceMethodDescription> GetNativeMockInterfaceMethodDescriptions (
-      IEnumerable<MethodInfo> methods,
-      Type? defaultDeclaringType,
-      NativeMockModuleDescription? defaultModule,
-      NativeMockBehavior defaultNativeMockBehavior)
-    {
-      return methods.Select (e => _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (e, defaultDeclaringType, defaultModule?.Name, defaultNativeMockBehavior));
+      return new NativeMockInterfaceDescription (interfaceType, methodDescriptions);
     }
   }
 }
