@@ -428,6 +428,27 @@ namespace NativeMock.UnitTests
       Assert.That (interfaceDescription.Behavior, Is.EqualTo (NativeMockBehavior.Loose));
     }
 
+    private interface IAmbiguousMethod
+    {
+      void AmbiguousMethod();
+    }
+
+    public class AmbiguousMethod
+    {
+      [DllImport (FakeDllNames.Dll1, EntryPoint = "AmbiguousMethod")]
+      public static extern void AmbiguousMethod1();
+
+      [DllImport (FakeDllNames.Dll1, EntryPoint = "AmbiguousMethod")]
+      public static extern void AmbiguousMethod2();
+    }
+
+    [Test]
+    public void AmbiguousMethodTest()
+    {
+      var interfaceMethod = GetInterfaceMethod<IAmbiguousMethod> (e => e.AmbiguousMethod());
+      Assert.That (() => _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (FakeDllNames.Dll1, interfaceMethod, typeof(AmbiguousMethod), NativeMockBehavior.Default), Throws.InvalidOperationException);
+    }
+
     private MethodInfo GetInterfaceMethod<T> (Expression<Action<T>> lambdaExpression) => ((MethodCallExpression) lambdaExpression.Body).Method;
 
     private MethodInfo GetClassMethod (Action action) => action.Method;

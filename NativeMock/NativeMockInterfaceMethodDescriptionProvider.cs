@@ -55,11 +55,13 @@ namespace NativeMock
 
       var pInvokeMembers = _pInvokeMemberProvider.GetPInvokeMembers (declaringType);
 
-      var targetPInvokeMember = pInvokeMembers.FirstOrDefault (e => e.Name == name);
-      if (targetPInvokeMember == null)
+      var targetPInvokeMemberMatches = pInvokeMembers.Where (e => e.Name == name).ToArray();
+      if (targetPInvokeMemberMatches.Length == 0)
         throw new InvalidOperationException ($"Cannot find the P/Invoke method '{name}' on the type '{declaringType}'.");
+      if (targetPInvokeMemberMatches.Length > 1)
+        throw new InvalidOperationException ($"Multiple P/Invoke methods for '{name}' found on the type '{declaringType}'.");
 
-      var resolvedMethod = targetPInvokeMember.Method;
+      var resolvedMethod = targetPInvokeMemberMatches[0].Method;
       EnsureMethodIsCompatible (originalMethod, resolvedMethod);
 
       return resolvedMethod;
