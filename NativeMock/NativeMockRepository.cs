@@ -10,7 +10,7 @@ namespace NativeMock
   /// <summary>
   /// Provides methods for registering mock interface and mocking them during tests.
   /// </summary>
-  public static class NativeMockRegistry
+  public static class NativeMockRepository
   {
     private delegate IntPtr GetProcAddressDelegate (IntPtr hModule, string procName);
 
@@ -40,30 +40,6 @@ namespace NativeMock
     private static readonly AsyncLocal<NativeMockSetupRegistry> s_nativeMockSetupRegistry = new();
 
     private static readonly ConcurrentDictionary<Type, NativeMockInterfaceDescription> s_registeredInterfaces = new();
-
-    /// <summary>
-    /// Automatically registers all suitable native mock interfaces from the specified <paramref name="assembly" />.
-    /// </summary>
-    /// <remarks>
-    /// A native mock interface is considered suitable if:
-    /// <list type="bullet">
-    ///   <item>
-    ///     <term>It is annotated with a <see cref="NativeMockInterfaceAttribute" /></term>
-    ///   </item>
-    ///   <item>
-    ///     <term>and its visibility is 'public'.</term>
-    ///   </item>
-    /// </list>
-    /// </remarks>
-    public static void AutoRegister (Assembly assembly, AutoRegisterSearchBehavior autoRegisterSearchBehavior = AutoRegisterSearchBehavior.TopLevelTypesOnly)
-    {
-      if (assembly == null)
-        throw new ArgumentNullException (nameof(assembly));
-
-      var nativeMockInterfaceLocator = s_nativeMockInterfaceLocatorFactory.CreateMockInterfaceLocator (autoRegisterSearchBehavior);
-      foreach (var type in nativeMockInterfaceLocator.LocateNativeMockInterfaces (assembly))
-        Register (type);
-    }
 
     /// <summary>
     /// Initializes the native mock infrastructure. Should be called as early as possible.
@@ -96,25 +72,13 @@ namespace NativeMock
     }
 
     /// <summary>
-    /// Clears all mocks that currently registered.
+    /// Sets up the specified <paramref name="implementation" /> for the specific mock interface
+    /// <typeparamref name="TInterface" />.
     /// </summary>
     /// <remarks>
     /// This function operations only in the current thread/task control flow.
     /// </remarks>
-    public static void ClearMocks()
-    {
-      CheckInitialized();
-
-      s_nativeMockSetupRegistry.Value?.Clear();
-    }
-
-    /// <summary>
-    /// Registers an <paramref name="implementation" /> for a specific mock interface <typeparamref name="TInterface" />.
-    /// </summary>
-    /// <remarks>
-    /// This function operations only in the current thread/task control flow.
-    /// </remarks>
-    public static void Mock<TInterface> (TInterface implementation)
+    public static void Setup<TInterface> (TInterface implementation)
       where TInterface : class
     {
       if (implementation == null)
@@ -125,7 +89,37 @@ namespace NativeMock
       CheckInitialized();
 
       var nativeMockSetupRegistry = s_nativeMockSetupRegistry.Value ??= new NativeMockSetupRegistry();
-      nativeMockSetupRegistry.Add (implementation);
+      nativeMockSetupRegistry.Setup (implementation);
+    }
+
+    /// <summary>
+    /// Removes the setup for the specified <typeparamref name="TInterface" />.
+    /// </summary>
+    /// <remarks>
+    /// This function operations only in the current thread/task control flow.
+    /// </remarks>
+    public static void Reset<TInterface>()
+      where TInterface : class
+    {
+      if (!s_registeredInterfaces.ContainsKey (typeof(TInterface)))
+        throw new InvalidOperationException ($"The specified mock interface '{typeof(TInterface)}' was not registered.");
+
+      CheckInitialized();
+
+      s_nativeMockSetupRegistry.Value?.Reset<TInterface>();
+    }
+
+    /// <summary>
+    /// Removes all registered setups.
+    /// </summary>
+    /// <remarks>
+    /// This function operations only in the current thread/task control flow.
+    /// </remarks>
+    public static void ResetAll()
+    {
+      CheckInitialized();
+
+      s_nativeMockSetupRegistry.Value?.ResetAll();
     }
 
     /// <summary>
@@ -179,6 +173,32 @@ namespace NativeMock
       }
     }
 
+    /// <summary>
+    /// Registers all suitable native mock interfaces from the specified <paramref name="assembly" />.
+    /// The parameter <paramref name="registerFromAssemblySearchBehavior" /> determines where to search for possible
+    /// interfaces.
+    /// </summary>
+    /// <remarks>
+    /// A native mock interface is considered suitable if:
+    /// <list type="bullet">
+    ///   <item>
+    ///     <term>It is annotated with a <see cref="NativeMockInterfaceAttribute" /></term>
+    ///   </item>
+    ///   <item>
+    ///     <term>and its visibility is 'public'.</term>
+    ///   </item>
+    /// </list>
+    /// </remarks>
+    public static void RegisterFromAssembly (Assembly assembly, RegisterFromAssemblySearchBehavior registerFromAssemblySearchBehavior = RegisterFromAssemblySearchBehavior.TopLevelTypesOnly)
+    {
+      if (assembly == null)
+        throw new ArgumentNullException (nameof(assembly));
+
+      var nativeMockInterfaceLocator = s_nativeMockInterfaceLocatorFactory.CreateMockInterfaceLocator (registerFromAssemblySearchBehavior);
+      foreach (var type in nativeMockInterfaceLocator.LocateNativeMockInterfaces (assembly))
+        Register (type);
+    }
+
     private static IntPtr GetProcAddress (IntPtr module, string functionName)
     {
       var moduleName = s_moduleNameResolver.Resolve (module);
@@ -191,14 +211,14 @@ namespace NativeMock
     internal static T? GetMockObject<T>()
       where T : class
     {
-      return s_nativeMockSetupRegistry.Value?.Get<T>();
+      return s_nativeMockSetupRegistry.Value?.GetSetup<T>();
     }
 
     private static void CheckInitialized()
     {
       if (!s_initialized)
       {
-        throw new InvalidOperationException ("NativeMockRegistry is not initialized. Call .Initialize as early as possible to ensure that all native calls are proxied.");
+        throw new InvalidOperationException ("NativeMockRepository is not initialized. Call .Initialize as early as possible to ensure that all native calls are proxied.");
       }
     }
   }

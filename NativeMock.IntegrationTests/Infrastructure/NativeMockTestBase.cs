@@ -14,8 +14,8 @@ namespace NativeMock.IntegrationTests.Infrastructure
     {
       ApiMock = new Mock<T> (MockBehavior.Strict);
 
-      NativeMockRegistry.ClearMocks();
-      NativeMockRegistry.Mock (ApiMock.Object);
+      NativeMockRepository.ResetAll();
+      NativeMockRepository.Setup (ApiMock.Object);
     }
   }
 }

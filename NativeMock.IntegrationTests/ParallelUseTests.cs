@@ -36,8 +36,8 @@ namespace NativeMock.IntegrationTests
     {
       var mock = new Mock<IFakeNativeApi>();
 
-      NativeMockRegistry.ClearMocks();
-      NativeMockRegistry.Mock (mock.Object);
+      NativeMockRepository.ResetAll();
+      NativeMockRepository.Setup (mock.Object);
 
       var result = Guid.NewGuid().ToString();
       mock.Setup (e => e.NmStringReturn()).Returns (result);

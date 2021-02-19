@@ -2,10 +2,10 @@
 {
   /// <summary>
   /// Provides methods for creating <see cref="INativeMockInterfaceLocator" />s for a specified
-  /// <see cref="AutoRegisterSearchBehavior" />.
+  /// <see cref="RegisterFromAssemblySearchBehavior" />.
   /// </summary>
   internal interface INativeMockInterfaceLocatorFactory
   {
-    INativeMockInterfaceLocator CreateMockInterfaceLocator (AutoRegisterSearchBehavior autoRegisterSearchBehavior);
+    INativeMockInterfaceLocator CreateMockInterfaceLocator (RegisterFromAssemblySearchBehavior registerFromAssemblySearchBehavior);
   }
 }

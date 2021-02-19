@@ -4,7 +4,7 @@ namespace NativeMock
   using System.Collections.Concurrent;
 
   /// <summary>
-  /// Provides a thread-safe registry for <see cref="NativeMockRegistry" /> instances that can be resolved using their
+  /// Provides a thread-safe registry for <see cref="NativeMockRepository" /> instances that can be resolved using their
   /// <see cref="NativeFunctionIdentifier" />.
   /// </summary>
   internal class NativeFunctionProxyRegistry

@@ -15,8 +15,8 @@ namespace NativeMock
 
     static NativeFunctionProxyCodeGenerator()
     {
-      s_getMockObjectMethod = typeof(NativeMockRegistry).GetMethod (nameof(NativeMockRegistry.GetMockObject), BindingFlags.Static | BindingFlags.NonPublic)!
-                              ?? throw new NotSupportedException ("NativeMockRegistry.GetMockObject could not be found.");
+      s_getMockObjectMethod = typeof(NativeMockRepository).GetMethod (nameof(NativeMockRepository.GetMockObject), BindingFlags.Static | BindingFlags.NonPublic)!
+                              ?? throw new NotSupportedException ("NativeMockRepository.GetMockObject could not be found.");
       s_nativeFunctionNotMockedExceptionConstructor = typeof(NativeFunctionNotMockedException).GetConstructor (new[] {typeof(string)})
                                                       ?? throw new NotSupportedException ("Constructor NativeFunctionNotMockedException(string) could not be found.");
     }
@@ -52,7 +52,7 @@ namespace NativeMock
 
       var mockObjectLocal = ilGenerator.DeclareLocal (interfaceType);
 
-      // var mockObject = NativeMockRegistry.GetMockObject<T>();
+      // var mockObject = NativeMockRepository.GetMockObject<T>();
       ilGenerator.Emit (OpCodes.Call, s_getMockObjectMethod.MakeGenericMethod (interfaceType));
       ilGenerator.Emit (OpCodes.Stloc, mockObjectLocal);
       ilGenerator.Emit (OpCodes.Ldloc, mockObjectLocal);

@@ -16,9 +16,9 @@ namespace NativeMock.IntegrationTests
       _duplicateMock1 = new Mock<IDuplicateNativeApi1> (MockBehavior.Strict);
       _duplicateMock2 = new Mock<IDuplicateNativeApi2> (MockBehavior.Strict);
 
-      NativeMockRegistry.ClearMocks();
-      NativeMockRegistry.Mock (_duplicateMock1.Object);
-      NativeMockRegistry.Mock (_duplicateMock2.Object);
+      NativeMockRepository.ResetAll();
+      NativeMockRepository.Setup (_duplicateMock1.Object);
+      NativeMockRepository.Setup (_duplicateMock2.Object);
     }
 
     [Test]
