@@ -10,5 +10,7 @@ namespace NativeMock.IntegrationTests.Infrastructure
     public const string Dll1 = "coreclr.dll";
     public const string Dll2 = "kernel32.dll";
     public const string Dll3 = "user32.dll";
+
+    public const string NonExistentDll = "nonexistent.dll";
   }
 }

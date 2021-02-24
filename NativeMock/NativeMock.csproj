@@ -6,4 +6,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Include="..\Resources\DummyDll.x64.dll" Link="DummyDll.x64.dll" />
+    <EmbeddedResource Include="..\Resources\DummyDll.x86.dll" Link="DummyDll.x86.dll" />
+  </ItemGroup>
+
 </Project>
