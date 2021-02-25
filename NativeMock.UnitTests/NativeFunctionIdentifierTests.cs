@@ -52,7 +52,8 @@ namespace NativeMock.UnitTests
     [Test]
     public void ToStringTest()
     {
-      Assert.That (new NativeFunctionIdentifier ("a", "b").ToString(), Is.EqualTo ("a+b"));
+      Assert.That (new NativeFunctionIdentifier ("a.dll", "b").ToString(), Is.EqualTo ("a.dll+b"));
+      Assert.That (new NativeFunctionIdentifier ("a", "b").ToString(), Is.EqualTo ("a.dll+b"));
     }
   }
 }

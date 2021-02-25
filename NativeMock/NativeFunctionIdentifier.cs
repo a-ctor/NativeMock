@@ -7,6 +7,8 @@ namespace NativeMock
   /// </summary>
   internal readonly struct NativeFunctionIdentifier : IEquatable<NativeFunctionIdentifier>
   {
+    private const string c_dllExtensions = ".dll";
+
     public string ModuleName { get; }
 
     public string FunctionName { get; }
@@ -24,7 +26,8 @@ namespace NativeMock
       if (string.IsNullOrWhiteSpace (functionName))
         throw new ArgumentException ("Function name cannot be empty.");
 
-      ModuleName = moduleName;
+      // Attach the dll extension to the module name if it was not specified
+      ModuleName = moduleName.EndsWith (c_dllExtensions, StringComparison.OrdinalIgnoreCase) ? moduleName : moduleName + c_dllExtensions;
       FunctionName = functionName;
     }
 
