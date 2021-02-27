@@ -6,9 +6,44 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <PackageId>NativeMock</PackageId>
+    <PackageVersion>$(Version)</PackageVersion>
+    <Authors>Patrick Widauer (a-ctor)</Authors>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <Description>A .NET 5 library that allows you to mock native function using custom interfaces.</Description>
+    <Copyright>Copyright (c) Patrick Widauer 2021</Copyright>
+    <NoPackageAnalysis>true</NoPackageAnalysis>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+
+    <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);_AddAnalyzersToOutput</TargetsForTfmSpecificContentInPackage>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\NativeMock.Analyzer.CodeFixes\NativeMock.Analyzer.CodeFixes.csproj">
+      <PrivateAssets>all</PrivateAssets>
+    </ProjectReference>
+    <ProjectReference Include="..\NativeMock.Analyzer\NativeMock.Analyzer.csproj">
+      <PrivateAssets>all</PrivateAssets>
+    </ProjectReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="tools\*.ps1" CopyToOutputDirectory="Always" Pack="true" PackagePath="" />
+  </ItemGroup>
+
   <ItemGroup>
     <EmbeddedResource Include="..\Resources\DummyDll.x64.dll" Link="DummyDll.x64.dll" />
     <EmbeddedResource Include="..\Resources\DummyDll.x86.dll" Link="DummyDll.x86.dll" />
   </ItemGroup>
+
+  <Target Name="_AddAnalyzersToOutput">
+    <ItemGroup>
+      <TfmSpecificPackageFile Include="$(OutputPath)\NativeMock.Analyzer.dll" PackagePath="analyzers/dotnet/cs" />
+      <TfmSpecificPackageFile Include="$(OutputPath)\NativeMock.Analyzer.CodeFixes.dll"
+                              PackagePath="analyzers/dotnet/cs" />
+    </ItemGroup>
+  </Target>
 
 </Project>
