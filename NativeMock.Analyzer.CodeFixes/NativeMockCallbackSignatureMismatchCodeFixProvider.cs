@@ -38,29 +38,27 @@ namespace NativeMock.Analyzer
       var diagnosticSpan = diagnostic.Location.SourceSpan;
 
       var methodDeclaration = root.FindToken (diagnosticSpan.Start).Parent.AncestorsAndSelf().OfType<MethodDeclarationSyntax>().First();
-      var methodDeclarationSymbol = model.GetDeclaredSymbol (methodDeclaration);
+      var methodSymbol = model.GetDeclaredSymbol (methodDeclaration);
 
-      var nativeMockInterfaceAttribute = AttributeHelper.GetNativeMockInterfaceAttribute (methodDeclarationSymbol.ContainingType);
+      var nativeMockInterfaceAttribute = AttributeHelper.GetNativeMockInterfaceAttribute (methodSymbol.ContainingType);
       var moduleName = AttributeHelper.GetModuleNameFromAttribute (nativeMockInterfaceAttribute);
       var defaultDeclaringType = AttributeHelper.GetDeclaringTypeSymbolFromAttribute (nativeMockInterfaceAttribute);
       if (moduleName == null)
         return;
 
-      var nativeMockCallback = s_nativeMockCallbackProvider.GetNativeMockCallback (methodDeclarationSymbol, moduleName, defaultDeclaringType);
+      var nativeMockCallback = s_nativeMockCallbackProvider.GetNativeMockCallback (methodSymbol, moduleName, defaultDeclaringType);
       if (nativeMockCallback?.DeclaringType == null)
         return;
 
       var pInvokeMembers = s_pInvokeMemberProvider.GetPInvokeMembers (nativeMockCallback.DeclaringType);
       var matchingPInvokeMember = pInvokeMembers.FirstOrDefault (e => e.Name == nativeMockCallback.Name);
-      if (matchingPInvokeMember == null)
+
+      var methodDeclaringSyntaxReference = matchingPInvokeMember?.Method.DeclaringSyntaxReferences.SingleOrDefault();
+      if (methodDeclaringSyntaxReference == null)
         return;
 
-      var methodDeclaringSyntaxReferences = matchingPInvokeMember.Method.DeclaringSyntaxReferences;
-      if (methodDeclaringSyntaxReferences.Length != 1)
-        return;
-
-      var pInvokeMethodDeclaration = root.FindNode (methodDeclaringSyntaxReferences[0].Span) as MethodDeclarationSyntax;
-      if (pInvokeMethodDeclaration == null)
+      var syntaxTree = await methodDeclaringSyntaxReference.GetSyntaxAsync();
+      if (syntaxTree.FindNode (methodDeclaringSyntaxReference.Span) is not MethodDeclarationSyntax pInvokeMethodDeclaration)
         return;
 
       context.RegisterCodeFix (

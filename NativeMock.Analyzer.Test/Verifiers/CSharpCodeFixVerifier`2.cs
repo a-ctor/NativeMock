@@ -1,5 +1,6 @@
 namespace NativeMock.Analyzer.Test.Verifiers
 {
+  using System.IO;
   using System.Threading;
   using System.Threading.Tasks;
   using Microsoft.CodeAnalysis;
@@ -13,6 +14,8 @@ namespace NativeMock.Analyzer.Test.Verifiers
     where TAnalyzer : DiagnosticAnalyzer, new()
     where TCodeFix : CodeFixProvider, new()
   {
+    private const string c_testAssemblyName = @"NativeMock.Analyzer.TestAssembly.dll";
+
     /// <inheritdoc cref="CodeFixVerifier{TAnalyzer, TCodeFix, TTest, TVerifier}.Diagnostic()" />
     public static DiagnosticResult Diagnostic()
       => CSharpCodeFixVerifier<TAnalyzer, TCodeFix, MSTestVerifier>.Diagnostic();
@@ -32,6 +35,7 @@ namespace NativeMock.Analyzer.Test.Verifiers
       var test = new Test
       {
         TestCode = source,
+        SolutionTransforms = {(solution, id) => solution.AddMetadataReference (id, MetadataReference.CreateFromFile (Path.GetFullPath (c_testAssemblyName)))}
       };
 
       test.ExpectedDiagnostics.AddRange (expected);
@@ -55,6 +59,7 @@ namespace NativeMock.Analyzer.Test.Verifiers
       {
         TestCode = source,
         FixedCode = fixedSource,
+        SolutionTransforms = {(solution, id) => solution.AddMetadataReference (id, MetadataReference.CreateFromFile (Path.GetFullPath (c_testAssemblyName)))}
       };
 
       test.ExpectedDiagnostics.AddRange (expected);

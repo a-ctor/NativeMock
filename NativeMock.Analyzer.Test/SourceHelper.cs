@@ -12,33 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-
-namespace NativeMock
-{
-  [AttributeUsage (AttributeTargets.Interface)]
-  public class NativeMockInterfaceAttribute : Attribute
-  {
-    public Type DeclaringType { get; set; }
-
-    public NativeMockInterfaceAttribute(string name)
-    {
-    }
-  }
-
-  [AttributeUsage (AttributeTargets.Method)]
-  public class NativeMockCallbackAttribute : Attribute
-  {
-    public Type DeclaringType { get; set; }
-
-    public NativeMockCallbackAttribute()
-    {
-    }
-
-    public NativeMockCallbackAttribute(string name)
-    {
-    }
-  }
-}
+using TestAssembly = NativeMock.Analyzer.TestAssembly;
 " + code;
     }
 

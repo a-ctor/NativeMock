@@ -223,5 +223,20 @@ interface Test
 
       await VerifyCS.VerifyAnalyzerAsync (test);
     }
+
+    [TestMethod]
+    public async Task NoDiagnosticEmittedWithExistingCompiledDeclaringType()
+    {
+      var test = SourceHelper.Create (
+        @"
+[NativeMock.NativeMockInterface (""test.dll"")]
+interface Test
+{
+  [NativeMock.NativeMockCallback (DeclaringType = typeof(TestAssembly.UnsafeMethods))]
+  void Test(); 
+}");
+
+      await VerifyCS.VerifyAnalyzerAsync (test);
+    }
   }
 }

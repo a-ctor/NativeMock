@@ -17,6 +17,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NativeMock.Analyzer.Test", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NativeMock.Analyzer.Vsix", "NativeMock.Analyzer.Vsix\NativeMock.Analyzer.Vsix.csproj", "{4825E6DA-9091-423B-905B-B1766128F1E5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NativeMock.Analyzer.TestAssembly", "NativeMock.Analyzer.TestAssembly\NativeMock.Analyzer.TestAssembly.csproj", "{A805753C-7F20-4B42-970F-3910B2147069}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -111,6 +113,18 @@ Global
 		{4825E6DA-9091-423B-905B-B1766128F1E5}.Release|x64.Build.0 = Release|Any CPU
 		{4825E6DA-9091-423B-905B-B1766128F1E5}.Release|x86.ActiveCfg = Release|Any CPU
 		{4825E6DA-9091-423B-905B-B1766128F1E5}.Release|x86.Build.0 = Release|Any CPU
+		{A805753C-7F20-4B42-970F-3910B2147069}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A805753C-7F20-4B42-970F-3910B2147069}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A805753C-7F20-4B42-970F-3910B2147069}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{A805753C-7F20-4B42-970F-3910B2147069}.Debug|x64.Build.0 = Debug|Any CPU
+		{A805753C-7F20-4B42-970F-3910B2147069}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{A805753C-7F20-4B42-970F-3910B2147069}.Debug|x86.Build.0 = Debug|Any CPU
+		{A805753C-7F20-4B42-970F-3910B2147069}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A805753C-7F20-4B42-970F-3910B2147069}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A805753C-7F20-4B42-970F-3910B2147069}.Release|x64.ActiveCfg = Release|Any CPU
+		{A805753C-7F20-4B42-970F-3910B2147069}.Release|x64.Build.0 = Release|Any CPU
+		{A805753C-7F20-4B42-970F-3910B2147069}.Release|x86.ActiveCfg = Release|Any CPU
+		{A805753C-7F20-4B42-970F-3910B2147069}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

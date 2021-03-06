@@ -13,11 +13,13 @@ namespace NativeMock.Analyzer.Shared
         if (member.Kind != SymbolKind.Method || !member.IsExtern)
           continue;
 
-        var identifier = AttributeHelper.GetDllImportIdentifier (member);
-        if (identifier == null)
+        var method = (IMethodSymbol) member;
+        var dllImportData = method.GetDllImportData();
+        if (dllImportData?.ModuleName == null)
           continue;
 
-        builder.Add (new PInvokeMember (identifier.Value, (IMethodSymbol) member));
+        var identifier = new NativeFunctionIdentifier (dllImportData.ModuleName, dllImportData.EntryPointName ?? method.Name);
+        builder.Add (new PInvokeMember (identifier, method));
       }
 
       return builder.ToImmutable();

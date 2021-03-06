@@ -11,27 +11,6 @@ namespace NativeMock.Analyzer.Shared
 
     private const string c_declaringTypePropertyName = "DeclaringType";
 
-    private const string c_dllImportAttributeName = "DllImportAttribute";
-    private const string c_dllImportAttributeNamespace = "InteropServices";
-    private const string c_dllImportEntryPointPropertyName = "EntryPoint";
-
-    public static NativeFunctionIdentifier? GetDllImportIdentifier (ISymbol? symbol)
-    {
-      if (symbol == null)
-        return null;
-
-      var dllImportAttribute = GetDllImportAttribute (symbol);
-      if (dllImportAttribute == null)
-        return null;
-
-      var moduleName = GetConstructorArgument (dllImportAttribute, 0) as string;
-      var entryPoint = GetNamedArgument (dllImportAttribute, c_dllImportEntryPointPropertyName)?.Value as string;
-
-      return moduleName != null
-        ? new NativeFunctionIdentifier (moduleName, entryPoint ?? symbol.Name)
-        : null;
-    }
-
     public static string? GetNameFromAttribute (AttributeData? attribute)
     {
       if (attribute == null)
@@ -76,10 +55,6 @@ namespace NativeMock.Analyzer.Shared
 
       return null;
     }
-
-    public static AttributeData? GetDllImportAttribute (ISymbol symbol) => symbol.GetAttributes().FirstOrDefault (IsDllImportAttribute);
-
-    private static bool IsDllImportAttribute (AttributeData attribute) => attribute.AttributeClass.Name == c_dllImportAttributeName && attribute.AttributeClass.ContainingNamespace.Name == c_dllImportAttributeNamespace;
 
     public static AttributeData? GetNativeMockInterfaceAttribute (ISymbol symbol) => symbol.GetAttributes().FirstOrDefault (IsNativeMockInterfaceAttribute);
 

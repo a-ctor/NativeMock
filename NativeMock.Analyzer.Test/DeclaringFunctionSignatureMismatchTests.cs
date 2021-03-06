@@ -157,5 +157,24 @@ interface Test
 
       await VerifyCS.VerifyAnalyzerAsync (test, expected);
     }
+
+    [TestMethod]
+    public async Task CompiledDeclaringType()
+    {
+      var test = SourceHelper.Create (
+        @"
+[NativeMock.NativeMockInterface (""test.dll"")]
+interface Test
+{
+  [NativeMock.NativeMockCallback (DeclaringType = typeof(TestAssembly.UnsafeMethods))]
+  void {|#0:Test|}(int value); 
+}");
+
+      var expected = VerifyCS.Diagnostic (RuleIds.DeclaringFunctionSignatureMismatchRuleId)
+        .WithLocation (0)
+        .WithArguments ("Test");
+
+      await VerifyCS.VerifyAnalyzerAsync (test, expected);
+    }
   }
 }

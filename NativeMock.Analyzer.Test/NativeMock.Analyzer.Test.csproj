@@ -23,6 +23,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\NativeMock.Analyzer.CodeFixes\NativeMock.Analyzer.CodeFixes.csproj" />
+    <ProjectReference Include="..\NativeMock.Analyzer.TestAssembly\NativeMock.Analyzer.TestAssembly.csproj" />
     <ProjectReference Include="..\NativeMock.Analyzer\NativeMock.Analyzer.csproj" />
   </ItemGroup>
 
