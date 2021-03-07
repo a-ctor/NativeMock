@@ -18,7 +18,7 @@ namespace NativeMock.Analyzer.Test
 
       var expected = VerifyCS.Diagnostic (RuleIds.DeclaringFunctionSignatureMismatchRuleId)
         .WithLocation (0)
-        .WithArguments ("Test");
+        .WithArguments ("Test", "NativeFunctions.Test()");
 
       await VerifyCS.VerifyCodeFixAsync (test, expected, fixedTest);
     }
@@ -33,7 +33,7 @@ namespace NativeMock.Analyzer.Test
 
       var expected = VerifyCS.Diagnostic (RuleIds.DeclaringFunctionSignatureMismatchRuleId)
         .WithLocation (0)
-        .WithArguments ("Test");
+        .WithArguments ("Test", "NativeFunctions.Test()");
 
       await VerifyCS.VerifyCodeFixAsync (test, expected, fixedTest);
     }
@@ -48,7 +48,7 @@ namespace NativeMock.Analyzer.Test
 
       var expected = VerifyCS.Diagnostic (RuleIds.DeclaringFunctionSignatureMismatchRuleId)
         .WithLocation (0)
-        .WithArguments ("Test");
+        .WithArguments ("Test", "NativeFunctions.Test(int)");
 
       await VerifyCS.VerifyCodeFixAsync (test, expected, fixedTest);
     }
@@ -63,7 +63,7 @@ namespace NativeMock.Analyzer.Test
 
       var expected = VerifyCS.Diagnostic (RuleIds.DeclaringFunctionSignatureMismatchRuleId)
         .WithLocation (0)
-        .WithArguments ("Test");
+        .WithArguments ("Test", "NativeFunctions.Test(ref int)");
 
       await VerifyCS.VerifyCodeFixAsync (test, expected, fixedTest);
     }
@@ -78,7 +78,7 @@ namespace NativeMock.Analyzer.Test
 
       var expected = VerifyCS.Diagnostic (RuleIds.DeclaringFunctionSignatureMismatchRuleId)
         .WithLocation (0)
-        .WithArguments ("Test");
+        .WithArguments ("Test", "NativeFunctions.Test(int)");
 
       await VerifyCS.VerifyCodeFixAsync (test, expected, fixedTest);
     }
@@ -93,7 +93,7 @@ namespace NativeMock.Analyzer.Test
 
       var expected = VerifyCS.Diagnostic (RuleIds.DeclaringFunctionSignatureMismatchRuleId)
         .WithLocation (0)
-        .WithArguments ("Test");
+        .WithArguments ("Test", "NativeFunctions.Test(string, ref int)");
 
       await VerifyCS.VerifyCodeFixAsync (test, expected, fixedTest);
     }
@@ -108,7 +108,7 @@ namespace NativeMock.Analyzer.Test
 
       var expected = VerifyCS.Diagnostic (RuleIds.DeclaringFunctionSignatureMismatchRuleId)
         .WithLocation (0)
-        .WithArguments ("Test");
+        .WithArguments ("Test", "NativeFunctions.Test(string)");
 
       await VerifyCS.VerifyCodeFixAsync (test, expected, fixedTest);
     }

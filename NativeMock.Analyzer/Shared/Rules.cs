@@ -16,9 +16,14 @@ namespace NativeMock.Analyzer.Shared
       true,
       new LocalizableResourceString (nameof(Resources.NoDeclaringTypeDescription), Resources.ResourceManager, typeof(Resources)));
 
-    public static Diagnostic CreateNoDeclaringTypeDiagnostic (ISymbol method)
+    public static Diagnostic CreateNoDeclaringTypeDiagnostic (IMethodSymbol method, NativeFunctionIdentifier identifier, ITypeSymbol declaringType)
     {
-      return Diagnostic.Create (NoDeclaringTypeRule, method.Locations[0], method.Name);
+      return Diagnostic.Create (
+        NoDeclaringTypeRule,
+        method.Locations[0],
+        method.Name,
+        identifier,
+        declaringType.ToDisplayString (SymbolDisplayFormat.CSharpShortErrorMessageFormat));
     }
 
     public static readonly DiagnosticDescriptor DeclaringFunctionSignatureMismatchRule = new (
@@ -30,9 +35,13 @@ namespace NativeMock.Analyzer.Shared
       true,
       new LocalizableResourceString (nameof(Resources.DeclaringFunctionSignatureMismatchDescription), Resources.ResourceManager, typeof(Resources)));
 
-    public static Diagnostic CreateDeclaringFunctionSignatureMismatchDiagnostic (ISymbol method)
+    public static Diagnostic CreateDeclaringFunctionSignatureMismatchDiagnostic (IMethodSymbol method, IMethodSymbol declaringMethod)
     {
-      return Diagnostic.Create (DeclaringFunctionSignatureMismatchRule, method.Locations[0], method.Name);
+      return Diagnostic.Create (
+        DeclaringFunctionSignatureMismatchRule,
+        method.Locations[0],
+        method.Name,
+        declaringMethod.ToDisplayString (SymbolDisplayFormat.CSharpShortErrorMessageFormat));
     }
 
     public static ImmutableArray<DiagnosticDescriptor> All { get; } = ImmutableArray.Create (NoDeclaringTypeRule, DeclaringFunctionSignatureMismatchRule);

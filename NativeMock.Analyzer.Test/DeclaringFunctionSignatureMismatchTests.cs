@@ -28,7 +28,7 @@ interface Test
 
       var expected = VerifyCS.Diagnostic (RuleIds.DeclaringFunctionSignatureMismatchRuleId)
         .WithLocation (0)
-        .WithArguments ("Test");
+        .WithArguments ("Test", "NativeFunctions.Test()");
 
       await VerifyCS.VerifyAnalyzerAsync (test, expected);
     }
@@ -53,7 +53,7 @@ interface Test
 
       var expected = VerifyCS.Diagnostic (RuleIds.DeclaringFunctionSignatureMismatchRuleId)
         .WithLocation (0)
-        .WithArguments ("Test");
+        .WithArguments ("Test", "NativeFunctions.Test()");
 
       await VerifyCS.VerifyAnalyzerAsync (test, expected);
     }
@@ -78,7 +78,7 @@ interface Test
 
       var expected = VerifyCS.Diagnostic (RuleIds.DeclaringFunctionSignatureMismatchRuleId)
         .WithLocation (0)
-        .WithArguments ("Test");
+        .WithArguments ("Test", "NativeFunctions.Test()");
 
       await VerifyCS.VerifyAnalyzerAsync (test, expected);
     }
@@ -103,7 +103,7 @@ interface Test
 
       var expected = VerifyCS.Diagnostic (RuleIds.DeclaringFunctionSignatureMismatchRuleId)
         .WithLocation (0)
-        .WithArguments ("Test");
+        .WithArguments ("Test", "NativeFunctions.Test()");
 
       await VerifyCS.VerifyAnalyzerAsync (test, expected);
     }
@@ -128,7 +128,7 @@ interface Test
 
       var expected = VerifyCS.Diagnostic (RuleIds.DeclaringFunctionSignatureMismatchRuleId)
         .WithLocation (0)
-        .WithArguments ("Test");
+        .WithArguments ("Test", "NativeFunctions.Test(string)");
 
       await VerifyCS.VerifyAnalyzerAsync (test, expected);
     }
@@ -153,7 +153,7 @@ interface Test
 
       var expected = VerifyCS.Diagnostic (RuleIds.DeclaringFunctionSignatureMismatchRuleId)
         .WithLocation (0)
-        .WithArguments ("Test");
+        .WithArguments ("Test", "NativeFunctions.Test(ref int)");
 
       await VerifyCS.VerifyAnalyzerAsync (test, expected);
     }
@@ -172,7 +172,7 @@ interface Test
 
       var expected = VerifyCS.Diagnostic (RuleIds.DeclaringFunctionSignatureMismatchRuleId)
         .WithLocation (0)
-        .WithArguments ("Test");
+        .WithArguments ("Test", "UnsafeMethods.Test()");
 
       await VerifyCS.VerifyAnalyzerAsync (test, expected);
     }

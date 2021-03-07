@@ -61,7 +61,7 @@ namespace NativeMock.Analyzer {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The signature of a native mock interface method must match with the signature of the declaring method..
+        ///   Looks up a localized string similar to Change one of the signatures to match the other. This can lead to serious and hard to diagnose problems if ignored..
         /// </summary>
         internal static string DeclaringFunctionSignatureMismatchDescription {
             get {
@@ -70,7 +70,7 @@ namespace NativeMock.Analyzer {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The signature of the native mock interface method &apos;{0}&apos; did not match its declaring method.
+        ///   Looks up a localized string similar to The mock callback method &apos;{0}&apos; and its declaring function &apos;{1}&apos; differ in signature..
         /// </summary>
         internal static string DeclaringFunctionSignatureMismatchMessageFormat {
             get {
@@ -79,7 +79,7 @@ namespace NativeMock.Analyzer {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Signature mismatch between native mock interface method and declaring method.
+        ///   Looks up a localized string similar to The signature of the declaring function does not match..
         /// </summary>
         internal static string DeclaringFunctionSignatureMismatchTitle {
             get {
@@ -88,7 +88,7 @@ namespace NativeMock.Analyzer {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to No suitable declaring method was found. Make sure the name and module match the provided name and module in the DllImportAttribute..
+        ///   Looks up a localized string similar to Make sure that the DLL name and entry point match the values specified in the DllImportAttribute..
         /// </summary>
         internal static string NoDeclaringTypeDescription {
             get {
@@ -97,7 +97,7 @@ namespace NativeMock.Analyzer {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to No declaring method was found for the native mock interface method &apos;{0}&apos;.
+        ///   Looks up a localized string similar to No suitable declaring function for &apos;{0}&apos; matching &apos;{1}&apos; was found in the declaring type &apos;{2}&apos;. .
         /// </summary>
         internal static string NoDeclaringTypeMessageFormat {
             get {
@@ -106,7 +106,7 @@ namespace NativeMock.Analyzer {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to No declaring method found for native mock interface method.
+        ///   Looks up a localized string similar to The declaring function was not found..
         /// </summary>
         internal static string NoDeclaringTypeTitle {
             get {

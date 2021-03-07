@@ -38,7 +38,7 @@ interface Test
 
       var expected = VerifyCS.Diagnostic (RuleIds.NoDeclaringTypeRuleId)
         .WithLocation (0)
-        .WithArguments ("Test");
+        .WithArguments ("Test", "test.dll+Test", "NativeFunctions");
 
       await VerifyCS.VerifyAnalyzerAsync (test, expected);
     }
@@ -61,7 +61,7 @@ interface Test
 
       var expected = VerifyCS.Diagnostic (RuleIds.NoDeclaringTypeRuleId)
         .WithLocation (0)
-        .WithArguments ("Test");
+        .WithArguments ("Test", "test.dll+Test", "NativeFunctions");
 
       await VerifyCS.VerifyAnalyzerAsync (test, expected);
     }
@@ -148,7 +148,7 @@ interface Test
 
       var expected = VerifyCS.Diagnostic (RuleIds.NoDeclaringTypeRuleId)
         .WithLocation (0)
-        .WithArguments ("Test");
+        .WithArguments ("Test", "test.dll+Test2", "NativeFunctions");
 
       await VerifyCS.VerifyAnalyzerAsync (test, expected);
     }
@@ -173,7 +173,7 @@ interface Test
 
       var expected = VerifyCS.Diagnostic (RuleIds.NoDeclaringTypeRuleId)
         .WithLocation (0)
-        .WithArguments ("Test");
+        .WithArguments ("Test", "test.dll+Test", "NativeFunctions");
 
       await VerifyCS.VerifyAnalyzerAsync (test, expected);
     }
@@ -198,7 +198,7 @@ interface Test
 
       var expected = VerifyCS.Diagnostic (RuleIds.NoDeclaringTypeRuleId)
         .WithLocation (0)
-        .WithArguments ("Test");
+        .WithArguments ("Test", "test.dll+Test", "NativeFunctions");
 
       await VerifyCS.VerifyAnalyzerAsync (test, expected);
     }

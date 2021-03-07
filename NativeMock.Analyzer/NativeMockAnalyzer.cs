@@ -53,12 +53,12 @@ namespace NativeMock.Analyzer
         if (matchingPInvokeMember == null)
         {
           // Cannot find declaring method
-          context.ReportDiagnostic (Rules.CreateNoDeclaringTypeDiagnostic (method));
+          context.ReportDiagnostic (Rules.CreateNoDeclaringTypeDiagnostic (method, nativeMockCallback.Name, nativeMockCallback.DeclaringType));
         }
         else if (!MethodComparer.HaveSameSignature (method, matchingPInvokeMember.Method))
         {
           // Signature mismatch
-          context.ReportDiagnostic (Rules.CreateDeclaringFunctionSignatureMismatchDiagnostic (method));
+          context.ReportDiagnostic (Rules.CreateDeclaringFunctionSignatureMismatchDiagnostic (method, matchingPInvokeMember.Method));
         }
       }
     }
