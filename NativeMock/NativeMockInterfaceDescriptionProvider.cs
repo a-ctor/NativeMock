@@ -36,7 +36,7 @@ namespace NativeMock
           e =>
           {
             return _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (
-              nativeMockInterfaceAttribute.Module,
+              nativeMockInterfaceAttribute.DllName,
               e,
               nativeMockInterfaceAttribute.DeclaringType,
               nativeMockInterfaceAttribute.Behavior);

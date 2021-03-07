@@ -38,21 +38,21 @@ namespace NativeMock
     public Type? DeclaringType { get; set; }
 
     /// <summary>
-    /// The name of the module that should be mocked using this interface.
+    /// The name of the DLL mocked using this interface.
     /// </summary>
     /// <remarks>
-    /// The specified module must match the name specified in the <see cref="DllImportAttribute" />.
+    /// The specified DLL name must match the name specified in the <see cref="DllImportAttribute" />.
     /// </remarks>
-    public string Module { get; }
+    public string DllName { get; }
 
-    public NativeMockInterfaceAttribute (string module)
+    public NativeMockInterfaceAttribute (string dllName)
     {
-      if (module == null)
-        throw new ArgumentNullException (nameof(module));
-      if (string.IsNullOrWhiteSpace (module))
+      if (dllName == null)
+        throw new ArgumentNullException (nameof(dllName));
+      if (string.IsNullOrWhiteSpace (dllName))
         throw new ArgumentException ("Module must not be empty.");
 
-      Module = module;
+      DllName = dllName;
     }
   }
 }

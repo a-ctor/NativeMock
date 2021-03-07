@@ -34,7 +34,7 @@ namespace NativeMock
 
       var nativeMockCallbackAttribute = method.GetCustomAttribute<NativeMockCallbackAttribute>();
 
-      var functionName = nativeMockCallbackAttribute?.Name ?? method.Name;
+      var functionName = nativeMockCallbackAttribute?.EntryPoint ?? method.Name;
       var name = new NativeFunctionIdentifier (moduleName, functionName);
       var nativeMockBehavior = nativeMockCallbackAttribute?.Behavior ?? NativeMockBehavior.Default;
       if (nativeMockBehavior == NativeMockBehavior.Default)

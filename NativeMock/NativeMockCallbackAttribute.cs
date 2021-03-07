@@ -14,9 +14,7 @@ namespace NativeMock
   public class NativeMockCallbackAttribute : Attribute
   {
     /// <summary>
-    /// The name of the native function that should be mocked, or <see langword="null" /> if the name of the mock interface
-    /// method should
-    /// be used.
+    /// Indicates the name of the native function that should be mocked.
     /// </summary>
     /// <remarks>
     /// By default the mock interface method name is used to identify the native function to be mocked.
@@ -37,7 +35,7 @@ namespace NativeMock
     /// }
     /// </code>
     /// </example>
-    public string? Name { get; }
+    public string? EntryPoint { get; }
 
     /// <summary>
     /// Determines the behavior of the native function when it is called when no mock is set up.
@@ -79,9 +77,9 @@ namespace NativeMock
     {
     }
 
-    public NativeMockCallbackAttribute (string name)
+    public NativeMockCallbackAttribute (string entryPoint)
     {
-      Name = name;
+      EntryPoint = entryPoint;
     }
   }
 }
