@@ -12,10 +12,7 @@ namespace NativeMock
 
     public NativeMockInterfaceMethodDescriptionProvider (IPInvokeMemberProvider pInvokeMemberProvider)
     {
-      if (pInvokeMemberProvider == null)
-        throw new ArgumentNullException (nameof(pInvokeMemberProvider));
-
-      _pInvokeMemberProvider = pInvokeMemberProvider;
+      _pInvokeMemberProvider = pInvokeMemberProvider ?? throw new ArgumentNullException (nameof(pInvokeMemberProvider));
     }
 
     /// <inheritdoc />
@@ -67,7 +64,7 @@ namespace NativeMock
       return resolvedMethod;
     }
 
-    private void EnsureMethodIsCompatible (MethodInfo original, MethodInfo declaration)
+    private static void EnsureMethodIsCompatible (MethodInfo original, MethodInfo declaration)
     {
       var originalParameters = original.GetParameters();
       var declarationParameters = declaration.GetParameters();
@@ -98,19 +95,19 @@ namespace NativeMock
       }
     }
 
-    private bool IsParameterEqual (ParameterInfo original, ParameterInfo declaration)
+    private static bool IsParameterEqual (ParameterInfo original, ParameterInfo declaration)
     {
       return original.ParameterType == declaration.ParameterType
              && original.IsIn == declaration.IsIn
              && original.IsOut == declaration.IsOut;
     }
 
-    private string FormatComparison (ParameterInfo original, ParameterInfo declaration)
+    private static string FormatComparison (ParameterInfo original, ParameterInfo declaration)
     {
       return $"'{FormatParameter (original)}' vs '{FormatParameter (declaration)}'";
     }
 
-    private string FormatParameter (ParameterInfo parameter)
+    private static string FormatParameter (ParameterInfo parameter)
     {
       var stringBuilder = new StringBuilder();
 

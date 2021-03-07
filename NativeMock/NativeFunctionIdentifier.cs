@@ -1,4 +1,8 @@
+#if NETSTANDARD2_0
+namespace NativeMock.Analyzer.Shared
+#else
 namespace NativeMock
+#endif
 {
   using System;
 

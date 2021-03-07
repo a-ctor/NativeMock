@@ -7,7 +7,7 @@ namespace NativeMock.Analyzer.Shared
     public static bool HaveSameSignature (IMethodSymbol left, IMethodSymbol right)
     {
       // Check the return type
-      var correctReturnType = left.ReturnType.Equals (right.ReturnType)
+      var correctReturnType = left.ReturnType.Equals (right.ReturnType, SymbolEqualityComparer.Default)
                               && left.ReturnsByRef == right.ReturnsByRef
                               && left.ReturnsByRefReadonly == right.ReturnsByRefReadonly;
 
@@ -21,7 +21,7 @@ namespace NativeMock.Analyzer.Shared
         var leftParameter = left.Parameters[i];
         var rightParameter = right.Parameters[i];
 
-        var correctParameter = leftParameter.Type.Equals (rightParameter.Type)
+        var correctParameter = leftParameter.Type.Equals (rightParameter.Type, SymbolEqualityComparer.Default)
                                && leftParameter.RefKind == rightParameter.RefKind;
         if (!correctParameter)
           return false;
