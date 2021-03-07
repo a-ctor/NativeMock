@@ -12,7 +12,7 @@ namespace NativeMock
   /// </summary>
   public static class NativeMockRepository
   {
-    private delegate IntPtr GetProcAddressDelegate (IntPtr hModule, string procName);
+    private delegate IntPtr GetProcAddressDelegate (IntPtr hModule, IntPtr procName);
 
     private const string c_coreClrDll = "coreclr.dll";
     private const string c_kernel32Dll = "kernel32.dll";
@@ -199,13 +199,17 @@ namespace NativeMock
         Register (type);
     }
 
-    private static IntPtr GetProcAddress (IntPtr module, string functionName)
+    private static IntPtr GetProcAddress (IntPtr module, IntPtr procName)
     {
+      var functionName = FunctionName.ParseFromProcName (procName);
+      if (functionName.IsOrdinal)
+        return s_getProcAddressHook.Original (module, procName);
+
       var moduleName = s_moduleNameResolver.Resolve (module);
-      var nativeFunctionIdentifier = new NativeFunctionIdentifier (moduleName, functionName);
+      var nativeFunctionIdentifier = new NativeFunctionIdentifier (moduleName, functionName.StringValue);
 
       return s_nativeFunctionProxyRegistry.Resolve (nativeFunctionIdentifier)?.NativePtr
-             ?? s_getProcAddressHook.Original (module, functionName);
+             ?? s_getProcAddressHook.Original (module, procName);
     }
 
     internal static T? GetMockObject<T>()
