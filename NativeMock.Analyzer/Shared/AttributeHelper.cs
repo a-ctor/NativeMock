@@ -58,10 +58,10 @@ namespace NativeMock.Analyzer.Shared
 
     public static AttributeData? GetNativeMockInterfaceAttribute (ISymbol symbol) => symbol.GetAttributes().FirstOrDefault (IsNativeMockInterfaceAttribute);
 
-    private static bool IsNativeMockInterfaceAttribute (AttributeData attribute) => attribute.AttributeClass.Name == c_nativeMockInterfaceAttributeName && attribute.AttributeClass.ContainingNamespace.Name == c_nativeMockNamespace;
+    private static bool IsNativeMockInterfaceAttribute (AttributeData attribute) => attribute.AttributeClass!.Name == c_nativeMockInterfaceAttributeName && attribute.AttributeClass.ContainingNamespace.Name == c_nativeMockNamespace;
 
     public static AttributeData? GetNativeMockCallbackAttribute (ISymbol symbol) => symbol.GetAttributes().FirstOrDefault (IsNativeMockCallbackAttribute);
 
-    private static bool IsNativeMockCallbackAttribute (AttributeData attribute) => attribute.AttributeClass.Name == c_nativeMockCallbackAttributeName && attribute.AttributeClass.ContainingNamespace.Name == c_nativeMockNamespace;
+    private static bool IsNativeMockCallbackAttribute (AttributeData attribute) => attribute.AttributeClass!.Name == c_nativeMockCallbackAttributeName && attribute.AttributeClass.ContainingNamespace.Name == c_nativeMockNamespace;
   }
 }

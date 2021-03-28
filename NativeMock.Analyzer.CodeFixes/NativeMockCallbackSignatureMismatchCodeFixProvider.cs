@@ -17,8 +17,8 @@ namespace NativeMock.Analyzer
   [Shared]
   public class NativeMockCallbackSignatureMismatchCodeFixProvider : CodeFixProvider
   {
-    private static readonly NativeMockCallbackProvider s_nativeMockCallbackProvider = new NativeMockCallbackProvider();
-    private static readonly PInvokeMemberProvider s_pInvokeMemberProvider = new PInvokeMemberProvider();
+    private static readonly NativeMockCallbackProvider s_nativeMockCallbackProvider = new();
+    private static readonly PInvokeMemberProvider s_pInvokeMemberProvider = new();
 
     private static readonly SyntaxTriviaList s_singleSpaceTriviaList = SyntaxTriviaList.Create (SyntaxFactory.Space);
 
@@ -32,13 +32,13 @@ namespace NativeMock.Analyzer
     public sealed override async Task RegisterCodeFixesAsync (CodeFixContext context)
     {
       var model = await context.Document.GetSemanticModelAsync (context.CancellationToken).ConfigureAwait (false);
-      var root = await context.Document.GetSyntaxRootAsync (context.CancellationToken).ConfigureAwait (false);
+      var root = (await context.Document.GetSyntaxRootAsync (context.CancellationToken).ConfigureAwait (false))!;
 
       var diagnostic = context.Diagnostics.First();
       var diagnosticSpan = diagnostic.Location.SourceSpan;
 
-      var methodDeclaration = root.FindToken (diagnosticSpan.Start).Parent.AncestorsAndSelf().OfType<MethodDeclarationSyntax>().First();
-      var methodSymbol = model.GetDeclaredSymbol (methodDeclaration);
+      var methodDeclaration = root.FindToken (diagnosticSpan.Start).Parent!.AncestorsAndSelf().OfType<MethodDeclarationSyntax>().First();
+      var methodSymbol = model.GetDeclaredSymbol (methodDeclaration)!;
 
       var nativeMockInterfaceAttribute = AttributeHelper.GetNativeMockInterfaceAttribute (methodSymbol.ContainingType);
       var moduleName = AttributeHelper.GetModuleNameFromAttribute (nativeMockInterfaceAttribute);
@@ -94,9 +94,9 @@ namespace NativeMock.Analyzer
         var newParameter = newParameters[i];
         var patchedParameter = oldParameter;
 
-        if (!oldParameter.Type.IsEquivalentTo (newParameter.Type))
+        if (!oldParameter.Type!.IsEquivalentTo (newParameter.Type!))
         {
-          var newType = newParameter.Type.WithTriviaFrom (oldParameter.Type);
+          var newType = newParameter.Type!.WithTriviaFrom (oldParameter.Type);
           patchedParameter = patchedParameter.WithType (newType);
         }
 
@@ -117,7 +117,7 @@ namespace NativeMock.Analyzer
           var patchedParameter = newParameter.Update (
             SyntaxFactory.List<AttributeListSyntax>(),
             PatchModifierWhitespace (newParameter.Modifiers),
-            newParameter.Type.WithoutTrivia().WithTrailingTrivia (s_singleSpaceTriviaList),
+            newParameter.Type!.WithoutTrivia().WithTrailingTrivia (s_singleSpaceTriviaList),
             newParameter.Identifier.WithoutTrivia(),
             null);
 
@@ -133,7 +133,7 @@ namespace NativeMock.Analyzer
       if (oldParameters != patchedParameters)
         patchedMethod = patchedMethod.WithParameterList (patchedMethod.ParameterList.WithParameters (patchedParameters));
 
-      var root = await document.GetSyntaxRootAsync (cancellationToken);
+      var root = (await document.GetSyntaxRootAsync (cancellationToken))!;
       var newRoot = root.ReplaceNode (oldMethod, patchedMethod);
       var newDocument = document.WithSyntaxRoot (newRoot);
 
