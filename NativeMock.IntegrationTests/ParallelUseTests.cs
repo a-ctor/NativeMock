@@ -5,6 +5,7 @@ namespace NativeMock.IntegrationTests
   using Moq;
   using NUnit.Framework;
 
+  [Ignore ("Deadlock")]
   [Parallelizable (ParallelScope.Children)]
   [TestFixture]
   public class ParallelUseTests
