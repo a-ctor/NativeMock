@@ -122,18 +122,18 @@
     <value>Change one of the signatures to match the other. This can lead to serious and hard to diagnose problems if ignored.</value>
   </data>
   <data name="DeclaringFunctionSignatureMismatchMessageFormat" xml:space="preserve">
-    <value>The mock callback method '{0}' and its declaring function '{1}' differ in signature.</value>
+    <value>The mock callback method '{0}' and its declaring function '{1}' differ in signature</value>
   </data>
   <data name="DeclaringFunctionSignatureMismatchTitle" xml:space="preserve">
-    <value>The signature of the declaring function does not match.</value>
+    <value>The signature of the declaring function does not match</value>
   </data>
   <data name="NoDeclaringTypeDescription" xml:space="preserve">
     <value>Make sure that the DLL name and entry point match the values specified in the DllImportAttribute.</value>
   </data>
   <data name="NoDeclaringTypeMessageFormat" xml:space="preserve">
-    <value>No suitable declaring function for '{0}' matching '{1}' was found in the declaring type '{2}'. </value>
+    <value>No suitable declaring function for '{0}' matching '{1}' was found in the declaring type '{2}'</value>
   </data>
   <data name="NoDeclaringTypeTitle" xml:space="preserve">
-    <value>The declaring function was not found.</value>
+    <value>The declaring function was not found</value>
   </data>
 </root>
