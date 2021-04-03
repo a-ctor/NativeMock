@@ -83,7 +83,7 @@ namespace NativeMock.IntegrationTests
     [Test]
     public void UnproxiedThrowsNotSupportedExceptionTest()
     {
-      NativeMockRepository.ResetAll();
+      ApiNativeMock.Dispose();
 
       Assert.That (FakeNativeApi.NmEmpty, Throws.TypeOf<NativeFunctionNotMockedException>());
     }

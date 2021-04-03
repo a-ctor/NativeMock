@@ -33,7 +33,8 @@ namespace NativeMock.IntegrationTests
     {
       var mock = new Mock<IMultipleSameNamedImports1> (MockBehavior.Strict);
       mock.Setup (e => e.SameNamed());
-      NativeMockRepository.Setup (mock.Object);
+
+      using var nativeMock = new NativeMock<IMultipleSameNamedImports1> (mock.Object);
 
       MultipleSameNamedImports.SameNamed1();
       mock.VerifyAll();
@@ -44,7 +45,8 @@ namespace NativeMock.IntegrationTests
     {
       var mock = new Mock<IMultipleSameNamedImports2> (MockBehavior.Strict);
       mock.Setup (e => e.SameNamed ("asd"));
-      NativeMockRepository.Setup (mock.Object);
+
+      using var nativeMock = new NativeMock<IMultipleSameNamedImports2> (mock.Object);
 
       MultipleSameNamedImports.SameNamed2 ("asd");
       mock.VerifyAll();

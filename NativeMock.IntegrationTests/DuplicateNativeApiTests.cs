@@ -8,17 +8,25 @@ namespace NativeMock.IntegrationTests
   public class DuplicateNativeApiTests
   {
     private Mock<IDuplicateNativeApi1> _duplicateMock1;
+    private NativeMock<IDuplicateNativeApi1> _duplicateNativeMock1;
     private Mock<IDuplicateNativeApi2> _duplicateMock2;
+    private NativeMock<IDuplicateNativeApi2> _duplicateNativeMock2;
 
     [SetUp]
     public void Setup()
     {
       _duplicateMock1 = new Mock<IDuplicateNativeApi1> (MockBehavior.Strict);
-      _duplicateMock2 = new Mock<IDuplicateNativeApi2> (MockBehavior.Strict);
+      _duplicateNativeMock1 = new NativeMock<IDuplicateNativeApi1> (_duplicateMock1.Object);
 
-      NativeMockRepository.ResetAll();
-      NativeMockRepository.Setup (_duplicateMock1.Object);
-      NativeMockRepository.Setup (_duplicateMock2.Object);
+      _duplicateMock2 = new Mock<IDuplicateNativeApi2> (MockBehavior.Strict);
+      _duplicateNativeMock2 = new NativeMock<IDuplicateNativeApi2> (_duplicateMock2.Object);
+    }
+
+    [SetUp]
+    public void TearDown()
+    {
+      _duplicateNativeMock1.Dispose();
+      _duplicateNativeMock2.Dispose();
     }
 
     [Test]

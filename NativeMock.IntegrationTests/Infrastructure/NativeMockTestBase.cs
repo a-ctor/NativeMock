@@ -8,14 +8,13 @@ namespace NativeMock.IntegrationTests.Infrastructure
     where T : class
   {
     protected Mock<T> ApiMock;
+    protected NativeMock<T> ApiNativeMock;
 
     [SetUp]
     public void Setup()
     {
       ApiMock = new Mock<T> (MockBehavior.Strict);
-
-      NativeMockRepository.ResetAll();
-      NativeMockRepository.Setup (ApiMock.Object);
+      ApiNativeMock = new NativeMock<T> (ApiMock.Object);
     }
   }
 }

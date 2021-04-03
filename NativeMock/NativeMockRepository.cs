@@ -72,54 +72,27 @@ namespace NativeMock
     }
 
     /// <summary>
-    /// Sets up the specified <paramref name="implementation" /> for the specific mock interface
-    /// <typeparamref name="TInterface" />.
+    /// Returns <see langword="true" /> if the type specified by <typeparamref name="T" /> has been registered, otherwise
+    /// returns <see langword="false" />.
     /// </summary>
-    /// <remarks>
-    /// This function operations only in the current thread/task control flow.
-    /// </remarks>
-    public static void Setup<TInterface> (TInterface implementation)
-      where TInterface : class
+    public static bool IsRegistered<T>()
+      where T : class
     {
-      if (implementation == null)
-        throw new ArgumentNullException (nameof(implementation));
-      if (!s_registeredInterfaces.ContainsKey (typeof(TInterface)))
-        throw new InvalidOperationException ($"The specified mock interface '{typeof(TInterface)}' was not registered.");
-
-      CheckInitialized();
-
-      var nativeMockSetupRegistry = s_nativeMockSetupRegistry.Value ??= new NativeMockSetupRegistry();
-      nativeMockSetupRegistry.Setup (implementation);
+      return IsRegistered (typeof(T));
     }
 
     /// <summary>
-    /// Removes the setup for the specified <typeparamref name="TInterface" />.
+    /// Returns <see langword="true" /> if the type specified by <paramref name="interfaceType" /> has been registered,
+    /// otherwise returns <see langword="false" />.
     /// </summary>
-    /// <remarks>
-    /// This function operations only in the current thread/task control flow.
-    /// </remarks>
-    public static void Reset<TInterface>()
-      where TInterface : class
+    public static bool IsRegistered (Type interfaceType)
     {
-      if (!s_registeredInterfaces.ContainsKey (typeof(TInterface)))
-        throw new InvalidOperationException ($"The specified mock interface '{typeof(TInterface)}' was not registered.");
+      if (interfaceType == null)
+        throw new ArgumentNullException (nameof(interfaceType));
+      if (!interfaceType.IsInterface)
+        throw new ArgumentException ("The specified type parameter must be a interface.");
 
-      CheckInitialized();
-
-      s_nativeMockSetupRegistry.Value?.Reset<TInterface>();
-    }
-
-    /// <summary>
-    /// Removes all registered setups.
-    /// </summary>
-    /// <remarks>
-    /// This function operations only in the current thread/task control flow.
-    /// </remarks>
-    public static void ResetAll()
-    {
-      CheckInitialized();
-
-      s_nativeMockSetupRegistry.Value?.ResetAll();
+      return s_registeredInterfaces.ContainsKey (interfaceType);
     }
 
     /// <summary>
@@ -151,6 +124,8 @@ namespace NativeMock
     /// </remarks>
     public static void Register (Type interfaceType)
     {
+      if (interfaceType == null)
+        throw new ArgumentNullException (nameof(interfaceType));
       if (!interfaceType.IsInterface)
         throw new ArgumentException ("The specified type parameter must be a interface.");
 
@@ -197,6 +172,15 @@ namespace NativeMock
       var nativeMockInterfaceLocator = s_nativeMockInterfaceLocatorFactory.CreateMockInterfaceLocator (registerFromAssemblySearchBehavior);
       foreach (var type in nativeMockInterfaceLocator.LocateNativeMockInterfaces (assembly))
         Register (type);
+    }
+
+    /// <summary>
+    /// Returns the <see cref="NativeMockSetupRegistry" /> for the current async (thread) context. See
+    /// <see cref="AsyncLocal{T}" /> for more information about the context.
+    /// </summary>
+    internal static NativeMockSetupRegistry GetSetupRegistryForCurrentContext()
+    {
+      return s_nativeMockSetupRegistry.Value ??= new NativeMockSetupRegistry();
     }
 
     private static IntPtr GetProcAddress (IntPtr module, IntPtr procName)

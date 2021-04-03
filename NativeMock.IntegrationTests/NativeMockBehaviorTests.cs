@@ -55,8 +55,7 @@ namespace NativeMock.IntegrationTests
       var mock = new Mock<INativeMockBehavior> (MockBehavior.Strict);
       mock.Setup (e => e.NmStrictBehavior());
 
-      NativeMockRepository.ResetAll();
-      NativeMockRepository.Setup (mock.Object);
+      using var nativeMock = new NativeMock<INativeMockBehavior> (mock.Object);
 
       NativeMockBehavior.NmStrictBehavior();
       mock.VerifyAll();
@@ -76,8 +75,7 @@ namespace NativeMock.IntegrationTests
       var mock = new Mock<INativeMockBehavior> (MockBehavior.Strict);
       mock.Setup (e => e.NmLooseBehavior());
 
-      NativeMockRepository.ResetAll();
-      NativeMockRepository.Setup (mock.Object);
+      using var nativeMock = new NativeMock<INativeMockBehavior> (mock.Object);
 
       NativeMockBehavior.NmLooseBehavior();
       mock.VerifyAll();
@@ -95,8 +93,7 @@ namespace NativeMock.IntegrationTests
       var mock = new Mock<INativeMockBehavior> (MockBehavior.Strict);
       mock.Setup (e => e.NmLooseBehaviorStructReturn()).Returns (0);
 
-      NativeMockRepository.ResetAll();
-      NativeMockRepository.Setup (mock.Object);
+      using var nativeMock = new NativeMock<INativeMockBehavior> (mock.Object);
 
       NativeMockBehavior.NmLooseBehaviorStructReturn();
       mock.VerifyAll();
@@ -115,8 +112,7 @@ namespace NativeMock.IntegrationTests
       var mock = new Mock<INativeMockBehavior> (MockBehavior.Strict);
       mock.Setup (e => e.NmLooseBehaviorClassReturn()).Returns ((string) null);
 
-      NativeMockRepository.ResetAll();
-      NativeMockRepository.Setup (mock.Object);
+      using var nativeMock = new NativeMock<INativeMockBehavior> (mock.Object);
 
       NativeMockBehavior.NmLooseBehaviorClassReturn();
       mock.VerifyAll();
