@@ -30,6 +30,11 @@ namespace NativeMock
       _moduleBuilder = assemblyBuilder.DefineDynamicModule (moduleName);
     }
 
+    public DelegateGenerator (ModuleBuilder moduleBuilder)
+    {
+      _moduleBuilder = moduleBuilder;
+    }
+
     /// <summary>
     /// Creates a delegate type using the specified <paramref name="methodInfo" />, retaining any applied custom attributes.
     /// </summary>
