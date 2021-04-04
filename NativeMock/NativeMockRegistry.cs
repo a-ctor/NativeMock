@@ -2,6 +2,7 @@ namespace NativeMock
 {
   using System;
   using System.Reflection;
+  using System.Reflection.Emit;
 
   /// <summary>
   /// Provides methods for registering mock interface and mocking them during tests.
@@ -16,6 +17,7 @@ namespace NativeMock
 
     private static readonly NativeMockInterfaceRegistry s_nativeMockInterfaceRegistry;
     private static readonly GetProcAddressHook s_getGetProcAddressHook;
+    private static readonly INativeMockProxyFactory s_nativeMockProxyFactory;
 
     static NativeMockRegistry()
     {
@@ -29,7 +31,10 @@ namespace NativeMock
       var nativeMockInterfaceDescriptionProvider = new NativeMockInterfaceDescriptionProvider (nativeMockInterfaceMethodDescriptionProvider);
 
       var assemblyName = new AssemblyName (ProxyAssemblyName);
-      var delegateGenerator = new DelegateGenerator (assemblyName, ProxyAssemblyModuleName);
+      var assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly (assemblyName, AssemblyBuilderAccess.Run);
+      var moduleBuilder = assemblyBuilder.DefineDynamicModule (ProxyAssemblyModuleName);
+
+      var delegateGenerator = new DelegateGenerator (moduleBuilder);
       var handlerProviderMethod = typeof(NativeMockRegistry).GetMethod (nameof(GetMockObject), BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public)!;
       var nativeFunctionProxyCodeGenerator = new NativeFunctionProxyCodeGenerator (handlerProviderMethod);
       var nativeFunctionProxyFactory = new NativeFunctionProxyFactory (delegateGenerator, nativeFunctionProxyCodeGenerator);
@@ -46,6 +51,8 @@ namespace NativeMock
         moduleNameResolver,
         s_nativeMockInterfaceRegistry);
 
+      var nativeMockProxyCodeGenerator = new NativeMockProxyCodeGenerator (moduleBuilder, delegateGenerator);
+      s_nativeMockProxyFactory = new NativeMockProxyFactory (nativeMockProxyCodeGenerator);
 
       var nativeMockSetupInternalRegistryFactory = new NativeMockSetupInternalRegistryFactory();
       LocalSetupsInternal = new AsyncLocalNativeMockSetupRegistry (nativeMockSetupInternalRegistryFactory);
@@ -175,6 +182,12 @@ namespace NativeMock
         NativeMockScope.Global => GlobalSetupsInternal,
         _ => throw new ArgumentOutOfRangeException (nameof(scope), scope, null)
       };
+    }
+
+    internal static NativeMockProxy<T> CreateProxy<T>()
+      where T : class
+    {
+      return s_nativeMockProxyFactory.CreateMockProxy<T>();
     }
 
     internal static T? GetMockObject<T>()

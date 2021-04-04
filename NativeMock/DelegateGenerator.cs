@@ -22,10 +22,12 @@ namespace NativeMock
 
     private readonly ModuleBuilder _moduleBuilder;
 
-    public DelegateGenerator (AssemblyName assemblyName, string moduleName)
+    public DelegateGenerator (ModuleBuilder moduleBuilder)
     {
-      var assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly (assemblyName, AssemblyBuilderAccess.Run);
-      _moduleBuilder = assemblyBuilder.DefineDynamicModule (moduleName);
+      if (moduleBuilder == null)
+        throw new ArgumentNullException (nameof(moduleBuilder));
+
+      _moduleBuilder = moduleBuilder;
     }
 
     /// <inheritdoc />
