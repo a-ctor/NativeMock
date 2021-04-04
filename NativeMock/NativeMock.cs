@@ -8,44 +8,44 @@ namespace NativeMock
     where T : class
   {
     private readonly INativeMockSetupInternalRegistry _setupRegistry;
-    private readonly NativeMockProxy<T>? _proxy;
+    private readonly NativeMockProxy<T> _proxy;
+    private readonly bool _isRegistered;
 
     private bool _disposed;
 
-    public T Object { get; }
+    public T Object => _proxy.Object;
 
     public NativeMock (NativeMockScope scope = NativeMockScope.Default)
+      : this (NativeMockRegistry.GetSetupRegistryForScope (scope), null)
     {
-      if (!typeof(T).IsInterface)
-        throw new ArgumentException ("The specified T type parameter must be an interface");
-
-      // todo register interface in addition to mocking
-
-      _setupRegistry = NativeMockRegistry.GetSetupRegistryForScope (scope);
-      _proxy = NativeMockRegistry.CreateProxy<T>();
-
-      Object = _proxy.Object;
     }
 
     public NativeMock (T implementation, NativeMockScope scope = NativeMockScope.Default)
+      : this (NativeMockRegistry.GetSetupRegistryForScope (scope), implementation ?? throw new ArgumentNullException (nameof(implementation)))
     {
-      if (implementation == null)
-        throw new ArgumentNullException (nameof(implementation));
+    }
+
+    public NativeMock (INativeMockSetupInternalRegistry setupRegistry, T? implementation)
+    {
+      if (setupRegistry == null)
+        throw new ArgumentNullException (nameof(setupRegistry));
       if (!typeof(T).IsInterface)
         throw new ArgumentException ("The specified T type parameter must be an interface");
-      if (!NativeMockRegistry.IsRegistered<T>())
-        throw new InvalidOperationException ($"The specified type '{typeof(T)}' is not registered as a native mock interface. Use NativeMockRegistry.Register as early in the program as possible to register an interface.");
-
-      var setupRegistry = NativeMockRegistry.GetSetupRegistryForScope (scope);
-      if (!setupRegistry.TrySetup (implementation))
-        throw new InvalidOperationException ("Cannot have two native mocks of the same interface in the same context at the same time.");
-
-      // todo allow mocking native mock interfaces
 
       _setupRegistry = setupRegistry;
-      _proxy = null;
+      _proxy = NativeMockRegistry.CreateProxy<T>();
+      _proxy.UnderlyingImplementation = implementation;
 
-      Object = implementation;
+      var isNativeMockInterface = NativeMockInterfaceIdentifier.Instance.IsNativeMockInterfaceType (typeof(T));
+      if (isNativeMockInterface)
+      {
+        if (!NativeMockRegistry.IsRegistered<T>())
+          throw new InvalidOperationException ($"The specified type '{typeof(T)}' is not registered as a native mock interface. Use NativeMockRegistry.Register as early in the program as possible to register an interface.");
+        if (!setupRegistry.TrySetup (_proxy.Object))
+          throw new InvalidOperationException ("Cannot have two native mocks of the same interface in the same context at the same time.");
+
+        _isRegistered = true;
+      }
     }
 
     /// <inheritdoc />
@@ -54,7 +54,9 @@ namespace NativeMock
       if (_disposed)
         return;
 
-      _setupRegistry.Reset<T>();
+      if (_isRegistered)
+        _setupRegistry.Reset<T>();
+
       _disposed = true;
     }
 
@@ -66,9 +68,6 @@ namespace NativeMock
         throw new ArgumentException ("The specified selector is invalid. Please specify the interface method using an expression like 'e => e.MyInterfaceMethod'.");
       if (handler == null)
         throw new ArgumentNullException (nameof(handler));
-
-      if (_proxy == null)
-        throw new InvalidOperationException ("Setups are only allow with a parameterless constructor.");
 
       _proxy.SetMethodHandler (target, handler);
     }

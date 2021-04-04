@@ -7,14 +7,9 @@ namespace NativeMock.UnitTests
   [TestFixture]
   public class NativeMockTests
   {
+    [NativeMockInterface ("sad")]
     public interface ITest
     {
-    }
-
-    [Test]
-    public void Constructor_ThrowsOnNullImplementation()
-    {
-      Assert.That (() => new NativeMock<ITest> (null!), Throws.ArgumentNullException);
     }
 
     [Test]
@@ -23,6 +18,12 @@ namespace NativeMock.UnitTests
       var mock = new Mock<ITest>();
 
       Assert.That (() => new NativeMock<ITest> (mock.Object), Throws.InvalidOperationException.With.Message.StartWith ("The specified"));
+    }
+
+    [Test]
+    public void Constructor_ThrowsOnNullImplementation()
+    {
+      Assert.That (() => new NativeMock<ITest> (null!), Throws.ArgumentNullException);
     }
 
     internal interface IInternalTestApi

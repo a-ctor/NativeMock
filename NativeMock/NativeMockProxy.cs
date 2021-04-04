@@ -8,12 +8,17 @@ namespace NativeMock
     where T : class
   {
     private readonly T _object;
-    private readonly INativeMockProxyController _nativeMockProxyController;
+    private readonly INativeMockProxyController<T> _nativeMockProxyController;
     private readonly ImmutableDictionary<MethodInfo, int> _methodHandleLookup;
 
     public T Object => _object;
 
-    public NativeMockProxy (T @object, INativeMockProxyController nativeMockProxyController, ImmutableDictionary<MethodInfo, int> methodHandleLookup)
+    public T? UnderlyingImplementation
+    {
+      set { _nativeMockProxyController.SetUnderlyingImplementation (value); }
+    }
+
+    public NativeMockProxy (T @object, INativeMockProxyController<T> nativeMockProxyController, ImmutableDictionary<MethodInfo, int> methodHandleLookup)
     {
       if (@object == null)
         throw new ArgumentNullException (nameof(@object));

@@ -6,6 +6,8 @@ namespace NativeMock
   /// <inheritdoc />
   internal class NativeMockInterfaceIdentifier : INativeMockInterfaceIdentifier
   {
+    public static INativeMockInterfaceIdentifier Instance { get; } = new NativeMockInterfaceIdentifier();
+
     /// <inheritdoc />
     public bool IsNativeMockInterfaceType (Type type)
     {

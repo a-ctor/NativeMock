@@ -1,6 +1,7 @@
 namespace NativeMock.IntegrationTests
 {
   using System;
+  using System.Runtime.InteropServices;
   using Infrastructure;
   using Moq;
   using NUnit.Framework;
@@ -13,6 +14,12 @@ namespace NativeMock.IntegrationTests
     {
       // ReSharper disable once UnusedMember.Global
       void NmNoop();
+    }
+
+    private class Test
+    {
+      [DllImport (FakeDllNames.Dll1)]
+      public static extern void NmNoop();
     }
 
     [Test]
@@ -52,6 +59,20 @@ namespace NativeMock.IntegrationTests
       Assert.That (NativeMockRegistry.GlobalSetups.TrySetup (mock.Object), Is.False);
     }
 
+    [Test]
+    public void Setup_OverridesUnderlyingImplementation()
+    {
+      var mock = new Mock<ITest>();
+      using var nativeMock = new NativeMock<ITest> (mock.Object);
+
+      bool wasCalled = false;
+      nativeMock.Setup<Action> (e => e.NmNoop, () => wasCalled = true);
+
+      Test.NmNoop();
+
+      Assert.That (wasCalled, Is.True);
+    }
+
     public interface ITestApi
     {
       public delegate void RefStructParameterDelegate (Span<byte> test);
@@ -68,7 +89,7 @@ namespace NativeMock.IntegrationTests
     }
 
     [Test]
-    public void NoSetupThrows()
+    public void NoSetupThrowsWhenNoUnderlyingImplementation()
     {
       var testUnsafeMock = new NativeMock<ITestApi>();
 
@@ -79,6 +100,18 @@ namespace NativeMock.IntegrationTests
           testUnsafeMock.Object.RefStructParameter (span);
         },
         Throws.InvalidOperationException);
+    }
+
+    [Test]
+    public void NoSetupUsesUnderlyingImplementationWhenAvailable()
+    {
+      var mock = new Mock<ITest>();
+      mock.Setup (e => e.NmNoop());
+
+      using var testUnsafeMock = new NativeMock<ITest> (mock.Object);
+      Test.NmNoop();
+
+      mock.VerifyAll();
     }
 
     [Test]

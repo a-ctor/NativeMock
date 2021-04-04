@@ -24,7 +24,7 @@ namespace NativeMock
     {
       var proxy = Activator.CreateInstance (_proxyType)!;
       var @object = (T) proxy;
-      var controller = (INativeMockProxyController) proxy;
+      var controller = (INativeMockProxyController<T>) proxy;
 
       return new NativeMockProxy<T> (@object, controller, _methodHandleLookup);
     }
