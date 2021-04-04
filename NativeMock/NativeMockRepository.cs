@@ -2,7 +2,6 @@ namespace NativeMock
 {
   using System;
   using System.Reflection;
-  using System.Threading;
 
   /// <summary>
   /// Provides methods for registering mock interface and mocking them during tests.
@@ -17,7 +16,6 @@ namespace NativeMock
 
     private static readonly NativeMockInterfaceRegistry s_nativeMockInterfaceRegistry;
     private static readonly GetProcAddressHook s_getGetProcAddressHook;
-    private static readonly AsyncLocal<NativeMockSetupRegistry> s_nativeMockSetupRegistry;
 
     static NativeMockRepository()
     {
@@ -48,8 +46,14 @@ namespace NativeMock
         moduleNameResolver,
         s_nativeMockInterfaceRegistry);
 
-      s_nativeMockSetupRegistry = new AsyncLocal<NativeMockSetupRegistry>();
+
+      var nativeMockSetupInternalRegistryFactory = new NativeMockSetupInternalRegistryFactory();
+      LocalSetupsInternal = new AsyncLocalNativeMockSetupRegistry (nativeMockSetupInternalRegistryFactory);
     }
+
+    internal static INativeMockSetupInternalRegistry LocalSetupsInternal { get; }
+
+    public static INativeMockSetupRegistry LocalSetups => LocalSetupsInternal;
 
     /// <summary>
     /// Initializes the native mock infrastructure. Should be called as early as possible.
@@ -158,19 +162,10 @@ namespace NativeMock
       s_nativeMockInterfaceRegistry.RegisterFromAssembly (assembly, registerFromAssemblySearchBehavior);
     }
 
-    /// <summary>
-    /// Returns the <see cref="NativeMockSetupRegistry" /> for the current async (thread) context. See
-    /// <see cref="AsyncLocal{T}" /> for more information about the context.
-    /// </summary>
-    internal static NativeMockSetupRegistry GetSetupRegistryForCurrentContext()
-    {
-      return s_nativeMockSetupRegistry.Value ??= new NativeMockSetupRegistry();
-    }
-
     internal static T? GetMockObject<T>()
       where T : class
     {
-      return s_nativeMockSetupRegistry.Value?.GetSetup<T>();
+      return LocalSetupsInternal.GetSetup<T>();
     }
 
     private static void CheckInitialized()

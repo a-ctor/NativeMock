@@ -5,18 +5,18 @@ namespace NativeMock
   public class NativeMock<T> : IDisposable
     where T : class
   {
-    private readonly NativeMockSetupRegistry _setupRegistry;
+    private readonly INativeMockSetupInternalRegistry _setupRegistry;
 
     private bool _disposed;
 
     public T Object { get; }
 
     public NativeMock (T implementation)
-      : this (NativeMockRepository.GetSetupRegistryForCurrentContext(), implementation)
+      : this (NativeMockRepository.LocalSetupsInternal, implementation)
     {
     }
 
-    internal NativeMock (NativeMockSetupRegistry setupRegistry, T implementation)
+    internal NativeMock (INativeMockSetupInternalRegistry setupRegistry, T implementation)
     {
       if (setupRegistry == null)
         throw new ArgumentNullException (nameof(setupRegistry));
@@ -37,7 +37,7 @@ namespace NativeMock
       if (_disposed)
         return;
 
-      _setupRegistry.Reset<T> (Object);
+      _setupRegistry.Reset<T>();
       _disposed = true;
     }
   }

@@ -2,13 +2,25 @@ namespace NativeMock
 {
   using System;
   using System.Collections.Concurrent;
-  using System.Collections.Generic;
 
-  internal class NativeMockSetupRegistry
+  internal class NativeMockSetupRegistry : INativeMockSetupInternalRegistry
   {
     private readonly ConcurrentDictionary<Type, object> _setups = new();
 
+    /// <inheritdoc />
+    public void Setup<T> (T implementation)
+      where T : class
+    {
+      if (implementation == null)
+        throw new ArgumentNullException();
+
+      if (!_setups.TryAdd (typeof(T), implementation))
+        throw new InvalidOperationException ($"A setup for the mock interface '{typeof(T)}' was already registered.");
+    }
+
+    /// <inheritdoc />
     public bool TrySetup<T> (T implementation)
+      where T : class
     {
       if (implementation == null)
         throw new ArgumentNullException();
@@ -16,6 +28,7 @@ namespace NativeMock
       return _setups.TryAdd (typeof(T), implementation);
     }
 
+    /// <inheritdoc />
     public T? GetSetup<T>()
       where T : class
     {
@@ -24,10 +37,11 @@ namespace NativeMock
         : null;
     }
 
-    public void Reset<T> (object implementation)
+    /// <inheritdoc />
+    public void Reset<T>()
       where T : class
     {
-      _setups.TryRemove (new KeyValuePair<Type, object> (typeof(T), implementation));
+      _setups.TryRemove (typeof(T), out _);
     }
   }
 }
