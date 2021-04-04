@@ -7,8 +7,8 @@ namespace NativeMock.IntegrationTests
     [ModuleInitializer]
     public static void Initialize()
     {
-      NativeMockRepository.Initialize();
-      NativeMockRepository.RegisterFromAssembly (typeof(ModuleInitializer).Assembly, RegisterFromAssemblySearchBehavior.IncludeNestedTypes);
+      NativeMockRegistry.Initialize();
+      NativeMockRegistry.RegisterFromAssembly (typeof(ModuleInitializer).Assembly, RegisterFromAssemblySearchBehavior.IncludeNestedTypes);
     }
   }
 }

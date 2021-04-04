@@ -6,7 +6,7 @@ namespace NativeMock
   /// <summary>
   /// Provides methods for registering mock interface and mocking them during tests.
   /// </summary>
-  public static class NativeMockRepository
+  public static class NativeMockRegistry
   {
     public const string ProxyAssemblyName = "NativeMockDynamicAssembly";
     public const string ProxyAssemblyModuleName = "NativeMockDynamicAssemblyModule";
@@ -17,7 +17,7 @@ namespace NativeMock
     private static readonly NativeMockInterfaceRegistry s_nativeMockInterfaceRegistry;
     private static readonly GetProcAddressHook s_getGetProcAddressHook;
 
-    static NativeMockRepository()
+    static NativeMockRegistry()
     {
       var nativeMockInterfaceIdentifier = new NativeMockInterfaceIdentifier();
       var nativeMockInterfaceIdentifierWithOnlyPublicTypes = new PublicTypesOnlyNativeMockInterfaceIdentifierDecorator (nativeMockInterfaceIdentifier);
@@ -30,7 +30,7 @@ namespace NativeMock
 
       var assemblyName = new AssemblyName (ProxyAssemblyName);
       var delegateGenerator = new DelegateGenerator (assemblyName, ProxyAssemblyModuleName);
-      var handlerProviderMethod = typeof(NativeMockRepository).GetMethod (nameof(GetMockObject), BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public)!;
+      var handlerProviderMethod = typeof(NativeMockRegistry).GetMethod (nameof(GetMockObject), BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public)!;
       var nativeFunctionProxyCodeGenerator = new NativeFunctionProxyCodeGenerator (handlerProviderMethod);
       var nativeFunctionProxyFactory = new NativeFunctionProxyFactory (delegateGenerator, nativeFunctionProxyCodeGenerator);
 
@@ -172,7 +172,7 @@ namespace NativeMock
     {
       if (!s_initialized)
       {
-        throw new InvalidOperationException ("NativeMockRepository is not initialized. Call .Initialize as early as possible to ensure that all native calls are proxied.");
+        throw new InvalidOperationException ("NativeMockRegistry is not initialized. Call .Initialize as early as possible to ensure that all native calls are proxied.");
       }
     }
   }

@@ -12,7 +12,7 @@ namespace NativeMock
     public T Object { get; }
 
     public NativeMock (T implementation)
-      : this (NativeMockRepository.LocalSetupsInternal, implementation)
+      : this (NativeMockRegistry.LocalSetupsInternal, implementation)
     {
     }
 
@@ -22,8 +22,8 @@ namespace NativeMock
         throw new ArgumentNullException (nameof(setupRegistry));
       if (implementation == null)
         throw new ArgumentNullException (nameof(implementation));
-      if (!NativeMockRepository.IsRegistered<T>())
-        throw new InvalidOperationException ($"The specified type '{typeof(T)}' is not registered as a native mock interface. Use NativeMockRepository.Register as early in the program as possible to register an interface.");
+      if (!NativeMockRegistry.IsRegistered<T>())
+        throw new InvalidOperationException ($"The specified type '{typeof(T)}' is not registered as a native mock interface. Use NativeMockRegistry.Register as early in the program as possible to register an interface.");
       if (!setupRegistry.TrySetup (implementation))
         throw new InvalidOperationException ("Cannot have two native mocks of the same interface in the same context at the same time.");
 

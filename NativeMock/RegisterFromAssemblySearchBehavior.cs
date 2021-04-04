@@ -1,7 +1,7 @@
 namespace NativeMock
 {
   /// <summary>
-  /// Specifies how the <see cref="NativeMockRepository" />.<see cref="NativeMockRepository.RegisterFromAssembly" /> method
+  /// Specifies how the <see cref="NativeMockRegistry" />.<see cref="NativeMockRegistry.RegisterFromAssembly" /> method
   /// behaves.
   /// </summary>
   public enum RegisterFromAssemblySearchBehavior

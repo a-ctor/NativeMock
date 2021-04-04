@@ -25,7 +25,7 @@ namespace NativeMock.IntegrationTests
     [Test]
     public void ReturnTypeMismatch()
     {
-      Assert.That (NativeMockRepository.Register<IReturnType>, Throws.TypeOf<NativeMockDeclarationMismatchException>());
+      Assert.That (NativeMockRegistry.Register<IReturnType>, Throws.TypeOf<NativeMockDeclarationMismatchException>());
     }
   }
 }

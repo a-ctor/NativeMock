@@ -61,7 +61,7 @@ namespace NativeMock
 
       var mockObjectLocal = ilGenerator.DeclareLocal (interfaceType);
 
-      // var mockObject = NativeMockRepository.GetMockObject<T>();
+      // var mockObject = NativeMockRegistry.GetMockObject<T>();
       ilGenerator.Emit (OpCodes.Call, _handlerProviderMethod.MakeGenericMethod (interfaceType));
       ilGenerator.Emit (OpCodes.Stloc, mockObjectLocal);
       ilGenerator.Emit (OpCodes.Ldloc, mockObjectLocal);
