@@ -7,7 +7,7 @@ namespace NativeMock
   /// <summary>
   /// Provides methods for hooking imported functions by modifying the address import table of the module's PE header.
   /// </summary>
-  internal static class IatHook
+  internal class IatHookFactory : IHookFactory
   {
     private const nint c_addressOfNewExeHeaderFieldOffset = 0x3c;
     private const nint c_importTableOffset32 = 0x80;
@@ -19,18 +19,18 @@ namespace NativeMock
     private static extern bool VirtualProtect (IntPtr lpAddress, nint dwSize, uint flNewProtect, out uint lpflOldProtect);
 
     /// <summary>
-    /// Creates a hook for an imported function using <paramref name="redirect" />
+    /// Creates a hook for an imported function using <paramref name="hook" />
     /// </summary>
     /// <typeparam name="TDelegate">The delegate type describing the signature of the target function.</typeparam>
     /// <param name="module">The target module whose imported function should be hooked.</param>
     /// <param name="targetModuleName">The module name (e.g. kernel32.dll) of the module containing the function to be hooked.</param>
     /// <param name="targetFunctionName">The name of the function to be hooked.</param>
-    /// <param name="redirect">The delegate that will be called instead of the original function.</param>
+    /// <param name="hook">The delegate that will be called instead of the original function.</param>
     /// <returns>
     /// Returns a <see cref="HookedFunction{TDelegate}" /> which contains the original function that has been replaced
     /// by the hook.
     /// </returns>
-    public static unsafe HookedFunction<TDelegate> Create<TDelegate> (ProcessModule module, string targetModuleName, FunctionName targetFunctionName, TDelegate redirect)
+    public unsafe HookedFunction<TDelegate> CreateHook<TDelegate> (ProcessModule module, string targetModuleName, FunctionName targetFunctionName, TDelegate hook)
       where TDelegate : Delegate
     {
       nint baseAddress = module.BaseAddress;
@@ -41,10 +41,10 @@ namespace NativeMock
 
       VirtualProtect (new IntPtr (iatEntryPtr), sizeof(nint), c_pageExecuteReadWrite, out var oldProtect);
       var orig = Marshal.GetDelegateForFunctionPointer (new IntPtr (*iatEntryPtr), typeof(TDelegate));
-      *iatEntryPtr = Marshal.GetFunctionPointerForDelegate (redirect);
+      *iatEntryPtr = Marshal.GetFunctionPointerForDelegate (hook);
       VirtualProtect (new IntPtr (iatEntryPtr), sizeof(nint), oldProtect, out _);
 
-      return new HookedFunction<TDelegate> ((TDelegate) orig, redirect);
+      return new HookedFunction<TDelegate> ((TDelegate) orig, hook);
     }
 
     private static unsafe nint GetFunctionPointerForIatEntry (nint moduleBaseAddress, string targetModuleName, FunctionName targetFunctionName)

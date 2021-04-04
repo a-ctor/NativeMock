@@ -1,9 +1,6 @@
 namespace NativeMock
 {
   using System;
-  using System.Collections.Concurrent;
-  using System.Diagnostics;
-  using System.Linq;
   using System.Reflection;
   using System.Threading;
 
@@ -12,34 +9,47 @@ namespace NativeMock
   /// </summary>
   public static class NativeMockRepository
   {
-    private delegate IntPtr GetProcAddressDelegate (IntPtr hModule, IntPtr procName);
-
-    private const string c_coreClrDll = "coreclr.dll";
-    private const string c_kernel32Dll = "kernel32.dll";
-    private const string c_getProcAddressName = "GetProcAddress";
-
-    private const string c_assemblyName = "NativeFunctionDelegateAssembly";
-    private const string c_moduleName = "NativeFunctionDelegateModule";
-
-    private static HookedFunction<GetProcAddressDelegate> s_getProcAddressHook = null!;
+    public const string ProxyAssemblyName = "NativeMockDynamicAssembly";
+    public const string ProxyAssemblyModuleName = "NativeMockDynamicAssemblyModule";
 
     private static readonly object s_initializedLock = new();
     private static bool s_initialized;
 
-    private static readonly INativeMockInterfaceIdentifier s_nativeMockInterfaceIdentifier = new PublicTypesOnlyNativeMockInterfaceIdentifierDecorator (new NativeMockInterfaceIdentifier());
-    private static readonly INativeMockInterfaceLocatorFactory s_nativeMockInterfaceLocatorFactory = new NativeMockInterfaceLocatorFactory (s_nativeMockInterfaceIdentifier);
+    private static readonly NativeMockInterfaceRegistry s_nativeMockInterfaceRegistry;
+    private static readonly GetProcAddressHook s_getGetProcAddressHook;
+    private static readonly AsyncLocal<NativeMockSetupRegistry> s_nativeMockSetupRegistry;
 
-    private static readonly INativeMockInterfaceDescriptionProvider s_nativeMockInterfaceDescriptionProvider = new NativeMockInterfaceDescriptionProvider (
-      new NativeMockInterfaceMethodDescriptionProvider (new CachingPInvokeMemberProviderDecorator (new PInvokeMemberProvider())));
+    static NativeMockRepository()
+    {
+      var nativeMockInterfaceIdentifier = new NativeMockInterfaceIdentifier();
+      var nativeMockInterfaceIdentifierWithOnlyPublicTypes = new PublicTypesOnlyNativeMockInterfaceIdentifierDecorator (nativeMockInterfaceIdentifier);
+      var nativeMockInterfaceLocatorFactory = new NativeMockInterfaceLocatorFactory (nativeMockInterfaceIdentifierWithOnlyPublicTypes);
 
-    private static readonly DelegateGenerator s_delegateGenerator = new (new AssemblyName (c_assemblyName), c_moduleName);
-    private static readonly NativeFunctionProxyFactory s_nativeFunctionProxyFactory = new (s_delegateGenerator, new NativeFunctionProxyCodeGenerator());
-    private static readonly NativeFunctionProxyRegistry s_nativeFunctionProxyRegistry = new();
+      var pInvokeMemberProvider = new PInvokeMemberProvider();
+      var pInvokeMemberProviderWithCaching = new CachingPInvokeMemberProviderDecorator (pInvokeMemberProvider);
+      var nativeMockInterfaceMethodDescriptionProvider = new NativeMockInterfaceMethodDescriptionProvider (pInvokeMemberProviderWithCaching);
+      var nativeMockInterfaceDescriptionProvider = new NativeMockInterfaceDescriptionProvider (nativeMockInterfaceMethodDescriptionProvider);
 
-    private static readonly ModuleNameResolver s_moduleNameResolver = new();
-    private static readonly AsyncLocal<NativeMockSetupRegistry> s_nativeMockSetupRegistry = new();
+      var assemblyName = new AssemblyName (ProxyAssemblyName);
+      var delegateGenerator = new DelegateGenerator (assemblyName, ProxyAssemblyModuleName);
+      var handlerProviderMethod = typeof(NativeMockRepository).GetMethod (nameof(GetMockObject), BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public)!;
+      var nativeFunctionProxyCodeGenerator = new NativeFunctionProxyCodeGenerator (handlerProviderMethod);
+      var nativeFunctionProxyFactory = new NativeFunctionProxyFactory (delegateGenerator, nativeFunctionProxyCodeGenerator);
 
-    private static readonly ConcurrentDictionary<Type, NativeMockInterfaceDescription> s_registeredInterfaces = new();
+      s_nativeMockInterfaceRegistry = new NativeMockInterfaceRegistry (
+        nativeMockInterfaceLocatorFactory,
+        nativeMockInterfaceDescriptionProvider,
+        nativeFunctionProxyFactory);
+
+      var iatHookFactory = new IatHookFactory();
+      var moduleNameResolver = new ModuleNameResolver();
+      s_getGetProcAddressHook = new GetProcAddressHook (
+        iatHookFactory,
+        moduleNameResolver,
+        s_nativeMockInterfaceRegistry);
+
+      s_nativeMockSetupRegistry = new AsyncLocal<NativeMockSetupRegistry>();
+    }
 
     /// <summary>
     /// Initializes the native mock infrastructure. Should be called as early as possible.
@@ -59,26 +69,21 @@ namespace NativeMock
         if (s_initialized)
           return;
 
-        var coreClrModule = Process.GetCurrentProcess().Modules
-          .Cast<ProcessModule>()
-          .SingleOrDefault (p => p.ModuleName?.Equals (c_coreClrDll, StringComparison.OrdinalIgnoreCase) ?? false);
+        s_getGetProcAddressHook.Initialize();
 
-        if (coreClrModule == null)
-          throw new InvalidOperationException ("Cannot find the CoreCLR module in the current process.");
-
-        s_getProcAddressHook = IatHook.Create<GetProcAddressDelegate> (coreClrModule, c_kernel32Dll, c_getProcAddressName, GetProcAddress);
         s_initialized = true;
       }
     }
 
     /// <summary>
-    /// Returns <see langword="true" /> if the type specified by <typeparamref name="T" /> has been registered, otherwise
+    /// Returns <see langword="true" /> if the type specified by <typeparamref name="TInterface" /> has been registered,
+    /// otherwise
     /// returns <see langword="false" />.
     /// </summary>
-    public static bool IsRegistered<T>()
-      where T : class
+    public static bool IsRegistered<TInterface>()
+      where TInterface : class
     {
-      return IsRegistered (typeof(T));
+      return s_nativeMockInterfaceRegistry.IsRegistered<TInterface>();
     }
 
     /// <summary>
@@ -89,10 +94,8 @@ namespace NativeMock
     {
       if (interfaceType == null)
         throw new ArgumentNullException (nameof(interfaceType));
-      if (!interfaceType.IsInterface)
-        throw new ArgumentException ("The specified type parameter must be a interface.");
 
-      return s_registeredInterfaces.ContainsKey (interfaceType);
+      return s_nativeMockInterfaceRegistry.IsRegistered (interfaceType);
     }
 
     /// <summary>
@@ -104,14 +107,11 @@ namespace NativeMock
     /// Native methods that have been jitted before a containing interface is registered cannot be mocked.
     /// </remarks>
     public static void Register<TInterface>()
+      where TInterface : class
     {
-      var interfaceType = typeof(TInterface);
-      if (!interfaceType.IsInterface)
-        throw new ArgumentException ("The specified type parameter must be a interface.");
-
       CheckInitialized();
 
-      Register (interfaceType);
+      s_nativeMockInterfaceRegistry.Register<TInterface>();
     }
 
     /// <summary>
@@ -126,26 +126,10 @@ namespace NativeMock
     {
       if (interfaceType == null)
         throw new ArgumentNullException (nameof(interfaceType));
-      if (!interfaceType.IsInterface)
-        throw new ArgumentException ("The specified type parameter must be a interface.");
 
       CheckInitialized();
 
-      lock (s_nativeFunctionProxyRegistry)
-      {
-        if (s_registeredInterfaces.ContainsKey (interfaceType))
-          throw new InvalidOperationException ($"The specified type '{interfaceType}' is already registered.");
-
-        var interfaceDescription = s_nativeMockInterfaceDescriptionProvider.GetMockInterfaceDescription (interfaceType);
-
-        foreach (var interfaceMethod in interfaceDescription.Methods)
-        {
-          var nativeFunctionProxy = s_nativeFunctionProxyFactory.CreateNativeFunctionProxy (interfaceMethod);
-          s_nativeFunctionProxyRegistry.Register (nativeFunctionProxy);
-        }
-
-        s_registeredInterfaces.TryAdd (interfaceType, interfaceDescription);
-      }
+      s_nativeMockInterfaceRegistry.Register (interfaceType);
     }
 
     /// <summary>
@@ -169,9 +153,9 @@ namespace NativeMock
       if (assembly == null)
         throw new ArgumentNullException (nameof(assembly));
 
-      var nativeMockInterfaceLocator = s_nativeMockInterfaceLocatorFactory.CreateMockInterfaceLocator (registerFromAssemblySearchBehavior);
-      foreach (var type in nativeMockInterfaceLocator.LocateNativeMockInterfaces (assembly))
-        Register (type);
+      CheckInitialized();
+
+      s_nativeMockInterfaceRegistry.RegisterFromAssembly (assembly, registerFromAssemblySearchBehavior);
     }
 
     /// <summary>
@@ -181,19 +165,6 @@ namespace NativeMock
     internal static NativeMockSetupRegistry GetSetupRegistryForCurrentContext()
     {
       return s_nativeMockSetupRegistry.Value ??= new NativeMockSetupRegistry();
-    }
-
-    private static IntPtr GetProcAddress (IntPtr module, IntPtr procName)
-    {
-      var functionName = FunctionName.ParseFromProcName (procName);
-      if (functionName.IsOrdinal)
-        return s_getProcAddressHook.Original (module, procName);
-
-      var moduleName = s_moduleNameResolver.Resolve (module);
-      var nativeFunctionIdentifier = new NativeFunctionIdentifier (moduleName, functionName.StringValue);
-
-      return s_nativeFunctionProxyRegistry.Resolve (nativeFunctionIdentifier)?.NativePtr
-             ?? s_getProcAddressHook.Original (module, procName);
     }
 
     internal static T? GetMockObject<T>()

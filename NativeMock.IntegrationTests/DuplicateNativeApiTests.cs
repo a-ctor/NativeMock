@@ -22,7 +22,7 @@ namespace NativeMock.IntegrationTests
       _duplicateNativeMock2 = new NativeMock<IDuplicateNativeApi2> (_duplicateMock2.Object);
     }
 
-    [SetUp]
+    [TearDown]
     public void TearDown()
     {
       _duplicateNativeMock1.Dispose();

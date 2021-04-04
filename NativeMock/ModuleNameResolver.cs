@@ -5,10 +5,8 @@ namespace NativeMock
   using System.ComponentModel;
   using System.Runtime.InteropServices;
 
-  /// <summary>
-  /// Provides methods for resolving native module names from their base address.
-  /// </summary>
-  internal class ModuleNameResolver
+  /// <inheritdoc />
+  internal class ModuleNameResolver : IModuleNameResolver
   {
     [DllImport ("Kernel32.dll", SetLastError = true)]
     private static extern unsafe int GetModuleFileNameW (IntPtr moduleHandle, byte* filename, int capacity);
@@ -26,6 +24,7 @@ namespace NativeMock
     private readonly ConcurrentDictionary<IntPtr, string> _resolvedModules = new();
     private readonly byte[] _buffer = new byte [c_characterCount * 2];
 
+    /// <inheritdoc />
     public unsafe string Resolve (IntPtr moduleHandle)
     {
       if (_resolvedModules.TryGetValue (moduleHandle, out var moduleName))

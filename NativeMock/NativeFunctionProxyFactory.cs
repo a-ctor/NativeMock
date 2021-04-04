@@ -3,15 +3,13 @@ namespace NativeMock
   using System;
   using System.Runtime.InteropServices;
 
-  /// <summary>
-  /// Provides methods for crate <see cref="NativeFunctionProxy" />s for a specific native function.
-  /// </summary>
-  internal class NativeFunctionProxyFactory
+  /// <inheritdoc />
+  internal class NativeFunctionProxyFactory : INativeFunctionProxyFactory
   {
-    private readonly DelegateGenerator _delegateGenerator;
-    private readonly NativeFunctionProxyCodeGenerator _nativeFunctionProxyCodeGenerator;
+    private readonly IDelegateGenerator _delegateGenerator;
+    private readonly INativeFunctionProxyCodeGenerator _nativeFunctionProxyCodeGenerator;
 
-    public NativeFunctionProxyFactory (DelegateGenerator delegateGenerator, NativeFunctionProxyCodeGenerator nativeFunctionProxyCodeGenerator)
+    public NativeFunctionProxyFactory (IDelegateGenerator delegateGenerator, INativeFunctionProxyCodeGenerator nativeFunctionProxyCodeGenerator)
     {
       if (delegateGenerator == null)
         throw new ArgumentNullException (nameof(delegateGenerator));

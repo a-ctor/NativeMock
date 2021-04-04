@@ -5,24 +5,33 @@ namespace NativeMock
   using System.Reflection;
   using System.Reflection.Emit;
 
-  /// <summary>
-  /// Provides methods for generating a <see cref="NativeFunctionProxy" />s IL.
-  /// </summary>
-  internal class NativeFunctionProxyCodeGenerator
+  /// <inheritdoc />
+  internal class NativeFunctionProxyCodeGenerator : INativeFunctionProxyCodeGenerator
   {
-    private static readonly MethodInfo s_getMockObjectMethod;
     private static readonly ConstructorInfo s_nativeFunctionNotMockedExceptionConstructor;
 
     static NativeFunctionProxyCodeGenerator()
     {
-      s_getMockObjectMethod = typeof(NativeMockRepository).GetMethod (nameof(NativeMockRepository.GetMockObject), BindingFlags.Static | BindingFlags.NonPublic)!
-                              ?? throw new NotSupportedException ("NativeMockRepository.GetMockObject could not be found.");
       s_nativeFunctionNotMockedExceptionConstructor = typeof(NativeFunctionNotMockedException).GetConstructor (new[] {typeof(string)})
                                                       ?? throw new NotSupportedException ("Constructor NativeFunctionNotMockedException(string) could not be found.");
     }
 
-    public NativeFunctionProxyCodeGenerator()
+    private readonly MethodInfo _handlerProviderMethod;
+
+    public NativeFunctionProxyCodeGenerator (MethodInfo handlerProviderMethod)
     {
+      if (handlerProviderMethod == null)
+        throw new ArgumentNullException (nameof(handlerProviderMethod));
+      if (!handlerProviderMethod.IsStatic)
+        throw new ArgumentException ("Handler provider method must be static.", nameof(handlerProviderMethod));
+      if (!handlerProviderMethod.IsGenericMethodDefinition || handlerProviderMethod.GetGenericArguments().Length != 1)
+        throw new ArgumentException ("Handler provider method must be generic method definition with one type parameter.", nameof(handlerProviderMethod));
+      if (handlerProviderMethod.GetParameters().Length != 0)
+        throw new ArgumentException ("Handler provider method must not have any parameters.", nameof(handlerProviderMethod));
+      if (!handlerProviderMethod.ReturnType.IsGenericParameter || handlerProviderMethod.ReturnType.IsByRef)
+        throw new ArgumentException ("Handler provider method must have a return type of T.", nameof(handlerProviderMethod));
+
+      _handlerProviderMethod = handlerProviderMethod;
     }
 
     public Delegate CreateProxyMethod (NativeMockInterfaceMethodDescription method, Type nativeFunctionDelegateType)
@@ -53,7 +62,7 @@ namespace NativeMock
       var mockObjectLocal = ilGenerator.DeclareLocal (interfaceType);
 
       // var mockObject = NativeMockRepository.GetMockObject<T>();
-      ilGenerator.Emit (OpCodes.Call, s_getMockObjectMethod.MakeGenericMethod (interfaceType));
+      ilGenerator.Emit (OpCodes.Call, _handlerProviderMethod.MakeGenericMethod (interfaceType));
       ilGenerator.Emit (OpCodes.Stloc, mockObjectLocal);
       ilGenerator.Emit (OpCodes.Ldloc, mockObjectLocal);
 
