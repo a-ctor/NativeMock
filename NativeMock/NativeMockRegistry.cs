@@ -49,11 +49,16 @@ namespace NativeMock
 
       var nativeMockSetupInternalRegistryFactory = new NativeMockSetupInternalRegistryFactory();
       LocalSetupsInternal = new AsyncLocalNativeMockSetupRegistry (nativeMockSetupInternalRegistryFactory);
+      GlobalSetupsInternal = new NativeMockSetupRegistry();
     }
 
     internal static INativeMockSetupInternalRegistry LocalSetupsInternal { get; }
 
     public static INativeMockSetupRegistry LocalSetups => LocalSetupsInternal;
+
+    internal static INativeMockSetupInternalRegistry GlobalSetupsInternal { get; }
+
+    public static INativeMockSetupRegistry GlobalSetups => GlobalSetupsInternal;
 
     /// <summary>
     /// Initializes the native mock infrastructure. Should be called as early as possible.
@@ -162,10 +167,20 @@ namespace NativeMock
       s_nativeMockInterfaceRegistry.RegisterFromAssembly (assembly, registerFromAssemblySearchBehavior);
     }
 
+    internal static INativeMockSetupInternalRegistry GetSetupRegistryForScope (NativeMockScope scope)
+    {
+      return scope switch
+      {
+        NativeMockScope.Default or NativeMockScope.Local => LocalSetupsInternal,
+        NativeMockScope.Global => GlobalSetupsInternal,
+        _ => throw new ArgumentOutOfRangeException (nameof(scope), scope, null)
+      };
+    }
+
     internal static T? GetMockObject<T>()
       where T : class
     {
-      return LocalSetupsInternal.GetSetup<T>();
+      return LocalSetupsInternal.GetSetup<T>() ?? GlobalSetupsInternal.GetSetup<T>();
     }
 
     private static void CheckInitialized()

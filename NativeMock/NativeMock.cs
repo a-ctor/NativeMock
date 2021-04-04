@@ -11,8 +11,8 @@ namespace NativeMock
 
     public T Object { get; }
 
-    public NativeMock (T implementation)
-      : this (NativeMockRegistry.LocalSetupsInternal, implementation)
+    public NativeMock (T implementation, NativeMockScope scope = NativeMockScope.Default)
+      : this (NativeMockRegistry.GetSetupRegistryForScope (scope), implementation)
     {
     }
 

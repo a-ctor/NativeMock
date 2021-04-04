@@ -7,7 +7,7 @@ namespace NativeMock.IntegrationTests
   using NUnit.Framework;
 
   [TestFixture]
-  public class AsyncFlowTests : NativeMockTestBase<IFakeNativeApi>
+  public class LocalSetupTests : NativeMockTestBase<IFakeNativeApi>
   {
     [Test]
     public void RegisteredApiFlowsToNewThreadTest()

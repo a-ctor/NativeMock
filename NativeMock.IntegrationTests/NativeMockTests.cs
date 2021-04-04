@@ -10,6 +10,7 @@ namespace NativeMock.IntegrationTests
     [NativeMockInterface (FakeDllNames.Dll1)]
     public interface ITest
     {
+      // ReSharper disable once UnusedMember.Global
       void NmNoop();
     }
 
@@ -30,6 +31,24 @@ namespace NativeMock.IntegrationTests
       nativeMock.Dispose();
 
       using var nativeMock2 = new NativeMock<ITest> (mock.Object);
+    }
+
+    [Test]
+    public void Constructor_LocalByDefault()
+    {
+      var mock = new Mock<ITest>();
+      using var nativeMock = new NativeMock<ITest> (mock.Object);
+
+      Assert.That(NativeMockRegistry.LocalSetups.TrySetup (mock.Object), Is.False);
+    }
+
+    [Test]
+    public void Constructor_GlobalRegistration()
+    {
+      var mock = new Mock<ITest>();
+      using var nativeMock = new NativeMock<ITest> (mock.Object, NativeMockScope.Global);
+
+      Assert.That (NativeMockRegistry.GlobalSetups.TrySetup (mock.Object), Is.False);
     }
   }
 }
