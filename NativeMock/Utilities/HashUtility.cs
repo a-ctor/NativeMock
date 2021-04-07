@@ -7,7 +7,7 @@ namespace NativeMock.Utilities
   /// <summary>
   /// Provides methods for hashing <see cref="Stream" />s.
   /// </summary>
-  public static class HashUtility
+  internal static class HashUtility
   {
     public static GenericHash CreateSha256Hash (Stream stream)
     {

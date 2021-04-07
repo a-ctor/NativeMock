@@ -3,7 +3,7 @@ namespace NativeMock.Emit
   using System;
   using System.Reflection;
 
-  public readonly struct NativeMockProxyCodeGeneratedMethod
+  internal readonly struct NativeMockProxyCodeGeneratedMethod
   {
     public readonly MethodInfo MethodInfo;
     public readonly int MethodHandle;

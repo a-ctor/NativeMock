@@ -1,11 +1,11 @@
-namespace NativeMock
+namespace NativeMock.Analyzer.Shared
 {
   using System;
 
   /// <summary>
   /// Represents a native function using its name and an optional containing module.
   /// </summary>
-  internal readonly struct NativeFunctionIdentifier : IEquatable<NativeFunctionIdentifier>
+  public readonly struct NativeFunctionIdentifier : IEquatable<NativeFunctionIdentifier>
   {
     private const string c_dllExtensions = ".dll";
 

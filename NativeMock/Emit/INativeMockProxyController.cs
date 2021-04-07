@@ -2,7 +2,7 @@ namespace NativeMock.Emit
 {
   using System;
 
-  public interface INativeMockProxyController<in T>
+  internal interface INativeMockProxyController<in T>
     where T : class
   {
     void SetUnderlyingImplementation (T? underlyingImplementation);

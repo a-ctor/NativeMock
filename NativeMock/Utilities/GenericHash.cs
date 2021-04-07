@@ -6,7 +6,7 @@ namespace NativeMock.Utilities
   /// <summary>
   /// Represents a hash from any hash function using its hex string representation.
   /// </summary>
-  public struct GenericHash : IEquatable<GenericHash>
+  internal struct GenericHash : IEquatable<GenericHash>
   {
     public readonly string Value;
 

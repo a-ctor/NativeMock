@@ -28,7 +28,7 @@ namespace NativeMock
     {
     }
 
-    public NativeMock (INativeMockSetupInternalRegistry setupRegistry, T? implementation)
+    private NativeMock (INativeMockSetupInternalRegistry setupRegistry, T? implementation)
     {
       if (setupRegistry == null)
         throw new ArgumentNullException (nameof(setupRegistry));

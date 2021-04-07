@@ -2,7 +2,7 @@ namespace NativeMock.Fluent
 {
   using System.Reflection;
 
-  public interface IDummyActionInterfaceMethodSelectorController
+  internal interface IDummyActionInterfaceMethodSelectorController
   {
     MethodInfo? GetResult();
 

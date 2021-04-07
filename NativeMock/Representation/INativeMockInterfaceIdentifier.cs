@@ -5,7 +5,7 @@ namespace NativeMock.Representation
   /// <summary>
   /// Provides methods for identifying potential mock interface types in an assembly.
   /// </summary>
-  public interface INativeMockInterfaceIdentifier
+  internal interface INativeMockInterfaceIdentifier
   {
     bool IsNativeMockInterfaceType (Type type);
   }
