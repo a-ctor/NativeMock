@@ -6,6 +6,7 @@ namespace NativeMock.UnitTests
   using System.Runtime.InteropServices;
   using Infrastructure;
   using NUnit.Framework;
+  using Representation;
 
   public class NativeMockInterfaceMethodDescriptionProviderTests
   {

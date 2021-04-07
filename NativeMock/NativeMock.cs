@@ -3,6 +3,9 @@ namespace NativeMock
   using System;
   using System.Linq.Expressions;
   using System.Reflection;
+  using Emit;
+  using Registration;
+  using Representation;
 
   public class NativeMock<T> : IDisposable
     where T : class

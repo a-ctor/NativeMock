@@ -4,6 +4,7 @@ namespace NativeMock.UnitTests
   using System.Text;
   using Moq;
   using NUnit.Framework;
+  using Representation;
 
   [TestFixture]
   public class NativeMockInterfaceDescriptionProviderTests

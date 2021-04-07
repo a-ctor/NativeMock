@@ -3,6 +3,7 @@ namespace NativeMock.UnitTests
   using System;
   using Moq;
   using NUnit.Framework;
+  using Representation;
 
   [TestFixture]
   public class NativeMockCallbackTests

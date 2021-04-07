@@ -1,6 +1,7 @@
 namespace NativeMock.UnitTests
 {
   using System;
+  using Emit;
   using NUnit.Framework;
 
   [TestFixture]

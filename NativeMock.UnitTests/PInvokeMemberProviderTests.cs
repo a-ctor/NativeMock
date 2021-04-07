@@ -5,6 +5,7 @@ namespace NativeMock.UnitTests
   using System.Runtime.InteropServices;
   using Infrastructure;
   using NUnit.Framework;
+  using Representation;
 
   [TestFixture]
   public class PInvokeMemberProviderTests

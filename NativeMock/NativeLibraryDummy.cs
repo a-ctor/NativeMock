@@ -3,6 +3,7 @@
   using System;
   using System.IO;
   using System.Runtime.InteropServices;
+  using Utilities;
 
   /// <summary>
   /// Provides methods for loading dummy DLL files to satisfy P/Invoke dependencies.

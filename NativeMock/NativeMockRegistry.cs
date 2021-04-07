@@ -3,6 +3,11 @@ namespace NativeMock
   using System;
   using System.Reflection;
   using System.Reflection.Emit;
+  using Emit;
+  using Fluent;
+  using Hooking;
+  using Registration;
+  using Representation;
 
   /// <summary>
   /// Provides methods for registering mock interface and mocking them during tests.
