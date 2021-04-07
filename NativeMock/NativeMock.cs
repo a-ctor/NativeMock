@@ -72,6 +72,18 @@ namespace NativeMock
       _proxy.SetMethodHandler (target, handler);
     }
 
+    public void SetupRefReturn<TDelegate> (Action<T> selector, TDelegate handler)
+      where TDelegate : Delegate
+    {
+      var target = NativeMockRegistry.GetSelectedMethod (selector);
+      if (target == null)
+        throw new ArgumentException ("The specified selector is invalid. Please specify the interface method using an expression like 'e => e.MyInterfaceMethod'.");
+      if (handler == null)
+        throw new ArgumentNullException (nameof(handler));
+
+      _proxy.SetMethodHandler (target, handler);
+    }
+
     private MethodInfo? GetTargetMethod<TDelegate> (Expression<Func<T, TDelegate>> selector)
     {
       if (selector.Body is not UnaryExpression unaryExpression || selector.Body.NodeType != ExpressionType.Convert)

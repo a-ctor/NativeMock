@@ -18,6 +18,7 @@ namespace NativeMock
     private static readonly NativeMockInterfaceRegistry s_nativeMockInterfaceRegistry;
     private static readonly GetProcAddressHook s_getGetProcAddressHook;
     private static readonly INativeMockProxyFactory s_nativeMockProxyFactory;
+    private static readonly IDummyActionInterfaceMethodSelectorFactory s_dummyActionInterfaceMethodSelectorFactory;
 
     static NativeMockRegistry()
     {
@@ -53,6 +54,9 @@ namespace NativeMock
 
       var nativeMockProxyCodeGenerator = new NativeMockProxyCodeGenerator (moduleBuilder, delegateGenerator);
       s_nativeMockProxyFactory = new NativeMockProxyFactory (nativeMockProxyCodeGenerator);
+
+      var dummyActionInterfaceMethodSelectorCodeGenerator = new DummyActionInterfaceMethodSelectorCodeGenerator (moduleBuilder);
+      s_dummyActionInterfaceMethodSelectorFactory = new DummyActionInterfaceMethodSelectorFactory (dummyActionInterfaceMethodSelectorCodeGenerator);
 
       var nativeMockSetupInternalRegistryFactory = new NativeMockSetupInternalRegistryFactory();
       LocalSetupsInternal = new AsyncLocalNativeMockSetupRegistry (nativeMockSetupInternalRegistryFactory);
@@ -194,6 +198,16 @@ namespace NativeMock
       where T : class
     {
       return LocalSetupsInternal.GetSetup<T>() ?? GlobalSetupsInternal.GetSetup<T>();
+    }
+
+    internal static MethodInfo GetSelectedMethod<T>(Action<T> action)
+      where T : class
+    {
+      if (action == null)
+        throw new ArgumentNullException (nameof(action));
+
+      var selector = s_dummyActionInterfaceMethodSelectorFactory.CreateDummyActionInterfaceMethodSelector<T>();
+      return selector.GetSelectedMethod (action);
     }
 
     private static void CheckInitialized()

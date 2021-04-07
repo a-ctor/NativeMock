@@ -86,6 +86,10 @@ namespace NativeMock.IntegrationTests
       public delegate void RefParameterDelegate (ref int test);
 
       void RefParameter (ref int test);
+
+      public delegate ref int RefReturnDelegate();
+
+      ref int RefReturn();
     }
 
     [Test]
@@ -165,6 +169,25 @@ namespace NativeMock.IntegrationTests
       testUnsafeMock.Object.RefParameter (ref value);
 
       Assert.That (value, Is.EqualTo (2));
+    }
+
+    private static int s_refInt;
+
+    [Test]
+    public void RefReturn()
+    {
+      s_refInt = 4;
+
+      var testUnsafeMock = new NativeMock<ITestApi>();
+      testUnsafeMock.SetupRefReturn<ITestApi.RefReturnDelegate> (
+        e => e.RefReturn(),
+        () => ref s_refInt);
+
+      ref int result = ref testUnsafeMock.Object.RefReturn();
+      Assert.That (result, Is.EqualTo (4));
+
+      result = 13;
+      Assert.That (s_refInt, Is.EqualTo (13));
     }
   }
 }
