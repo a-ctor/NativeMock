@@ -6,17 +6,17 @@ namespace NativeMock
   /// <inheritdoc />
   internal class NativeFunctionProxyFactory : INativeFunctionProxyFactory
   {
-    private readonly IDelegateGenerator _delegateGenerator;
+    private readonly IDelegateCodeGenerator _delegateCodeGenerator;
     private readonly INativeFunctionProxyCodeGenerator _nativeFunctionProxyCodeGenerator;
 
-    public NativeFunctionProxyFactory (IDelegateGenerator delegateGenerator, INativeFunctionProxyCodeGenerator nativeFunctionProxyCodeGenerator)
+    public NativeFunctionProxyFactory (IDelegateCodeGenerator delegateCodeGenerator, INativeFunctionProxyCodeGenerator nativeFunctionProxyCodeGenerator)
     {
-      if (delegateGenerator == null)
-        throw new ArgumentNullException (nameof(delegateGenerator));
+      if (delegateCodeGenerator == null)
+        throw new ArgumentNullException (nameof(delegateCodeGenerator));
       if (nativeFunctionProxyCodeGenerator == null)
         throw new ArgumentNullException (nameof(nativeFunctionProxyCodeGenerator));
 
-      _delegateGenerator = delegateGenerator;
+      _delegateCodeGenerator = delegateCodeGenerator;
       _nativeFunctionProxyCodeGenerator = nativeFunctionProxyCodeGenerator;
     }
 
@@ -25,7 +25,7 @@ namespace NativeMock
       if (method == null)
         throw new ArgumentNullException (nameof(method));
 
-      var proxyType = _delegateGenerator.CreateDelegateType (method.StubTargetMethod);
+      var proxyType = _delegateCodeGenerator.CreateDelegateType (method.StubTargetMethod);
       var proxyMethod = _nativeFunctionProxyCodeGenerator.CreateProxyMethod (method, proxyType);
       var nativePtr = Marshal.GetFunctionPointerForDelegate (proxyMethod);
 

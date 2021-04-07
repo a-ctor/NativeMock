@@ -7,7 +7,7 @@ namespace NativeMock
   using System.Reflection.Emit;
 
   /// <inheritdoc />
-  internal class DelegateGenerator : IDelegateGenerator
+  internal class DelegateCodeGenerator : IDelegateCodeGenerator
   {
     private const TypeAttributes c_classTypeAttributes = TypeAttributes.Class | TypeAttributes.Public | TypeAttributes.Sealed | TypeAttributes.AutoClass | TypeAttributes.AnsiClass;
 
@@ -22,7 +22,7 @@ namespace NativeMock
 
     private readonly ModuleBuilder _moduleBuilder;
 
-    public DelegateGenerator (ModuleBuilder moduleBuilder)
+    public DelegateCodeGenerator (ModuleBuilder moduleBuilder)
     {
       if (moduleBuilder == null)
         throw new ArgumentNullException (nameof(moduleBuilder));

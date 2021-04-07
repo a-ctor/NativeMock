@@ -25,17 +25,17 @@ namespace NativeMock
     private static readonly MethodInfo s_createDelegateMethod = typeof(Delegate).GetMethod (nameof(Delegate.CreateDelegate), new[] {typeof(Type), typeof(object), typeof(MethodInfo)})!;
 
     private readonly ModuleBuilder _moduleBuilder;
-    private readonly DelegateGenerator _delegateGenerator;
+    private readonly IDelegateCodeGenerator _delegateCodeGenerator;
 
-    public NativeMockProxyCodeGenerator (ModuleBuilder moduleBuilder, DelegateGenerator delegateGenerator)
+    public NativeMockProxyCodeGenerator (ModuleBuilder moduleBuilder, IDelegateCodeGenerator delegateCodeGenerator)
     {
       if (moduleBuilder == null)
         throw new ArgumentNullException (nameof(moduleBuilder));
-      if (delegateGenerator == null)
-        throw new ArgumentNullException (nameof(delegateGenerator));
+      if (delegateCodeGenerator == null)
+        throw new ArgumentNullException (nameof(delegateCodeGenerator));
 
       _moduleBuilder = moduleBuilder;
-      _delegateGenerator = new DelegateGenerator (_moduleBuilder);
+      _delegateCodeGenerator = delegateCodeGenerator;
     }
 
     /// <inheritdoc />
@@ -79,7 +79,7 @@ namespace NativeMock
       var returnType = methodInfo.ReturnType;
       var parameters = methodInfo.GetParameters().Select (e => e.ParameterType).ToArray();
 
-      var delegateType = _delegateGenerator.CreateDelegateType (methodInfo);
+      var delegateType = _delegateCodeGenerator.CreateDelegateType (methodInfo);
       var delegateInvokeMethod = delegateType.GetMethod ("Invoke")!;
 
       // Instance field containing the handler

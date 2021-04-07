@@ -6,7 +6,7 @@ namespace NativeMock
   /// <summary>
   /// Provides methods for dynamically generating delegate types.
   /// </summary>
-  internal interface IDelegateGenerator
+  internal interface IDelegateCodeGenerator
   {
     /// <summary>
     /// Creates a delegate type from the specified <paramref name="methodInfo" />, retaining any applied custom attributes.
