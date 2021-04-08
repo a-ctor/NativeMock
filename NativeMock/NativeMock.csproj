@@ -42,8 +42,8 @@
 
   <Target Name="_AddAnalyzersToOutput">
     <ItemGroup>
-      <TfmSpecificPackageFile Include="$(OutputPath)\NativeMock.Analyzer.dll" PackagePath="analyzers/dotnet/cs" />
-      <TfmSpecificPackageFile Include="$(OutputPath)\NativeMock.Analyzer.CodeFixes.dll"
+      <TfmSpecificPackageFile Include="..\NativeMock.Analyzer\bin\$(Configuration)\netstandard2.0\NativeMock.Analyzer.dll" PackagePath="analyzers/dotnet/cs" />
+      <TfmSpecificPackageFile Include="..\NativeMock.Analyzer.CodeFixes\bin\$(Configuration)\netstandard2.0\NativeMock.Analyzer.CodeFixes.dll"
                               PackagePath="analyzers/dotnet/cs" />
     </ItemGroup>
   </Target>
