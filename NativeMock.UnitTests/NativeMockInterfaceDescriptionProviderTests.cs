@@ -68,10 +68,10 @@ namespace NativeMock.UnitTests
     {
       var method = typeof(ISimple2).GetMethod ("Test")!;
       var methodDescription = new NativeMockInterfaceMethodDescription (
-        new NativeFunctionIdentifier ("TestDll", "Test"),
         method!,
         method!,
-        NativeMockBehavior.Default);
+        NativeMockBehavior.Default,
+        new NativeFunctionIdentifier ("TestDll", "Test"));
       _interfaceMethodDescriptionProviderMock.Setup (m => m.GetMockInterfaceDescription ("TestDll", method, typeof(int), NativeMockBehavior.Default)).Returns (methodDescription);
 
       var nativeMockInterfaceDescription = _nativeMockInterfaceDescriptionProvider.GetMockInterfaceDescription (typeof(ISimple2));
@@ -95,10 +95,10 @@ namespace NativeMock.UnitTests
     {
       var method = typeof(IMockBehavior).GetMethod ("Test")!;
       var methodDescription = new NativeMockInterfaceMethodDescription (
-        new NativeFunctionIdentifier ("TestDll", "Test"),
         method!,
         method!,
-        NativeMockBehavior.Strict);
+        NativeMockBehavior.Strict,
+        new NativeFunctionIdentifier ("TestDll", "Test"));
       _interfaceMethodDescriptionProviderMock.Setup (m => m.GetMockInterfaceDescription ("TestDll", method, null, NativeMockBehavior.Strict)).Returns (methodDescription);
 
       var nativeMockInterfaceDescription = _nativeMockInterfaceDescriptionProvider.GetMockInterfaceDescription (typeof(IMockBehavior));

@@ -93,7 +93,7 @@ namespace NativeMock.UnitTests
       Assert.That (interfaceDescription, Is.Not.Null);
       Assert.That (interfaceDescription.Name, Is.EqualTo (new NativeFunctionIdentifier (FakeDllNames.Dll1, method.Name)));
       Assert.That (interfaceDescription.InterfaceMethod, Is.EqualTo (method));
-      Assert.That (interfaceDescription.StubTargetMethod, Is.EqualTo (method));
+      Assert.That (interfaceDescription.PrototypeMethod, Is.EqualTo (method));
       Assert.That (interfaceDescription.Behavior, Is.EqualTo (NativeMockBehavior.Default));
     }
 
@@ -106,7 +106,7 @@ namespace NativeMock.UnitTests
       Assert.That (interfaceDescription, Is.Not.Null);
       Assert.That (interfaceDescription.Name, Is.EqualTo (new NativeFunctionIdentifier (FakeDllNames.Dll1, method.Name)));
       Assert.That (interfaceDescription.InterfaceMethod, Is.EqualTo (method));
-      Assert.That (interfaceDescription.StubTargetMethod, Is.EqualTo (method));
+      Assert.That (interfaceDescription.PrototypeMethod, Is.EqualTo (method));
       Assert.That (interfaceDescription.Behavior, Is.EqualTo (NativeMockBehavior.Default));
     }
 
@@ -119,7 +119,7 @@ namespace NativeMock.UnitTests
       Assert.That (interfaceDescription, Is.Not.Null);
       Assert.That (interfaceDescription.Name, Is.EqualTo (new NativeFunctionIdentifier (FakeDllNames.Dll1, "Test")));
       Assert.That (interfaceDescription.InterfaceMethod, Is.EqualTo (method));
-      Assert.That (interfaceDescription.StubTargetMethod, Is.EqualTo (method));
+      Assert.That (interfaceDescription.PrototypeMethod, Is.EqualTo (method));
       Assert.That (interfaceDescription.Behavior, Is.EqualTo (NativeMockBehavior.Default));
     }
 
@@ -147,7 +147,7 @@ namespace NativeMock.UnitTests
       Assert.That (interfaceDescription, Is.Not.Null);
       Assert.That (interfaceDescription.Name, Is.EqualTo (new NativeFunctionIdentifier (FakeDllNames.Dll1, "PublicDeclarationElsewhere")));
       Assert.That (interfaceDescription.InterfaceMethod, Is.EqualTo (interfaceMethod));
-      Assert.That (interfaceDescription.StubTargetMethod, Is.EqualTo (classMethod));
+      Assert.That (interfaceDescription.PrototypeMethod, Is.EqualTo (classMethod));
       Assert.That (interfaceDescription.Behavior, Is.EqualTo (NativeMockBehavior.Default));
     }
 
@@ -161,7 +161,7 @@ namespace NativeMock.UnitTests
       Assert.That (interfaceDescription, Is.Not.Null);
       Assert.That (interfaceDescription.Name, Is.EqualTo (new NativeFunctionIdentifier (FakeDllNames.Dll1, "PrivateDeclarationElsewhere")));
       Assert.That (interfaceDescription.InterfaceMethod, Is.EqualTo (interfaceMethod));
-      Assert.That (interfaceDescription.StubTargetMethod, Is.EqualTo (classMethod));
+      Assert.That (interfaceDescription.PrototypeMethod, Is.EqualTo (classMethod));
       Assert.That (interfaceDescription.Behavior, Is.EqualTo (NativeMockBehavior.Default));
     }
 
@@ -175,7 +175,7 @@ namespace NativeMock.UnitTests
       Assert.That (interfaceDescription, Is.Not.Null);
       Assert.That (interfaceDescription.Name, Is.EqualTo (new NativeFunctionIdentifier (FakeDllNames.Dll1, "RealRenamedDeclarationElsewhere")));
       Assert.That (interfaceDescription.InterfaceMethod, Is.EqualTo (interfaceMethod));
-      Assert.That (interfaceDescription.StubTargetMethod, Is.EqualTo (classMethod));
+      Assert.That (interfaceDescription.PrototypeMethod, Is.EqualTo (classMethod));
       Assert.That (interfaceDescription.Behavior, Is.EqualTo (NativeMockBehavior.Default));
     }
 
@@ -189,7 +189,7 @@ namespace NativeMock.UnitTests
       Assert.That (interfaceDescription, Is.Not.Null);
       Assert.That (interfaceDescription.Name, Is.EqualTo (new NativeFunctionIdentifier (FakeDllNames.Dll1, "VirtualRenamedDeclarationElsewhere")));
       Assert.That (interfaceDescription.InterfaceMethod, Is.EqualTo (interfaceMethod));
-      Assert.That (interfaceDescription.StubTargetMethod, Is.EqualTo (classMethod));
+      Assert.That (interfaceDescription.PrototypeMethod, Is.EqualTo (classMethod));
       Assert.That (interfaceDescription.Behavior, Is.EqualTo (NativeMockBehavior.Default));
     }
 
@@ -223,7 +223,7 @@ namespace NativeMock.UnitTests
       Assert.That (interfaceDescription, Is.Not.Null);
       Assert.That (interfaceDescription.Name, Is.EqualTo (new NativeFunctionIdentifier (FakeDllNames.Dll1, "InheritDeclaringType")));
       Assert.That (interfaceDescription.InterfaceMethod, Is.EqualTo (interfaceMethod));
-      Assert.That (interfaceDescription.StubTargetMethod, Is.EqualTo (classMethod));
+      Assert.That (interfaceDescription.PrototypeMethod, Is.EqualTo (classMethod));
       Assert.That (interfaceDescription.Behavior, Is.EqualTo (NativeMockBehavior.Default));
     }
 
@@ -237,7 +237,7 @@ namespace NativeMock.UnitTests
       Assert.That (interfaceDescription, Is.Not.Null);
       Assert.That (interfaceDescription.Name, Is.EqualTo (new NativeFunctionIdentifier (FakeDllNames.Dll1, "OverrideDeclaringType")));
       Assert.That (interfaceDescription.InterfaceMethod, Is.EqualTo (interfaceMethod));
-      Assert.That (interfaceDescription.StubTargetMethod, Is.EqualTo (classMethod));
+      Assert.That (interfaceDescription.PrototypeMethod, Is.EqualTo (classMethod));
       Assert.That (interfaceDescription.Behavior, Is.EqualTo (NativeMockBehavior.Default));
     }
 
@@ -386,7 +386,7 @@ namespace NativeMock.UnitTests
       Assert.That (interfaceDescription, Is.Not.Null);
       Assert.That (interfaceDescription.Name, Is.EqualTo (new NativeFunctionIdentifier (FakeDllNames.Dll1, "DefaultBehavior")));
       Assert.That (interfaceDescription.InterfaceMethod, Is.EqualTo (interfaceMethod));
-      Assert.That (interfaceDescription.StubTargetMethod, Is.EqualTo (interfaceMethod));
+      Assert.That (interfaceDescription.PrototypeMethod, Is.EqualTo (interfaceMethod));
       Assert.That (interfaceDescription.Behavior, Is.EqualTo (NativeMockBehavior.Default));
     }
 
@@ -399,7 +399,7 @@ namespace NativeMock.UnitTests
       Assert.That (interfaceDescription, Is.Not.Null);
       Assert.That (interfaceDescription.Name, Is.EqualTo (new NativeFunctionIdentifier (FakeDllNames.Dll1, "OverrideDefaultBehavior")));
       Assert.That (interfaceDescription.InterfaceMethod, Is.EqualTo (interfaceMethod));
-      Assert.That (interfaceDescription.StubTargetMethod, Is.EqualTo (interfaceMethod));
+      Assert.That (interfaceDescription.PrototypeMethod, Is.EqualTo (interfaceMethod));
       Assert.That (interfaceDescription.Behavior, Is.EqualTo (NativeMockBehavior.Loose));
     }
 
@@ -412,7 +412,7 @@ namespace NativeMock.UnitTests
       Assert.That (interfaceDescription, Is.Not.Null);
       Assert.That (interfaceDescription.Name, Is.EqualTo (new NativeFunctionIdentifier (FakeDllNames.Dll1, "DefaultBehavior")));
       Assert.That (interfaceDescription.InterfaceMethod, Is.EqualTo (interfaceMethod));
-      Assert.That (interfaceDescription.StubTargetMethod, Is.EqualTo (interfaceMethod));
+      Assert.That (interfaceDescription.PrototypeMethod, Is.EqualTo (interfaceMethod));
       Assert.That (interfaceDescription.Behavior, Is.EqualTo (NativeMockBehavior.Strict));
     }
 
@@ -425,7 +425,7 @@ namespace NativeMock.UnitTests
       Assert.That (interfaceDescription, Is.Not.Null);
       Assert.That (interfaceDescription.Name, Is.EqualTo (new NativeFunctionIdentifier (FakeDllNames.Dll1, "OverrideDefaultBehavior")));
       Assert.That (interfaceDescription.InterfaceMethod, Is.EqualTo (interfaceMethod));
-      Assert.That (interfaceDescription.StubTargetMethod, Is.EqualTo (interfaceMethod));
+      Assert.That (interfaceDescription.PrototypeMethod, Is.EqualTo (interfaceMethod));
       Assert.That (interfaceDescription.Behavior, Is.EqualTo (NativeMockBehavior.Loose));
     }
 

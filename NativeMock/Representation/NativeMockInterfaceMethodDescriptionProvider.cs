@@ -39,10 +39,10 @@ namespace NativeMock.Representation
 
       var declaringType = nativeMockCallbackAttribute?.DeclaringType ?? defaultDeclaringType;
       return new NativeMockInterfaceMethodDescription (
-        name,
         method,
         ResolveMethod (method, name, declaringType),
-        nativeMockBehavior);
+        nativeMockBehavior,
+        name);
     }
 
     private MethodInfo ResolveMethod (MethodInfo originalMethod, NativeFunctionIdentifier name, Type? declaringType)

@@ -26,7 +26,7 @@ namespace NativeMock.Emit
       if (method == null)
         throw new ArgumentNullException (nameof(method));
 
-      var proxyType = _delegateCodeGenerator.CreateDelegateType (method.StubTargetMethod);
+      var proxyType = _delegateCodeGenerator.CreateDelegateType (method.PrototypeMethod);
       var proxyMethod = _nativeFunctionProxyCodeGenerator.CreateProxyMethod (method, proxyType);
       var nativePtr = Marshal.GetFunctionPointerForDelegate (proxyMethod);
 
