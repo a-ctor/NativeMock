@@ -50,5 +50,11 @@ namespace NativeMock.Hooking
     public static implicit operator FunctionName (nint value) => new (value);
 
     public static implicit operator FunctionName (string value) => new (value);
+
+    /// <inheritdoc />
+    public override string ToString()
+    {
+      return IsOrdinal ? $"#{OrdinalValue}" : StringValue;
+    }
   }
 }

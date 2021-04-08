@@ -238,5 +238,76 @@ interface Test
 
       await VerifyCS.VerifyAnalyzerAsync (test);
     }
+
+    [TestMethod]
+    public async Task OrdinalValueMismatch1()
+    {
+      var test = SourceHelper.Create (
+        @"
+class NativeFunctions
+{
+  [DllImport(""test.dll"", EntryPoint = ""#1337"")]
+  public static extern void Test();
+}
+
+[NativeMock.NativeMockInterface (""test.dll"")]
+interface Test
+{
+  [NativeMock.NativeMockCallback (DeclaringType = typeof(NativeFunctions))]
+  void {|#0:Test|}(int value); 
+}");
+
+      var expected = VerifyCS.Diagnostic (RuleIds.NoDeclaringTypeRuleId)
+        .WithLocation (0)
+        .WithArguments ("Test", "test.dll+Test", "NativeFunctions");
+
+      await VerifyCS.VerifyAnalyzerAsync (test, expected);
+    }
+
+    [TestMethod]
+    public async Task OrdinalValueMismatch2()
+    {
+      var test = SourceHelper.Create (
+        @"
+class NativeFunctions
+{
+  [DllImport(""test.dll"")]
+  public static extern void Test();
+}
+
+[NativeMock.NativeMockInterface (""test.dll"")]
+interface Test
+{
+  [NativeMock.NativeMockCallback (""#1337"", DeclaringType = typeof(NativeFunctions))]
+  void {|#0:Test|}(int value); 
+}");
+
+      var expected = VerifyCS.Diagnostic (RuleIds.NoDeclaringTypeRuleId)
+        .WithLocation (0)
+        .WithArguments ("Test", "test.dll+#1337", "NativeFunctions");
+
+      await VerifyCS.VerifyAnalyzerAsync (test, expected);
+    }
+
+    [TestMethod]
+    public async Task OrdinalValueMatch()
+    {
+      var test = SourceHelper.Create (
+        @"
+class NativeFunctions
+{
+  [DllImport(""test.dll"", EntryPoint = ""#1337"")]
+  public static extern void Test3();
+}
+
+[NativeMock.NativeMockInterface (""test.dll"")]
+interface Test
+{
+  [NativeMock.NativeMockCallback (""#1337"", DeclaringType = typeof(NativeFunctions))]
+  void {|#0:Test|}(); 
+}");
+
+      await VerifyCS.VerifyAnalyzerAsync (test);
+    }
   }
 }

@@ -63,12 +63,10 @@ namespace NativeMock.Hooking
 
     private IntPtr GetProcAddress (IntPtr module, IntPtr procName)
     {
-      var functionName = FunctionName.ParseFromProcName (procName);
-      if (functionName.IsOrdinal)
-        return _hook.Original (module, procName);
+      var importFunctionName = FunctionName.ParseFromProcName (procName);
 
       var moduleName = _moduleNameResolver.Resolve (module);
-      var nativeFunctionIdentifier = new NativeFunctionIdentifier (moduleName, functionName.StringValue);
+      var nativeFunctionIdentifier = new NativeFunctionIdentifier (moduleName, importFunctionName.ToString());
 
       return _nativeFunctionProxyLookup.GetNativeFunctionProxy (nativeFunctionIdentifier)?.NativePtr
              ?? _hook.Original (module, procName);
