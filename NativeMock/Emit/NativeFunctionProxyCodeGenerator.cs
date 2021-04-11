@@ -18,11 +18,14 @@ namespace NativeMock.Emit
     }
 
     private readonly MethodInfo _handlerProviderMethod;
+    private readonly MethodInfo _getForwardProxyMethod;
 
-    public NativeFunctionProxyCodeGenerator (MethodInfo handlerProviderMethod)
+    public NativeFunctionProxyCodeGenerator (MethodInfo handlerProviderMethod, MethodInfo getForwardProxyMethod)
     {
       if (handlerProviderMethod == null)
         throw new ArgumentNullException (nameof(handlerProviderMethod));
+      if (getForwardProxyMethod == null)
+        throw new ArgumentNullException (nameof(getForwardProxyMethod));
       if (!handlerProviderMethod.IsStatic)
         throw new ArgumentException ("Handler provider method must be static.", nameof(handlerProviderMethod));
       if (!handlerProviderMethod.IsGenericMethodDefinition || handlerProviderMethod.GetGenericArguments().Length != 1)
@@ -31,8 +34,17 @@ namespace NativeMock.Emit
         throw new ArgumentException ("Handler provider method must not have any parameters.", nameof(handlerProviderMethod));
       if (!handlerProviderMethod.ReturnType.IsGenericParameter || handlerProviderMethod.ReturnType.IsByRef)
         throw new ArgumentException ("Handler provider method must have a return type of T.", nameof(handlerProviderMethod));
+      if (!getForwardProxyMethod.IsStatic)
+        throw new ArgumentException ("Handler provider method must be static.", nameof(getForwardProxyMethod));
+      if (!getForwardProxyMethod.IsGenericMethodDefinition || getForwardProxyMethod.GetGenericArguments().Length != 1)
+        throw new ArgumentException ("Handler provider method must be generic method definition with one type parameter.", nameof(getForwardProxyMethod));
+      if (getForwardProxyMethod.GetParameters().Length != 0)
+        throw new ArgumentException ("Handler provider method must not have any parameters.", nameof(getForwardProxyMethod));
+      if (!getForwardProxyMethod.ReturnType.IsGenericParameter || getForwardProxyMethod.ReturnType.IsByRef)
+        throw new ArgumentException ("Handler provider method must have a return type of T.", nameof(getForwardProxyMethod));
 
       _handlerProviderMethod = handlerProviderMethod;
+      _getForwardProxyMethod = getForwardProxyMethod;
     }
 
     public Delegate CreateProxyMethod (NativeMockInterfaceMethodDescription method, Type nativeFunctionDelegateType)
@@ -111,6 +123,17 @@ namespace NativeMock.Emit
           ilGenerator.Emit (OpCodes.Ldnull);
           ilGenerator.Emit (OpCodes.Ret);
         }
+      }
+      else if (method.Behavior == NativeMockBehavior.Forward)
+      {
+        // var temp0 = NativeMockRegistry.GetMockForwardProxy<T>();
+        ilGenerator.Emit (OpCodes.Call, _getForwardProxyMethod.MakeGenericMethod (interfaceType));
+
+        // return temp0.XXX(args);
+        for (short i = 0; i < parameters.Length; i++)
+          ilGenerator.Emit (OpCodes.Ldarg, i);
+        ilGenerator.Emit (OpCodes.Callvirt, interfaceMethod);
+        ilGenerator.Emit (OpCodes.Ret);
       }
       else
       {

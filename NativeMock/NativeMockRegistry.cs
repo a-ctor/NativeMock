@@ -44,7 +44,8 @@ namespace NativeMock
 
       var delegateGenerator = new DelegateCodeGenerator (moduleBuilder);
       var handlerProviderMethod = typeof(NativeMockRegistry).GetMethod (nameof(GetMockObject), BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public)!;
-      var nativeFunctionProxyCodeGenerator = new NativeFunctionProxyCodeGenerator (handlerProviderMethod);
+      var getForwardProxyMethod = typeof(NativeMockRegistry).GetMethod (nameof(GetMockForwardProxy), BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public)!;
+      var nativeFunctionProxyCodeGenerator = new NativeFunctionProxyCodeGenerator (handlerProviderMethod, getForwardProxyMethod);
       var nativeFunctionProxyFactory = new NativeFunctionProxyFactory (delegateGenerator, nativeFunctionProxyCodeGenerator);
 
       s_nativeMockInterfaceRegistry = new NativeMockInterfaceRegistry (
@@ -211,7 +212,7 @@ namespace NativeMock
       return LocalSetupsInternal.GetSetup<T>() ?? GlobalSetupsInternal.GetSetup<T>();
     }
 
-    internal static T GetMockForwardObject<T>()
+    internal static T GetMockForwardProxy<T>()
       where T : class
     {
       return s_nativeMockForwardProxyFactory.CreateMockForwardProxy<T>();

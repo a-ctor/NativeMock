@@ -18,6 +18,11 @@ namespace NativeMock
     /// <summary>
     /// A default value is returned when no callback is set up.
     /// </summary>
-    Loose
+    Loose,
+
+    /// <summary>
+    /// The call is forwarded to the original P/Invoke method when no callback is set up.
+    /// </summary>
+    Forward
   }
 }

@@ -10,6 +10,7 @@ namespace NativeMock.IntegrationTests
     [NativeMockInterface (TestDriver.DllName)]
     public interface IForwardProxy
     {
+      [NativeMockCallback (Behavior = NativeMockBehavior.Forward)]
       int NmForward (int i);
     }
 
@@ -38,9 +39,19 @@ namespace NativeMock.IntegrationTests
       mock.Setup (e => e (3)).Returns (5);
       TestDriver.SetForwardHandler (mock.Object);
 
-      var mockForwardObject = NativeMockRegistry.GetMockForwardObject<IForwardProxy>();
+      var mockForwardObject = NativeMockRegistry.GetMockForwardProxy<IForwardProxy>();
 
       Assert.That (mockForwardObject.NmForward (3), Is.EqualTo (5));
+    }
+
+    [Test]
+    public void ForwardsWhenNoMockIsSetUp()
+    {
+      var mock = new Mock<TestDriver.ForwardHandlerDelegate>();
+      mock.Setup (e => e (3)).Returns (5);
+      TestDriver.SetForwardHandler (mock.Object);
+
+      Assert.That (TestDriverApi.NmForward (3), Is.EqualTo (5));
     }
   }
 }
