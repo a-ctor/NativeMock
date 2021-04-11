@@ -24,6 +24,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\NativeMock.IntegrationTests.Driver\NativeMock.IntegrationTests.Driver.vcxproj">
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <OutputItemType>Content</OutputItemType>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </ProjectReference>
     <ProjectReference Include="..\NativeMock\NativeMock.csproj" />
   </ItemGroup>
 

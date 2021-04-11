@@ -1,43 +1,46 @@
 namespace NativeMock.IntegrationTests
 {
-  using System.Runtime.InteropServices;
+  using Infrastructure;
   using Moq;
   using NUnit.Framework;
 
   [TestFixture]
   public class ForwardProxyTests
   {
-    [NativeMockInterface ("kernel32.dll")]
+    [NativeMockInterface (TestDriver.DllName)]
     public interface IForwardProxy
     {
-      uint GetErrorMode();
+      int NmForward (int i);
     }
 
-    public class ForwardProxy
+    [TearDown]
+    public void TearDown()
     {
-      [DllImport ("kernel32.dll", SetLastError = true)]
-      public static extern uint GetErrorMode();
+      TestDriver.ClearForwardHandler();
     }
 
     [Test]
     public void CanMockTest()
     {
       var mock = new Mock<IForwardProxy>();
-      mock.Setup (e => e.GetErrorMode()).Returns (5);
+      mock.Setup (e => e.NmForward (3)).Returns (5);
 
       using var nativeMock = new NativeMock<IForwardProxy> (mock.Object);
 
-      Assert.That (ForwardProxy.GetErrorMode(), Is.EqualTo (5));
+      Assert.That (TestDriverApi.NmForward (3), Is.EqualTo (5));
       mock.VerifyAll();
     }
 
     [Test]
     public void CanUseForwardInterface()
     {
+      var mock = new Mock<TestDriver.ForwardHandlerDelegate>();
+      mock.Setup (e => e (3)).Returns (5);
+      TestDriver.SetForwardHandler (mock.Object);
+
       var mockForwardObject = NativeMockRegistry.GetMockForwardObject<IForwardProxy>();
 
-      var errorMode = mockForwardObject.GetErrorMode();
-      Assert.That (errorMode, Is.Not.Zero);
+      Assert.That (mockForwardObject.NmForward (3), Is.EqualTo (5));
     }
   }
 }

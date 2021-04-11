@@ -1,6 +1,7 @@
 namespace NativeMock.IntegrationTests
 {
   using System.Runtime.CompilerServices;
+  using Infrastructure;
 
   public static class ModuleInitializer
   {
@@ -9,6 +10,8 @@ namespace NativeMock.IntegrationTests
     {
       NativeMockRegistry.Initialize();
       NativeMockRegistry.RegisterFromAssembly (typeof(ModuleInitializer).Assembly, RegisterFromAssemblySearchBehavior.IncludeNestedTypes);
+
+      TestDriver.LoadDriver();
     }
   }
 }
