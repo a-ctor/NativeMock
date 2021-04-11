@@ -46,7 +46,7 @@ namespace NativeMock.IntegrationTests
     [Test]
     public void LocalSetupOverridesGlobalSetup()
     {
-      var mock = new Mock<IGlobalSetup>();
+      var mock = new Mock<IGlobalSetup> (MockBehavior.Strict);
       mock.Setup (e => e.NmGlobalSetup()).Returns (13);
 
       var nativeMock = new NativeMock<IGlobalSetup> (mock.Object);

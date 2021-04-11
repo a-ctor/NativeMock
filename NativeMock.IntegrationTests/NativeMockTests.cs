@@ -26,7 +26,7 @@ namespace NativeMock.IntegrationTests
     [Test]
     public void Constructor_TwoMocksAtTheSameTimeThrows()
     {
-      var mock = new Mock<ITest>();
+      var mock = new Mock<ITest> (MockBehavior.Strict);
       using var nativeMock = new NativeMock<ITest> (mock.Object);
 
       Assert.That (() => new NativeMock<ITest> (mock.Object), Throws.InvalidOperationException.With.Message.StartWith ("Cannot have"));
@@ -35,7 +35,7 @@ namespace NativeMock.IntegrationTests
     [Test]
     public void Constructor_DisposeUnRegisteresMock()
     {
-      var mock = new Mock<ITest>();
+      var mock = new Mock<ITest> (MockBehavior.Strict);
       var nativeMock = new NativeMock<ITest> (mock.Object);
       nativeMock.Dispose();
 
@@ -45,7 +45,7 @@ namespace NativeMock.IntegrationTests
     [Test]
     public void Constructor_LocalByDefault()
     {
-      var mock = new Mock<ITest>();
+      var mock = new Mock<ITest> (MockBehavior.Strict);
       using var nativeMock = new NativeMock<ITest> (mock.Object);
 
       Assert.That (NativeMockRegistry.LocalSetups.TrySetup (mock.Object), Is.False);
@@ -54,7 +54,7 @@ namespace NativeMock.IntegrationTests
     [Test]
     public void Constructor_GlobalRegistration()
     {
-      var mock = new Mock<ITest>();
+      var mock = new Mock<ITest> (MockBehavior.Strict);
       using var nativeMock = new NativeMock<ITest> (mock.Object, NativeMockScope.Global);
 
       Assert.That (NativeMockRegistry.GlobalSetups.TrySetup (mock.Object), Is.False);
@@ -63,7 +63,7 @@ namespace NativeMock.IntegrationTests
     [Test]
     public void Setup_OverridesUnderlyingImplementation()
     {
-      var mock = new Mock<ITest>();
+      var mock = new Mock<ITest> (MockBehavior.Strict);
       using var nativeMock = new NativeMock<ITest> (mock.Object);
 
       bool wasCalled = false;
@@ -110,7 +110,7 @@ namespace NativeMock.IntegrationTests
     [Test]
     public void NoSetupUsesUnderlyingImplementationWhenAvailable()
     {
-      var mock = new Mock<ITest>();
+      var mock = new Mock<ITest> (MockBehavior.Strict);
       mock.Setup (e => e.NmNoop());
 
       using var testUnsafeMock = new NativeMock<ITest> (mock.Object);

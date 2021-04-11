@@ -35,7 +35,7 @@ namespace NativeMock.IntegrationTests
 
     private void DoTest()
     {
-      var mock = new Mock<IFakeNativeApi>();
+      var mock = new Mock<IFakeNativeApi> (MockBehavior.Strict);
 
       using var nativeMock = new NativeMock<IFakeNativeApi> (mock.Object);
 

@@ -17,7 +17,7 @@ namespace NativeMock.IntegrationTests
     [Test]
     public void CanMockTest()
     {
-      var mock = new Mock<IForwardProxy>();
+      var mock = new Mock<IForwardProxy> (MockBehavior.Strict);
       mock.Setup (e => e.NmForward (3)).Returns (5);
 
       using var nativeMock = new NativeMock<IForwardProxy> (mock.Object);
