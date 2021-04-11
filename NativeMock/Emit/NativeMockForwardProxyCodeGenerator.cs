@@ -58,12 +58,14 @@ namespace NativeMock.Emit
       for (var i = 0; i < interfaceMethods.Length; i++)
         GenerateForwardMethod (proxyTypeBuilder, interfaceMethods[i], i);
 
-      // todo: do accessibility check and throw if inaccessible
-      var proxyType = proxyTypeBuilder.CreateType();
-      if (proxyType == null)
-        throw new InvalidOperationException ("Could not create the requested proxy type.");
-
-      return proxyType;
+      try
+      {
+        return proxyTypeBuilder.CreateType() ?? throw new InvalidOperationException ("Could not create the requested proxy type.");
+      }
+      catch (TypeLoadException ex)
+      {
+        throw new InvalidOperationException ($"Could not create the requested proxy type. Make sure that the specified interface is publicly accessible or internal with an [assembly: InternalsVisibleTo(\"{NativeMockRegistry.ProxyAssemblyName}\")] attribute.", ex);
+      }
     }
 
     private void GenerateForwardMethod (TypeBuilder proxyTypeBuilder, NativeMockInterfaceMethodDescription methodDescription, int methodHandle)

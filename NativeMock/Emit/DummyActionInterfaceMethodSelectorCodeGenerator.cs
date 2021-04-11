@@ -17,7 +17,7 @@ namespace NativeMock.Emit
 
     private static readonly ConstructorInfo s_notSupportedExceptionConstructor = typeof(NotSupportedException).GetConstructor (Array.Empty<Type>())!;
 
-    private static readonly MethodInfo s_getMethodFromHandleMethod = typeof(MethodBase).GetMethod (nameof(MethodBase.GetMethodFromHandle), new []{typeof(RuntimeMethodHandle)})!;
+    private static readonly MethodInfo s_getMethodFromHandleMethod = typeof(MethodBase).GetMethod (nameof(MethodBase.GetMethodFromHandle), new[] {typeof(RuntimeMethodHandle)})!;
 
     private readonly ModuleBuilder _moduleBuilder;
 
@@ -50,12 +50,14 @@ namespace NativeMock.Emit
       // Implement the controller interface
       GenerateProxyMetaMethods (dummyActionTypeBuilder, setCountField, resultField);
 
-      // todo: do accessibility check and throw if inaccessible
-      var dummyActionInterfaceMethodSelector = dummyActionTypeBuilder.CreateType();
-      if (dummyActionInterfaceMethodSelector == null)
-        throw new InvalidOperationException ("Could not create the requested proxy type.");
-
-      return dummyActionInterfaceMethodSelector;
+      try
+      {
+        return dummyActionTypeBuilder.CreateType() ?? throw new InvalidOperationException ("Could not create the requested proxy type.");
+      }
+      catch (TypeLoadException ex)
+      {
+        throw new InvalidOperationException ($"Could not create the requested proxy type. Make sure that the specified interface is publicly accessible or internal with an [assembly: InternalsVisibleTo(\"{NativeMockRegistry.ProxyAssemblyName}\")] attribute.", ex);
+      }
     }
 
     private void GenerateSelectorMethod (TypeBuilder dummySelectorTypeBuilder, MethodInfo methodInfo, FieldBuilder setCountField, FieldBuilder resultField)

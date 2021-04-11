@@ -69,10 +69,15 @@ namespace NativeMock.Emit
       // Implement the proxy interface
       GenerateProxyMetaMethods (proxyTypeBuilder, generatedFields, interfaceType, underlyingImplementationField);
 
-      // todo: do accessibility check and throw if inaccessible
-      var proxyType = proxyTypeBuilder.CreateType();
-      if (proxyType == null)
-        throw new InvalidOperationException ("Could not create the requested proxy type.");
+      Type proxyType;
+      try
+      {
+        proxyType = proxyTypeBuilder.CreateType() ?? throw new InvalidOperationException ("Could not create the requested proxy type.");
+      }
+      catch (TypeLoadException ex)
+      {
+        throw new InvalidOperationException ($"Could not create the requested proxy type. Make sure that the specified interface is publicly accessible or internal with an [assembly: InternalsVisibleTo(\"{NativeMockRegistry.ProxyAssemblyName}\")] attribute.", ex);
+      }
 
       return new NativeMockProxyCodeGeneratorResult (proxyType, generatedMethods.MoveToImmutable());
     }
