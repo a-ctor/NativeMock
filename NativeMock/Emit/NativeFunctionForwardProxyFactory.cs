@@ -4,7 +4,7 @@ namespace NativeMock.Emit
   using System.Collections.Concurrent;
   using System.Reflection;
 
-  public class NativeFunctionForwardProxyFactory : INativeFunctionForwardProxyFactory
+  internal class NativeFunctionForwardProxyFactory : INativeFunctionForwardProxyFactory
   {
     private readonly INativeFunctionForwardProxyCodeGenerator _nativeFunctionForwardProxyCodeGenerator;
 

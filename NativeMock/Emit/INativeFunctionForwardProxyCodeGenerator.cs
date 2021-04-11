@@ -1,9 +1,9 @@
-﻿namespace NativeMock.Emit
+namespace NativeMock.Emit
 {
   using System;
   using System.Reflection;
 
-  public interface INativeFunctionForwardProxyCodeGenerator
+  internal interface INativeFunctionForwardProxyCodeGenerator
   {
     Delegate GenerateNativeFunctionForwardProxy (MethodInfo method);
   }
