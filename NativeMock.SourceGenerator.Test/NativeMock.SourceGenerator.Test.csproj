@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NUnit" Version="3.13.1" />
+    <PackageReference Include="NUnit3TestAdapter" Version="3.17.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.9.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\NativeMock.Analyzer.TestAssembly\NativeMock.Analyzer.TestAssembly.csproj" />
+    <ProjectReference Include="..\NativeMock.SourceGenerator\NativeMock.SourceGenerator.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Verifiers\" />
+  </ItemGroup>
+
+</Project>

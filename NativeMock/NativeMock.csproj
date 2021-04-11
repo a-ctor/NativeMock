@@ -30,6 +30,10 @@
       <PrivateAssets>all</PrivateAssets>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
+    <ProjectReference Include="..\NativeMock.SourceGenerator\NativeMock.SourceGenerator.csproj">
+      <PrivateAssets>all</PrivateAssets>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
   </ItemGroup>
 
   <ItemGroup>
@@ -46,6 +50,7 @@
       <TfmSpecificPackageFile Include="..\NativeMock.Analyzer\bin\$(Configuration)\netstandard2.0\NativeMock.Analyzer.dll" PackagePath="analyzers/dotnet/cs" />
       <TfmSpecificPackageFile Include="..\NativeMock.Analyzer.CodeFixes\bin\$(Configuration)\netstandard2.0\NativeMock.Analyzer.CodeFixes.dll"
                               PackagePath="analyzers/dotnet/cs" />
+      <TfmSpecificPackageFile Include="..\NativeMock.SourceGenerator\bin\$(Configuration)\netstandard2.0\NativeMock.SourceGenerator.dll" PackagePath="analyzers/dotnet/cs" />
     </ItemGroup>
   </Target>
 
