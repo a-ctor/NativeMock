@@ -17,7 +17,6 @@ namespace NativeMock.Emit
 
     private static readonly ConstructorInfo s_notSupportedExceptionConstructor = typeof(NotSupportedException).GetConstructor (Array.Empty<Type>())!;
 
-    private static readonly MethodInfo s_getCurrentMethodMethod = typeof(MethodBase).GetMethod (nameof(MethodBase.GetCurrentMethod))!;
     private static readonly MethodInfo s_getMethodFromHandleMethod = typeof(MethodBase).GetMethod (nameof(MethodBase.GetMethodFromHandle), new []{typeof(RuntimeMethodHandle)})!;
 
     private readonly ModuleBuilder _moduleBuilder;
