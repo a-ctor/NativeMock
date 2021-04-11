@@ -4,6 +4,7 @@ namespace NativeMock.IntegrationTests
   using System.Runtime.InteropServices;
   using Infrastructure;
   using Moq;
+  using NativeApis;
   using NUnit.Framework;
 
   [TestFixture]
@@ -179,7 +180,7 @@ namespace NativeMock.IntegrationTests
       s_refInt = 4;
 
       var testUnsafeMock = new NativeMock<ITestApi>();
-      testUnsafeMock.SetupRefReturn<ITestApi.RefReturnDelegate> (
+      testUnsafeMock.SetupAlternate<ITestApi.RefReturnDelegate> (
         e => e.RefReturn(),
         () => ref s_refInt);
 
@@ -188,6 +189,21 @@ namespace NativeMock.IntegrationTests
 
       result = 13;
       Assert.That (s_refInt, Is.EqualTo (13));
+    }
+
+    [Test]
+    public void Forward()
+    {
+      var mock = new Mock<IForwardProxy.NmForwardDelegate>();
+      mock.Setup (e => e (3)).Returns (5);
+      TestDriver.SetForwardHandler (mock.Object);
+
+      var testUnsafeMock = new NativeMock<IForwardProxy>();
+      testUnsafeMock.SetupForward<IForwardProxy.NmForwardDelegate> (e => e.NmForward);
+
+      Assert.That (TestDriverApi.NmForward (3), Is.EqualTo (5));
+
+      mock.VerifyAll();
     }
   }
 }

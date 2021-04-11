@@ -66,25 +66,42 @@ namespace NativeMock
     public void Setup<TDelegate> (Expression<Func<T, TDelegate>> selector, TDelegate handler)
       where TDelegate : Delegate
     {
+      if (selector == null)
+        throw new ArgumentNullException (nameof(selector));
+      if (handler == null)
+        throw new ArgumentNullException (nameof(handler));
+
       var target = GetTargetMethod (selector);
       if (target == null)
         throw new ArgumentException ("The specified selector is invalid. Please specify the interface method using an expression like 'e => e.MyInterfaceMethod'.");
-      if (handler == null)
-        throw new ArgumentNullException (nameof(handler));
 
       _proxy.SetMethodHandler (target, handler);
     }
 
-    public void SetupRefReturn<TDelegate> (Action<T> selector, TDelegate handler)
+    public void SetupAlternate<TDelegate> (Action<T> selector, TDelegate handler)
       where TDelegate : Delegate
     {
-      var target = NativeMockRegistry.GetSelectedMethod (selector);
-      if (target == null)
-        throw new ArgumentException ("The specified selector is invalid. Please specify the interface method using an expression like 'e => e.MyInterfaceMethod'.");
+      if (selector == null)
+        throw new ArgumentNullException (nameof(selector));
       if (handler == null)
         throw new ArgumentNullException (nameof(handler));
 
+      var target = NativeMockRegistry.GetSelectedMethod (selector);
+      if (target == null)
+        throw new ArgumentException ("The specified selector is invalid. Please specify the interface method using an expression like 'e => e.MyInterfaceMethod'.");
+
       _proxy.SetMethodHandler (target, handler);
+    }
+
+    public void SetupForward<TDelegate> (Expression<Func<T, TDelegate>> selector)
+      where TDelegate : Delegate
+    {
+      var target = GetTargetMethod (selector);
+      if (target == null)
+        throw new ArgumentException ("The specified selector is invalid. Please specify the interface method using an expression like 'e => e.MyInterfaceMethod'.");
+
+      var forwardProxy = NativeMockRegistry.GetFunctionForwardProxy (target);
+      _proxy.SetMethodHandler (target, forwardProxy);
     }
 
     private MethodInfo? GetTargetMethod<TDelegate> (Expression<Func<T, TDelegate>> selector)

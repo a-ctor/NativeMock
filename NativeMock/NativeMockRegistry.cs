@@ -26,6 +26,7 @@ namespace NativeMock
     private static readonly INativeMockProxyFactory s_nativeMockProxyFactory;
     private static readonly IDummyActionInterfaceMethodSelectorFactory s_dummyActionInterfaceMethodSelectorFactory;
     private static readonly INativeMockForwardProxyFactory s_nativeMockForwardProxyFactory;
+    private static readonly INativeFunctionForwardProxyFactory s_nativeFunctionForwardProxyFactory;
 
     static NativeMockRegistry()
     {
@@ -42,11 +43,13 @@ namespace NativeMock
       var assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly (assemblyName, AssemblyBuilderAccess.Run);
       var moduleBuilder = assemblyBuilder.DefineDynamicModule (ProxyAssemblyModuleName);
 
-      var delegateGenerator = new DelegateCodeGenerator (moduleBuilder);
+      var delegateCodeGenerator = new DelegateCodeGenerator (moduleBuilder);
+      var delegateGeneratorWithCaching = new CachingDelegateCodeGeneratorDecorator (delegateCodeGenerator);
+
       var handlerProviderMethod = typeof(NativeMockRegistry).GetMethod (nameof(GetMockObject), BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public)!;
       var getForwardProxyMethod = typeof(NativeMockRegistry).GetMethod (nameof(GetMockForwardProxy), BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public)!;
       var nativeFunctionProxyCodeGenerator = new NativeFunctionProxyCodeGenerator (handlerProviderMethod, getForwardProxyMethod);
-      var nativeFunctionProxyFactory = new NativeFunctionProxyFactory (delegateGenerator, nativeFunctionProxyCodeGenerator);
+      var nativeFunctionProxyFactory = new NativeFunctionProxyFactory (delegateGeneratorWithCaching, nativeFunctionProxyCodeGenerator);
 
       s_nativeMockInterfaceRegistry = new NativeMockInterfaceRegistry (
         nativeMockInterfaceLocatorFactory,
@@ -60,15 +63,18 @@ namespace NativeMock
         moduleNameResolver,
         s_nativeMockInterfaceRegistry);
 
-      var nativeMockProxyCodeGenerator = new NativeMockProxyCodeGenerator (moduleBuilder, delegateGenerator);
+      var nativeMockProxyCodeGenerator = new NativeMockProxyCodeGenerator (moduleBuilder, delegateGeneratorWithCaching);
       s_nativeMockProxyFactory = new NativeMockProxyFactory (nativeMockProxyCodeGenerator);
 
       var dummyActionInterfaceMethodSelectorCodeGenerator = new DummyActionInterfaceMethodSelectorCodeGenerator (moduleBuilder);
       s_dummyActionInterfaceMethodSelectorFactory = new DummyActionInterfaceMethodSelectorFactory (dummyActionInterfaceMethodSelectorCodeGenerator);
 
       var resolveDllImportMethod = typeof(PInvokeUtility).GetMethod (nameof(PInvokeUtility.ResolveDllImport), BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public)!;
-      var nativeMockForwardProxyCodeGenerator = new NativeMockForwardProxyCodeGenerator (moduleBuilder, delegateGenerator, resolveDllImportMethod);
+      var nativeMockForwardProxyCodeGenerator = new NativeMockForwardProxyCodeGenerator (moduleBuilder, delegateGeneratorWithCaching, resolveDllImportMethod);
       s_nativeMockForwardProxyFactory = new NativeMockForwardProxyFactory (nativeMockForwardProxyCodeGenerator, s_nativeMockInterfaceRegistry);
+
+      var nativeFunctionForwardProxyCodeGenerator = new NativeFunctionForwardProxyCodeGenerator (delegateGeneratorWithCaching, getForwardProxyMethod);
+      s_nativeFunctionForwardProxyFactory = new NativeFunctionForwardProxyFactory (nativeFunctionForwardProxyCodeGenerator);
 
       var nativeMockSetupInternalRegistryFactory = new NativeMockSetupInternalRegistryFactory();
       LocalSetupsInternal = new AsyncLocalNativeMockSetupRegistry (nativeMockSetupInternalRegistryFactory);
@@ -216,6 +222,11 @@ namespace NativeMock
       where T : class
     {
       return s_nativeMockForwardProxyFactory.CreateMockForwardProxy<T>();
+    }
+
+    internal static Delegate GetFunctionForwardProxy (MethodInfo method)
+    {
+      return s_nativeFunctionForwardProxyFactory.CreateNativeFunctionForwardProxy (method);
     }
 
     internal static MethodInfo GetSelectedMethod<T> (Action<T> action)

@@ -18,6 +18,9 @@ namespace NativeMock.Emit
     private static readonly ConstructorInfo s_argumentExceptionConstructor = typeof(ArgumentException).GetConstructor (new[] {typeof(string), typeof(string)})!;
     private static readonly ConstructorInfo s_invalidOperationExceptionConstructor = typeof(InvalidOperationException).GetConstructor (new[] {typeof(string)})!;
 
+    private static readonly MethodInfo s_getTypeMethod = typeof(object).GetMethod (nameof(GetType))!;
+    private static readonly MethodInfo s_typeEqualsMethod = typeof(Type).GetMethod ("op_Equality", new[] {typeof(Type), typeof(Type)})!;
+
     private static readonly MethodInfo s_getTypeFromHandleMethod = typeof(Type).GetMethod ("GetTypeFromHandle")!;
 
     private static readonly MethodInfo s_delegateGetTargetMethod = typeof(Delegate).GetProperty (nameof(Delegate.Target))!.GetMethod!;
@@ -182,8 +185,30 @@ namespace NativeMock.Emit
         var field = generatedMethodFields[i];
         var delegateType = field.FieldType;
 
+        var convertDelegateLabel = ilGenerator.DefineLabel();
+
         // case X:
         ilGenerator.MarkLabel (switchLabels[i]);
+
+        // if (typeof(X) == arg.GetType()) {
+        ilGenerator.Emit (OpCodes.Ldtoken, delegateType);
+        ilGenerator.Emit (OpCodes.Call, s_getTypeFromHandleMethod);
+
+        ilGenerator.Emit (OpCodes.Ldarg_2);
+        ilGenerator.Emit (OpCodes.Callvirt, s_getTypeMethod);
+
+        ilGenerator.Emit (OpCodes.Call, s_typeEqualsMethod);
+        ilGenerator.Emit (OpCodes.Brfalse_S, convertDelegateLabel);
+
+        ilGenerator.Emit (OpCodes.Ldarg_0);
+        ilGenerator.Emit (OpCodes.Ldarg_2);
+        ilGenerator.Emit (OpCodes.Castclass, delegateType);
+        ilGenerator.Emit (OpCodes.Stfld, field);
+        ilGenerator.Emit (OpCodes.Ret);
+
+        // }
+
+        ilGenerator.MarkLabel (convertDelegateLabel);
 
         // this.fieldX = ...
         ilGenerator.Emit (OpCodes.Ldarg_0);

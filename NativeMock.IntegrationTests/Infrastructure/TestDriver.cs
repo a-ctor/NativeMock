@@ -2,18 +2,15 @@ namespace NativeMock.IntegrationTests.Infrastructure
 {
   using System;
   using System.Runtime.InteropServices;
+  using NativeApis;
 
   public static class TestDriver
   {
     public const string DllName = "NativeMock.IntegrationTests.Driver.dll";
 
-    [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
-    public delegate int ForwardHandlerDelegate (int i);
-
-
     // We need to keep a reference to the forward handler so that it does not get GC'ed while the test driver has a native reference to it
     // ReSharper disable once NotAccessedField.Local
-    private static ForwardHandlerDelegate s_forwardHandler;
+    private static IForwardProxy.NmForwardDelegate s_forwardHandler;
 
     public static void LoadDriver()
     {
@@ -26,7 +23,7 @@ namespace NativeMock.IntegrationTests.Infrastructure
       s_forwardHandler = null;
     }
 
-    public static void SetForwardHandler (ForwardHandlerDelegate func)
+    public static void SetForwardHandler (IForwardProxy.NmForwardDelegate func)
     {
       var ptr = Marshal.GetFunctionPointerForDelegate (func);
       TestDriverApi.NmForwardSetHandler (ptr);
