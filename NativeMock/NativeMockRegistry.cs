@@ -8,6 +8,7 @@ namespace NativeMock
   using Hooking;
   using Registration;
   using Representation;
+  using Utilities;
 
   /// <summary>
   /// Provides methods for registering mock interface and mocking them during tests.
@@ -24,6 +25,7 @@ namespace NativeMock
     private static readonly GetProcAddressHook s_getGetProcAddressHook;
     private static readonly INativeMockProxyFactory s_nativeMockProxyFactory;
     private static readonly IDummyActionInterfaceMethodSelectorFactory s_dummyActionInterfaceMethodSelectorFactory;
+    private static readonly INativeMockForwardProxyFactory s_nativeMockForwardProxyFactory;
 
     static NativeMockRegistry()
     {
@@ -62,6 +64,10 @@ namespace NativeMock
 
       var dummyActionInterfaceMethodSelectorCodeGenerator = new DummyActionInterfaceMethodSelectorCodeGenerator (moduleBuilder);
       s_dummyActionInterfaceMethodSelectorFactory = new DummyActionInterfaceMethodSelectorFactory (dummyActionInterfaceMethodSelectorCodeGenerator);
+
+      var resolveDllImportMethod = typeof(PInvokeUtility).GetMethod (nameof(PInvokeUtility.ResolveDllImport), BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public)!;
+      var nativeMockForwardProxyCodeGenerator = new NativeMockForwardProxyCodeGenerator (moduleBuilder, delegateGenerator, resolveDllImportMethod);
+      s_nativeMockForwardProxyFactory = new NativeMockForwardProxyFactory (nativeMockForwardProxyCodeGenerator, s_nativeMockInterfaceRegistry);
 
       var nativeMockSetupInternalRegistryFactory = new NativeMockSetupInternalRegistryFactory();
       LocalSetupsInternal = new AsyncLocalNativeMockSetupRegistry (nativeMockSetupInternalRegistryFactory);
@@ -205,7 +211,13 @@ namespace NativeMock
       return LocalSetupsInternal.GetSetup<T>() ?? GlobalSetupsInternal.GetSetup<T>();
     }
 
-    internal static MethodInfo GetSelectedMethod<T>(Action<T> action)
+    internal static T GetMockForwardObject<T>()
+      where T : class
+    {
+      return s_nativeMockForwardProxyFactory.CreateMockForwardProxy<T>();
+    }
+
+    internal static MethodInfo GetSelectedMethod<T> (Action<T> action)
       where T : class
     {
       if (action == null)

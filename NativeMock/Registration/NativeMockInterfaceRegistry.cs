@@ -8,7 +8,7 @@ namespace NativeMock.Registration
   using Emit;
   using Representation;
 
-  internal class NativeMockInterfaceRegistry : INativeFunctionProxyLookup
+  internal class NativeMockInterfaceRegistry : INativeFunctionProxyLookup, INativeMockInterfaceDescriptionLookup
   {
     private readonly INativeMockInterfaceLocatorFactory _nativeMockInterfaceLocatorFactory;
     private readonly INativeMockInterfaceDescriptionProvider _nativeMockInterfaceDescriptionProvider;
@@ -137,6 +137,13 @@ namespace NativeMock.Registration
       return _nativeFunctionProxies.TryGetValue (nativeFunctionIdentifier, out var proxy)
         ? proxy
         : null;
+    }
+
+    /// <inheritdoc />
+    public NativeMockInterfaceDescription? GetMockInterfaceDescription<T>()
+      where T : class
+    {
+      return _registeredInterfaces.TryGetValue (typeof(T), out var description) ? description : null;
     }
   }
 }

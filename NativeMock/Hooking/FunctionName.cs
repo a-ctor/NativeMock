@@ -23,6 +23,18 @@ namespace NativeMock.Hooking
         : new FunctionName (Marshal.PtrToStringAnsi (procName)!);
     }
 
+    public static FunctionName ParseFromString (string s)
+    {
+      if (s == null)
+        throw new ArgumentNullException (nameof(s));
+
+      // Only consider ordinal values in the form of '#23' which do not exceed the ordinal bit limit
+      // Otherwise just return the string as function name
+      return s.StartsWith ('#') && int.TryParse (s.AsSpan().Slice (1), out var ordinalValue) && ordinalValue < c_ordinalBits
+        ? new FunctionName (ordinalValue)
+        : new FunctionName (s);
+    }
+
     private readonly nint _ordinalValue;
     private readonly string? _stringValue;
 
