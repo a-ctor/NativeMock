@@ -104,7 +104,7 @@ namespace NativeMock.IntegrationTests
           Span<byte> span = stackalloc byte[4];
           testUnsafeMock.Object.RefStructParameter (span);
         },
-        Throws.InvalidOperationException);
+        Throws.TypeOf<NativeMockException>().With.Message.EqualTo ("'ITestApi.RefStructParameter' invocation failed because no setup was found."));
     }
 
     [Test]

@@ -16,7 +16,7 @@ namespace NativeMock.Emit
     private const FieldAttributes c_instanceFieldAttributes = FieldAttributes.Private;
 
     private static readonly ConstructorInfo s_argumentExceptionConstructor = typeof(ArgumentException).GetConstructor (new[] {typeof(string), typeof(string)})!;
-    private static readonly ConstructorInfo s_invalidOperationExceptionConstructor = typeof(InvalidOperationException).GetConstructor (new[] {typeof(string)})!;
+    private static readonly ConstructorInfo s_invalidOperationExceptionConstructor = typeof(NativeMockException).GetConstructor (new[] {typeof(string)})!;
 
     private static readonly MethodInfo s_getTypeMethod = typeof(object).GetMethod (nameof(GetType))!;
     private static readonly MethodInfo s_typeEqualsMethod = typeof(Type).GetMethod ("op_Equality", new[] {typeof(Type), typeof(Type)})!;
@@ -113,7 +113,7 @@ namespace NativeMock.Emit
       ilGenerator.Emit (OpCodes.Pop);
 
       // throw new InvalidOperationException("
-      ilGenerator.Emit (OpCodes.Ldstr, "No handler was set up."); // todo better exception
+      ilGenerator.Emit (OpCodes.Ldstr, $"'{methodInfo.DeclaringType!.Name}.{methodInfo.Name}' invocation failed because no setup was found.");
       ilGenerator.Emit (OpCodes.Newobj, s_invalidOperationExceptionConstructor);
       ilGenerator.Emit (OpCodes.Throw);
 
