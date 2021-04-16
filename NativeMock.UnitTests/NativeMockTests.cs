@@ -49,5 +49,71 @@ namespace NativeMock.UnitTests
       var unsafeMock = new NativeMock<ITestApi>();
       Assert.That (unsafeMock.Object, Is.Not.Null);
     }
+
+    public interface ISimpleTestApi
+    {
+      void A();
+
+      void B();
+    }
+
+    private delegate void TestDelegate();
+
+    [Test]
+    public void Verify_All()
+    {
+      var nativeMock = new NativeMock<ISimpleTestApi>();
+      nativeMock.Setup<TestDelegate> (e => e.A, () => { });
+
+      nativeMock.Object.A();
+      nativeMock.Verify();
+    }
+
+    [Test]
+    public void Verify_AllFails()
+    {
+      var nativeMock = new NativeMock<ISimpleTestApi>();
+      nativeMock.Setup<TestDelegate> (e => e.A, () => { });
+
+      Assert.That (() => nativeMock.Verify(), Throws.TypeOf<NativeMockException>());
+    }
+
+    [Test]
+    public void Verify()
+    {
+      var nativeMock = new NativeMock<ISimpleTestApi>();
+      nativeMock.Setup<TestDelegate> (e => e.A, () => { });
+
+      nativeMock.Object.A();
+      nativeMock.Verify<TestDelegate> (e => e.A);
+    }
+
+    [Test]
+    public void Verify_Fails()
+    {
+      var nativeMock = new NativeMock<ISimpleTestApi>();
+      nativeMock.Setup<TestDelegate> (e => e.A, () => { });
+
+      Assert.That (() => nativeMock.Verify<TestDelegate> (e => e.A), Throws.TypeOf<NativeMockException>());
+    }
+
+    [Test]
+    public void VerifyAlternate()
+    {
+      var nativeMock = new NativeMock<ISimpleTestApi>();
+      nativeMock.Setup<TestDelegate> (e => e.A, () => { });
+
+      nativeMock.Object.A();
+      nativeMock.VerifyAlternate (e => e.A());
+    }
+
+    [Test]
+    public void VerifyAlternate_Fails()
+    {
+      var nativeMock = new NativeMock<ISimpleTestApi>();
+      nativeMock.Setup<TestDelegate> (e => e.A, () => { });
+
+      Assert.That (() => nativeMock.VerifyAlternate (e => e.A()), Throws.TypeOf<NativeMockException>());
+    }
   }
 }

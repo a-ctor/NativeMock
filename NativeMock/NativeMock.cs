@@ -43,7 +43,8 @@ namespace NativeMock
       if (isNativeMockInterface)
       {
         if (!NativeMockRegistry.IsRegistered<T>())
-          throw new InvalidOperationException ($"The specified type '{typeof(T)}' is not registered as a native mock interface. Use NativeMockRegistry.Register as early in the program as possible to register an interface.");
+          throw new InvalidOperationException (
+            $"The specified type '{typeof(T)}' is not registered as a native mock interface. Use NativeMockRegistry.Register as early in the program as possible to register an interface.");
         if (!setupRegistry.TrySetup (_proxy.Object))
           throw new InvalidOperationException ("Cannot have two native mocks of the same interface in the same context at the same time.");
 
@@ -102,6 +103,36 @@ namespace NativeMock
 
       var forwardProxy = NativeMockRegistry.GetFunctionForwardProxy (target);
       _proxy.SetMethodHandler (target, forwardProxy);
+    }
+
+    public void Verify()
+    {
+      _proxy.Verify();
+    }
+
+    public void Verify<TDelegate> (Expression<Func<T, TDelegate>> selector)
+      where TDelegate : Delegate
+    {
+      if (selector == null)
+        throw new ArgumentNullException (nameof(selector));
+
+      var target = GetTargetMethod (selector);
+      if (target == null)
+        throw new ArgumentException ("The specified selector is invalid. Please specify the interface method using an expression like 'e => e.MyInterfaceMethod'.");
+
+      _proxy.Verify (target);
+    }
+
+    public void VerifyAlternate (Action<T> selector)
+    {
+      if (selector == null)
+        throw new ArgumentNullException (nameof(selector));
+
+      var target = NativeMockRegistry.GetSelectedMethod (selector);
+      if (target == null)
+        throw new ArgumentException ("The specified selector is invalid. Please specify the interface method using an expression like 'e => e.MyInterfaceMethod'.");
+
+      _proxy.Verify (target);
     }
 
     private MethodInfo? GetTargetMethod<TDelegate> (Expression<Func<T, TDelegate>> selector)
