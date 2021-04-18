@@ -9,12 +9,6 @@ namespace NativeMock.Emit
 
   internal class NativeMockForwardProxyCodeGenerator : INativeMockForwardProxyCodeGenerator
   {
-    private const TypeAttributes c_classTypeAttributes = TypeAttributes.Class | TypeAttributes.Public | TypeAttributes.Sealed | TypeAttributes.AutoClass | TypeAttributes.AnsiClass | TypeAttributes.BeforeFieldInit;
-
-    private const MethodAttributes c_implicitMethodImplementationAttributes = MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.NewSlot | MethodAttributes.Virtual;
-
-    private const FieldAttributes c_instanceFieldAttributes = FieldAttributes.Private;
-
     private static readonly MethodInfo s_getTypeFromHandleMethod = typeof(Type).GetMethod ("GetTypeFromHandle")!;
 
     private static readonly MethodInfo s_getDelegateForFunctionPointerMethod = typeof(Marshal).GetMethod (nameof(Marshal.GetDelegateForFunctionPointer), new[] {typeof(IntPtr), typeof(Type)})!;
@@ -51,7 +45,7 @@ namespace NativeMock.Emit
         throw new ArgumentNullException (nameof(nativeMockInterfaceDescription));
 
       var interfaceType = nativeMockInterfaceDescription.InterfaceType;
-      var proxyTypeBuilder = _moduleBuilder.DefineType ($"{interfaceType.Name}_NativeMockForwardProxy_{Guid.NewGuid()}", c_classTypeAttributes, typeof(object), new[] {interfaceType});
+      var proxyTypeBuilder = _moduleBuilder.DefinePublicClass ($"{interfaceType.Name}_NativeMockForwardProxy_{Guid.NewGuid()}", typeof(object), interfaceType);
 
       // Implement the interface that we want to proxy
       var interfaceMethods = nativeMockInterfaceDescription.Methods;
@@ -79,9 +73,9 @@ namespace NativeMock.Emit
       var delegateInvokeMethod = delegateType.GetMethod ("Invoke")!;
 
       // Instance field containing the handler
-      var forwardFieldBuilder = proxyTypeBuilder.DefineField ($"field{methodHandle}", delegateType, c_instanceFieldAttributes);
+      var forwardFieldBuilder = proxyTypeBuilder.DefinePrivateField (delegateType, $"field{methodHandle}");
 
-      var methodBuilder = proxyTypeBuilder.DefineMethod (methodInfo.Name, c_implicitMethodImplementationAttributes, returnType, parameters);
+      var methodBuilder = proxyTypeBuilder.DefineImplicitInterfaceMethodImplementation (returnType, methodInfo.Name, parameters);
       var ilGenerator = methodBuilder.GetILGenerator();
 
       var callHandlerLabel = ilGenerator.DefineLabel();

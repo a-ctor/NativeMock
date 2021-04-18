@@ -8,13 +8,6 @@ namespace NativeMock.Emit
 
   internal class DummyActionInterfaceMethodSelectorCodeGenerator : IDummyActionInterfaceMethodSelectorCodeGenerator
   {
-    private const TypeAttributes c_classTypeAttributes = TypeAttributes.Class | TypeAttributes.Public | TypeAttributes.Sealed | TypeAttributes.AutoClass | TypeAttributes.AnsiClass | TypeAttributes.BeforeFieldInit;
-
-    private const MethodAttributes c_implicitMethodImplementationAttributes = MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.NewSlot | MethodAttributes.Virtual;
-    private const MethodAttributes c_explicitMethodImplementationAttributes = MethodAttributes.Private | MethodAttributes.Final | MethodAttributes.HideBySig | MethodAttributes.NewSlot | MethodAttributes.Virtual;
-
-    private const FieldAttributes c_instanceFieldAttributes = FieldAttributes.Private;
-
     private static readonly MethodInfo s_getMethodFromHandleMethod = typeof(MethodBase).GetMethod (nameof(MethodBase.GetMethodFromHandle), new[] {typeof(RuntimeMethodHandle)})!;
 
     private readonly ModuleBuilder _moduleBuilder;
@@ -36,10 +29,10 @@ namespace NativeMock.Emit
         throw new ArgumentException ("The specified type must be an interface.");
 
       var dummyActionControllerType = typeof(IDummyActionInterfaceMethodSelectorController);
-      var dummyActionTypeBuilder = _moduleBuilder.DefineType ($"{interfaceType.Name}_DummyActionInterfaceMethodSelector_{Guid.NewGuid()}", c_classTypeAttributes, typeof(object), new[] {interfaceType, dummyActionControllerType});
+      var dummyActionTypeBuilder = _moduleBuilder.DefinePublicClass ($"{interfaceType.Name}_DummyActionInterfaceMethodSelector_{Guid.NewGuid()}", typeof(object), interfaceType, dummyActionControllerType);
 
-      var setCountField = dummyActionTypeBuilder.DefineField ("setCount", typeof(int), c_instanceFieldAttributes);
-      var resultField = dummyActionTypeBuilder.DefineField ("result", typeof(MethodInfo), c_instanceFieldAttributes);
+      var setCountField = dummyActionTypeBuilder.DefinePrivateField (typeof(int), "setCount");
+      var resultField = dummyActionTypeBuilder.DefinePrivateField (typeof(MethodInfo), "result");
 
       // Implement the interface with stub selector methods
       foreach (var methodInfo in interfaceType.GetMethods())
@@ -63,7 +56,7 @@ namespace NativeMock.Emit
       var returnType = methodInfo.ReturnType;
       var parameters = methodInfo.GetParameters().Select (e => e.ParameterType).ToArray();
 
-      var methodBuilder = dummySelectorTypeBuilder.DefineMethod (methodInfo.Name, c_implicitMethodImplementationAttributes, returnType, parameters);
+      var methodBuilder = dummySelectorTypeBuilder.DefineImplicitInterfaceMethodImplementation (returnType, methodInfo.Name, parameters);
       var ilGenerator = methodBuilder.GetILGenerator();
 
       // setCount++;
@@ -126,11 +119,9 @@ namespace NativeMock.Emit
 
     private MethodBuilder GenerateSimpleGetMethod (TypeBuilder dummySelectorTypeBuilder, string name, FieldBuilder field)
     {
-      var getMethod = dummySelectorTypeBuilder.DefineMethod (
-        $"{nameof(IDummyActionInterfaceMethodSelectorController)}.Get{name}",
-        c_explicitMethodImplementationAttributes,
+      var getMethod = dummySelectorTypeBuilder.DefineExplicitInterfaceMethodImplementation (
         field.FieldType,
-        Array.Empty<Type>());
+        $"{nameof(IDummyActionInterfaceMethodSelectorController)}.Get{name}");
 
       var ilGenerator = getMethod.GetILGenerator();
 
@@ -144,11 +135,9 @@ namespace NativeMock.Emit
 
     private MethodBuilder GenerateResetMethod (TypeBuilder dummySelectorTypeBuilder, FieldBuilder setCountField, FieldBuilder resultField)
     {
-      var getMethod = dummySelectorTypeBuilder.DefineMethod (
-        $"{nameof(IDummyActionInterfaceMethodSelectorController)}.Reset",
-        c_explicitMethodImplementationAttributes,
+      var getMethod = dummySelectorTypeBuilder.DefineExplicitInterfaceMethodImplementation (
         typeof(void),
-        Array.Empty<Type>());
+        $"{nameof(IDummyActionInterfaceMethodSelectorController)}.Reset");
 
       var ilGenerator = getMethod.GetILGenerator();
 

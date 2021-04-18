@@ -11,12 +11,8 @@ namespace NativeMock.Emit
   {
     private const TypeAttributes c_classTypeAttributes = TypeAttributes.Class | TypeAttributes.Public | TypeAttributes.Sealed | TypeAttributes.AutoClass | TypeAttributes.AnsiClass;
 
-    private const MethodAttributes c_constructorMethodAttributes = MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.RTSpecialName;
-
     // ReSharper disable once BitwiseOperatorOnEnumWithoutFlags
     private const MethodImplAttributes c_runtimeManagedMethodImplAttributes = MethodImplAttributes.Runtime | MethodImplAttributes.Managed;
-
-    private const MethodAttributes c_instanceMethodAttributes = MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.Virtual | MethodAttributes.NewSlot;
 
     private static readonly Type[] s_constructorArgumentTypes = {typeof(object), typeof(IntPtr)};
 
@@ -42,11 +38,11 @@ namespace NativeMock.Emit
       var delegateTypeBuilder = _moduleBuilder.DefineType ($"{methodInfo.Name}_NativeFunctionProxyDelegate_{Guid.NewGuid()}", c_classTypeAttributes, typeof(MulticastDelegate));
 
       // Create the constructor
-      var constructorBuilder = delegateTypeBuilder.DefineConstructor (c_constructorMethodAttributes, CallingConventions.Standard, s_constructorArgumentTypes);
+      var constructorBuilder = delegateTypeBuilder.DefinePublicConstructor (s_constructorArgumentTypes);
       constructorBuilder.SetImplementationFlags (c_runtimeManagedMethodImplAttributes);
 
       // Create the Invoke method
-      var invokeMethodBuilder = delegateTypeBuilder.DefineMethod ("Invoke", c_instanceMethodAttributes, returnType, parameterTypes);
+      var invokeMethodBuilder = delegateTypeBuilder.DefineImplicitInterfaceMethodImplementation (returnType, "Invoke", parameterTypes);
       invokeMethodBuilder.SetImplementationFlags (c_runtimeManagedMethodImplAttributes);
 
       var returnBuilder = invokeMethodBuilder.DefineParameter (0, returnParameter.Attributes, null);
