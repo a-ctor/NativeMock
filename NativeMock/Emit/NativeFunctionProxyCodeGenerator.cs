@@ -108,7 +108,7 @@ namespace NativeMock.Emit
           // return;
           ilGenerator.Emit (OpCodes.Ret);
         }
-        else if (returnType.IsValueType)
+        else if (returnType.IsValueType && !returnType.IsByRef)
         {
           // return default;
           var resultLocal = ilGenerator.DeclareLocal (returnType);

@@ -15,8 +15,6 @@ namespace NativeMock.Emit
 
     private const FieldAttributes c_instanceFieldAttributes = FieldAttributes.Private;
 
-    private static readonly ConstructorInfo s_notSupportedExceptionConstructor = typeof(NotSupportedException).GetConstructor (Array.Empty<Type>())!;
-
     private static readonly MethodInfo s_getMethodFromHandleMethod = typeof(MethodBase).GetMethod (nameof(MethodBase.GetMethodFromHandle), new[] {typeof(RuntimeMethodHandle)})!;
 
     private readonly ModuleBuilder _moduleBuilder;
@@ -84,18 +82,12 @@ namespace NativeMock.Emit
       ilGenerator.Emit (OpCodes.Stfld, resultField);
 
       // return;
-      if (returnType.IsByRef)
-      {
-        // We cannot return anything by ref here - there is no "default" value so we throw
-        ilGenerator.Emit (OpCodes.Newobj, s_notSupportedExceptionConstructor);
-        ilGenerator.Emit (OpCodes.Throw);
-      }
-      else if (returnType == typeof(void))
+      if (returnType == typeof(void))
       {
         // return;
         ilGenerator.Emit (OpCodes.Ret);
       }
-      else if (returnType.IsValueType)
+      else if (returnType.IsValueType && !returnType.IsByRef)
       {
         // return default;
         var resultLocal = ilGenerator.DeclareLocal (returnType);
