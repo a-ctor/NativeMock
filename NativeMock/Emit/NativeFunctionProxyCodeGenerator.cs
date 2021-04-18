@@ -9,13 +9,7 @@ namespace NativeMock.Emit
   /// <inheritdoc />
   internal class NativeFunctionProxyCodeGenerator : INativeFunctionProxyCodeGenerator
   {
-    private static readonly ConstructorInfo s_nativeFunctionNotMockedExceptionConstructor;
-
-    static NativeFunctionProxyCodeGenerator()
-    {
-      s_nativeFunctionNotMockedExceptionConstructor = typeof(NativeFunctionNotMockedException).GetConstructor (new[] {typeof(string)})
-                                                      ?? throw new NotSupportedException ("Constructor NativeFunctionNotMockedException(string) could not be found.");
-    }
+    private static readonly ConstructorInfo s_nativeFunctionNotMockedExceptionConstructor = ReflectionInfoUtility.SelectConstructor (() => new NativeFunctionNotMockedException (null!));
 
     private readonly MethodInfo _handlerProviderMethod;
     private readonly MethodInfo _getForwardProxyMethod;

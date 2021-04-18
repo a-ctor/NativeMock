@@ -9,17 +9,22 @@ namespace NativeMock.Emit
 
   internal class NativeMockProxyCodeGenerator : INativeMockProxyCodeGenerator
   {
-    private static readonly ConstructorInfo s_argumentExceptionConstructor = typeof(ArgumentException).GetConstructor (new[] {typeof(string), typeof(string)})!;
-    private static readonly ConstructorInfo s_nativeMockExceptionConstructor = typeof(NativeMockException).GetConstructor (new[] {typeof(string)})!;
+    private static readonly ConstructorInfo s_argumentExceptionConstructor
+      = ReflectionInfoUtility.SelectConstructor (() => new ArgumentException ("", ""));
 
-    private static readonly MethodInfo s_getTypeMethod = typeof(object).GetMethod (nameof(GetType))!;
-    private static readonly MethodInfo s_typeEqualsMethod = typeof(Type).GetMethod ("op_Equality", new[] {typeof(Type), typeof(Type)})!;
+    private static readonly ConstructorInfo s_nativeMockExceptionConstructor
+      = ReflectionInfoUtility.SelectConstructor (() => new NativeMockException (""));
 
-    private static readonly MethodInfo s_getTypeFromHandleMethod = typeof(Type).GetMethod ("GetTypeFromHandle")!;
+    // ReSharper disable once ReturnValueOfPureMethodIsNotUsed
+    private static readonly MethodInfo s_getTypeMethod = ReflectionInfoUtility.SelectMethod<object> (e => e.GetType());
+    private static readonly MethodInfo s_typeEqualsMethod = ReflectionInfoUtility.GetEqualityOperatorMethod (typeof(Type), typeof(Type), typeof(Type));
 
-    private static readonly MethodInfo s_delegateGetTargetMethod = typeof(Delegate).GetProperty (nameof(Delegate.Target))!.GetMethod!;
-    private static readonly MethodInfo s_delegateGetMethodMethod = typeof(Delegate).GetProperty (nameof(Delegate.Method))!.GetMethod!;
-    private static readonly MethodInfo s_createDelegateMethod = typeof(Delegate).GetMethod (nameof(Delegate.CreateDelegate), new[] {typeof(Type), typeof(object), typeof(MethodInfo)})!;
+    // ReSharper disable once ReturnValueOfPureMethodIsNotUsed
+    private static readonly MethodInfo s_getTypeFromHandleMethod = ReflectionInfoUtility.SelectMethod (() => Type.GetTypeFromHandle (default));
+
+    private static readonly MethodInfo s_delegateGetTargetMethod = ReflectionInfoUtility.SelectGetter<Delegate> (e => e.Target);
+    private static readonly MethodInfo s_delegateGetMethodMethod = ReflectionInfoUtility.SelectGetter<Delegate> (e => e.Method);
+    private static readonly MethodInfo s_createDelegateMethod = ReflectionInfoUtility.SelectMethod (() => Delegate.CreateDelegate (null!, default, ((MethodInfo?) null)!));
 
     private static readonly MethodInfo s_interlockedIntIncrement = typeof(Interlocked).GetMethod (nameof(Interlocked.Increment), new[] {typeof(int).MakeByRefType()})!;
 

@@ -9,9 +9,12 @@ namespace NativeMock.Emit
 
   internal class NativeMockForwardProxyCodeGenerator : INativeMockForwardProxyCodeGenerator
   {
-    private static readonly MethodInfo s_getTypeFromHandleMethod = typeof(Type).GetMethod ("GetTypeFromHandle")!;
+    // ReSharper disable once ReturnValueOfPureMethodIsNotUsed
+    private static readonly MethodInfo s_getTypeFromHandleMethod
+      = ReflectionInfoUtility.SelectMethod (() => Type.GetTypeFromHandle (default));
 
-    private static readonly MethodInfo s_getDelegateForFunctionPointerMethod = typeof(Marshal).GetMethod (nameof(Marshal.GetDelegateForFunctionPointer), new[] {typeof(IntPtr), typeof(Type)})!;
+    private static readonly MethodInfo s_getDelegateForFunctionPointerMethod
+      = ReflectionInfoUtility.SelectMethod (() => Marshal.GetDelegateForFunctionPointer (default, default!));
 
     private readonly ModuleBuilder _moduleBuilder;
     private readonly IDelegateFactory _delegateFactory;

@@ -8,7 +8,9 @@ namespace NativeMock.Emit
 
   internal class DummyActionInterfaceMethodSelectorCodeGenerator : IDummyActionInterfaceMethodSelectorCodeGenerator
   {
-    private static readonly MethodInfo s_getMethodFromHandleMethod = typeof(MethodBase).GetMethod (nameof(MethodBase.GetMethodFromHandle), new[] {typeof(RuntimeMethodHandle)})!;
+    // ReSharper disable once ReturnValueOfPureMethodIsNotUsed
+    private static readonly MethodInfo s_getMethodFromHandleMethod
+      = ReflectionInfoUtility.SelectMethod (() => MethodBase.GetMethodFromHandle (default!));
 
     private readonly ModuleBuilder _moduleBuilder;
 
