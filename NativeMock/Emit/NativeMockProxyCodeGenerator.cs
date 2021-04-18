@@ -5,6 +5,7 @@ namespace NativeMock.Emit
   using System.Linq;
   using System.Reflection;
   using System.Reflection.Emit;
+  using System.Threading;
 
   internal class NativeMockProxyCodeGenerator : INativeMockProxyCodeGenerator
   {
@@ -26,6 +27,8 @@ namespace NativeMock.Emit
     private static readonly MethodInfo s_delegateGetTargetMethod = typeof(Delegate).GetProperty (nameof(Delegate.Target))!.GetMethod!;
     private static readonly MethodInfo s_delegateGetMethodMethod = typeof(Delegate).GetProperty (nameof(Delegate.Method))!.GetMethod!;
     private static readonly MethodInfo s_createDelegateMethod = typeof(Delegate).GetMethod (nameof(Delegate.CreateDelegate), new[] {typeof(Type), typeof(object), typeof(MethodInfo)})!;
+
+    private static readonly MethodInfo s_interlockedIntIncrement = typeof(Interlocked).GetMethod (nameof(Interlocked.Increment), new[] {typeof(int).MakeByRefType()})!;
 
     private readonly ModuleBuilder _moduleBuilder;
     private readonly IDelegateFactory _delegateFactory;
@@ -134,13 +137,11 @@ namespace NativeMock.Emit
       // callHandler:
       ilGenerator.MarkLabel (callHandlerLabel);
 
-      // this.callCountX++;
+      // Interlocked.Increment(ref this.callCountX)
       ilGenerator.Emit (OpCodes.Ldarg_0);
-      ilGenerator.Emit (OpCodes.Dup);
-      ilGenerator.Emit (OpCodes.Ldfld, callCountFieldBuilder);
-      ilGenerator.Emit (OpCodes.Ldc_I4_1);
-      ilGenerator.Emit (OpCodes.Add);
-      ilGenerator.Emit (OpCodes.Stfld, callCountFieldBuilder);
+      ilGenerator.Emit (OpCodes.Ldflda, callCountFieldBuilder);
+      ilGenerator.Emit (OpCodes.Call, s_interlockedIntIncrement);
+      ilGenerator.Emit (OpCodes.Pop);
 
       // return this.handlerX(...args)
       for (short i = 1; i <= parameters.Length; i++)
