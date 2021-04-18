@@ -31,7 +31,7 @@ namespace NativeMock.Emit
     }
 
     /// <inheritdoc />
-    public Type CreateDelegateType (MethodInfo methodInfo)
+    public Type GenerateDelegateTypeForMethod (MethodInfo methodInfo)
     {
       var returnParameter = methodInfo.ReturnParameter;
       var returnType = methodInfo.ReturnType;

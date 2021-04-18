@@ -20,15 +20,15 @@ namespace NativeMock.Emit
     private static readonly MethodInfo s_getDelegateForFunctionPointerMethod = typeof(Marshal).GetMethod (nameof(Marshal.GetDelegateForFunctionPointer), new[] {typeof(IntPtr), typeof(Type)})!;
 
     private readonly ModuleBuilder _moduleBuilder;
-    private readonly IDelegateCodeGenerator _delegateCodeGenerator;
+    private readonly IDelegateFactory _delegateFactory;
     private readonly MethodInfo _dllImportResolveMethod;
 
-    public NativeMockForwardProxyCodeGenerator (ModuleBuilder moduleBuilder, IDelegateCodeGenerator delegateCodeGenerator, MethodInfo dllImportResolveMethod)
+    public NativeMockForwardProxyCodeGenerator (ModuleBuilder moduleBuilder, IDelegateFactory delegateFactory, MethodInfo dllImportResolveMethod)
     {
       if (moduleBuilder == null)
         throw new ArgumentNullException (nameof(moduleBuilder));
-      if (delegateCodeGenerator == null)
-        throw new ArgumentNullException (nameof(delegateCodeGenerator));
+      if (delegateFactory == null)
+        throw new ArgumentNullException (nameof(delegateFactory));
       if (dllImportResolveMethod == null)
         throw new ArgumentNullException (nameof(dllImportResolveMethod));
       if (!dllImportResolveMethod.IsStatic)
@@ -40,7 +40,7 @@ namespace NativeMock.Emit
         throw new ArgumentException ("Dll import resolve method must take two string parameters.", nameof(dllImportResolveMethod));
 
       _moduleBuilder = moduleBuilder;
-      _delegateCodeGenerator = delegateCodeGenerator;
+      _delegateFactory = delegateFactory;
       _dllImportResolveMethod = dllImportResolveMethod;
     }
 
@@ -75,7 +75,7 @@ namespace NativeMock.Emit
       var returnType = methodInfo.ReturnType;
       var parameters = methodInfo.GetParameters().Select (e => e.ParameterType).ToArray();
 
-      var delegateType = _delegateCodeGenerator.CreateDelegateType (methodInfo);
+      var delegateType = _delegateFactory.CreateDelegateType (methodInfo);
       var delegateInvokeMethod = delegateType.GetMethod ("Invoke")!;
 
       // Instance field containing the handler

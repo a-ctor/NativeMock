@@ -44,12 +44,12 @@ namespace NativeMock
       var moduleBuilder = assemblyBuilder.DefineDynamicModule (ProxyAssemblyModuleName);
 
       var delegateCodeGenerator = new DelegateCodeGenerator (moduleBuilder);
-      var delegateGeneratorWithCaching = new CachingDelegateCodeGeneratorDecorator (delegateCodeGenerator);
+      var delegateFactory = new DelegateFactory (delegateCodeGenerator);
 
       var handlerProviderMethod = typeof(NativeMockRegistry).GetMethod (nameof(GetMockObject), BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public)!;
       var getForwardProxyMethod = typeof(NativeMockRegistry).GetMethod (nameof(GetMockForwardProxy), BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public)!;
       var nativeFunctionProxyCodeGenerator = new NativeFunctionProxyCodeGenerator (handlerProviderMethod, getForwardProxyMethod);
-      var nativeFunctionProxyFactory = new NativeFunctionProxyFactory (delegateGeneratorWithCaching, nativeFunctionProxyCodeGenerator);
+      var nativeFunctionProxyFactory = new NativeFunctionProxyFactory (delegateFactory, nativeFunctionProxyCodeGenerator);
 
       s_nativeMockInterfaceRegistry = new NativeMockInterfaceRegistry (
         nativeMockInterfaceLocatorFactory,
@@ -63,17 +63,17 @@ namespace NativeMock
         moduleNameResolver,
         s_nativeMockInterfaceRegistry);
 
-      var nativeMockProxyCodeGenerator = new NativeMockProxyCodeGenerator (moduleBuilder, delegateGeneratorWithCaching);
+      var nativeMockProxyCodeGenerator = new NativeMockProxyCodeGenerator (moduleBuilder, delegateFactory);
       s_nativeMockProxyFactory = new NativeMockProxyFactory (nativeMockProxyCodeGenerator);
 
       var dummyActionInterfaceMethodSelectorCodeGenerator = new DummyActionInterfaceMethodSelectorCodeGenerator (moduleBuilder);
       s_dummyActionInterfaceMethodSelectorFactory = new DummyActionInterfaceMethodSelectorFactory (dummyActionInterfaceMethodSelectorCodeGenerator);
 
       var resolveDllImportMethod = typeof(PInvokeUtility).GetMethod (nameof(PInvokeUtility.ResolveDllImport), BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public)!;
-      var nativeMockForwardProxyCodeGenerator = new NativeMockForwardProxyCodeGenerator (moduleBuilder, delegateGeneratorWithCaching, resolveDllImportMethod);
+      var nativeMockForwardProxyCodeGenerator = new NativeMockForwardProxyCodeGenerator (moduleBuilder, delegateFactory, resolveDllImportMethod);
       s_nativeMockForwardProxyFactory = new NativeMockForwardProxyFactory (nativeMockForwardProxyCodeGenerator, s_nativeMockInterfaceRegistry);
 
-      var nativeFunctionForwardProxyCodeGenerator = new NativeFunctionForwardProxyCodeGenerator (delegateGeneratorWithCaching, getForwardProxyMethod);
+      var nativeFunctionForwardProxyCodeGenerator = new NativeFunctionForwardProxyCodeGenerator (delegateFactory, getForwardProxyMethod);
       s_nativeFunctionForwardProxyFactory = new NativeFunctionForwardProxyFactory (nativeFunctionForwardProxyCodeGenerator);
 
       var nativeMockSetupInternalRegistryFactory = new NativeMockSetupInternalRegistryFactory();

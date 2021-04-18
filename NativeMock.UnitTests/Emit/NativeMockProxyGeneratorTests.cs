@@ -20,7 +20,7 @@
     private readonly MethodInfo _testMethod = typeof(ITestInterface).GetMethod (nameof(ITestInterface.Test));
 
     private ModuleBuilder _moduleBuilder;
-    private Mock<IDelegateCodeGenerator> _delegateGeneratorMock;
+    private Mock<IDelegateFactory> _delegateFactoryMock;
     private NativeMockProxyCodeGenerator _nativeMockProxyCodeGenerator;
 
     public NativeMockProxyGeneratorTests()
@@ -33,10 +33,10 @@
     [SetUp]
     public void SetUp()
     {
-      _delegateGeneratorMock = new Mock<IDelegateCodeGenerator> (MockBehavior.Strict);
-      _delegateGeneratorMock.Setup (e => e.CreateDelegateType (_testMethod)).Returns (typeof(TestDelegate));
+      _delegateFactoryMock = new Mock<IDelegateFactory> (MockBehavior.Strict);
+      _delegateFactoryMock.Setup (e => e.CreateDelegateType (_testMethod)).Returns (typeof(TestDelegate));
 
-      _nativeMockProxyCodeGenerator = new NativeMockProxyCodeGenerator (_moduleBuilder, _delegateGeneratorMock.Object);
+      _nativeMockProxyCodeGenerator = new NativeMockProxyCodeGenerator (_moduleBuilder, _delegateFactoryMock.Object);
     }
 
     [Test]
@@ -51,7 +51,7 @@
       var (testInterface, _) = CreateNativeMockProxy<ITestInterface>();
 
       Assert.That (() => testInterface.Test (34), Throws.TypeOf<NativeMockException>());
-      _delegateGeneratorMock.Verify();
+      _delegateFactoryMock.Verify();
     }
 
     [Test]
@@ -65,7 +65,7 @@
 
       Assert.That (testInterface.Test (3), Is.EqualTo (5));
       testInterfaceMock.Verify();
-      _delegateGeneratorMock.Verify();
+      _delegateFactoryMock.Verify();
     }
 
     [Test]
@@ -79,7 +79,7 @@
 
       Assert.That (testInterface.Test (3), Is.EqualTo (5));
       testDelegateMock.Verify();
-      _delegateGeneratorMock.Verify();
+      _delegateFactoryMock.Verify();
     }
 
     [Test]
@@ -95,7 +95,7 @@
 
       Assert.That (testInterface.Test (3), Is.EqualTo (5));
       testDelegateMock.Verify();
-      _delegateGeneratorMock.Verify();
+      _delegateFactoryMock.Verify();
     }
 
     [Test]
@@ -122,7 +122,7 @@
       Assert.That (proxyController.GetMethodHandlerCallCount (1), Is.EqualTo (0));
 
       testInterfaceMock.Verify();
-      _delegateGeneratorMock.Verify();
+      _delegateFactoryMock.Verify();
     }
 
     [Test]
@@ -143,7 +143,7 @@
       Assert.That (proxyController.GetMethodHandlerCallCount (1), Is.EqualTo (2));
 
       testDelegateMock.Verify();
-      _delegateGeneratorMock.Verify();
+      _delegateFactoryMock.Verify();
     }
 
     private (T testInterface, INativeMockProxyController<T> proxyController) CreateNativeMockProxy<T>()

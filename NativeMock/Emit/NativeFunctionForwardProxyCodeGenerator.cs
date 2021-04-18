@@ -8,10 +8,10 @@ namespace NativeMock.Emit
   /// <inheritdoc />
   internal class NativeFunctionForwardProxyCodeGenerator : INativeFunctionForwardProxyCodeGenerator
   {
-    private readonly IDelegateCodeGenerator _delegateCodeGenerator;
+    private readonly IDelegateFactory _delegateFactory;
     private readonly MethodInfo _getForwardProxyMethod;
 
-    public NativeFunctionForwardProxyCodeGenerator (IDelegateCodeGenerator delegateCodeGenerator, MethodInfo getForwardProxyMethod)
+    public NativeFunctionForwardProxyCodeGenerator (IDelegateFactory delegateFactory, MethodInfo getForwardProxyMethod)
     {
       if (getForwardProxyMethod == null)
         throw new ArgumentNullException (nameof(getForwardProxyMethod));
@@ -24,7 +24,7 @@ namespace NativeMock.Emit
       if (!getForwardProxyMethod.ReturnType.IsGenericParameter || getForwardProxyMethod.ReturnType.IsByRef)
         throw new ArgumentException ("Handler provider method must have a return type of T.", nameof(getForwardProxyMethod));
 
-      _delegateCodeGenerator = delegateCodeGenerator;
+      _delegateFactory = delegateFactory;
       _getForwardProxyMethod = getForwardProxyMethod;
     }
 
@@ -58,7 +58,7 @@ namespace NativeMock.Emit
       ilGenerator.Emit (OpCodes.Callvirt, interfaceMethod);
       ilGenerator.Emit (OpCodes.Ret);
 
-      var delegateType = _delegateCodeGenerator.CreateDelegateType (method);
+      var delegateType = _delegateFactory.CreateDelegateType (method);
       return proxyMethod.CreateDelegate (delegateType);
     }
   }

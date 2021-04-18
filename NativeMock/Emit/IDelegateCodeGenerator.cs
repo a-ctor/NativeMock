@@ -11,6 +11,6 @@ namespace NativeMock.Emit
     /// <summary>
     /// Creates a delegate type from the specified <paramref name="methodInfo" />, retaining any applied custom attributes.
     /// </summary>
-    Type CreateDelegateType (MethodInfo methodInfo);
+    Type GenerateDelegateTypeForMethod (MethodInfo methodInfo);
   }
 }
