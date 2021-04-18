@@ -193,6 +193,11 @@ namespace NativeMock.Emit
       var setUnderlyingImplementationInterfaceMethod = proxyControllerType.GetMethod (nameof(INativeMockProxyController<object>.SetUnderlyingImplementation))!;
       var setUnderlyingImplementationMethod = GenerateSetUnderlyingImplementation (proxyTypeBuilder, interfaceType, underlyingImplementationField);
       proxyTypeBuilder.DefineMethodOverride (setUnderlyingImplementationMethod, setUnderlyingImplementationInterfaceMethod);
+
+      // void Reset ();
+      var resetInterfaceMethod = proxyControllerType.GetMethod (nameof(INativeMockProxyController<object>.Reset))!;
+      var resetMethod = GenerateReset (proxyTypeBuilder, interfaceType, underlyingImplementationField, handlerFields, callCountFields);
+      proxyTypeBuilder.DefineMethodOverride (resetMethod, resetInterfaceMethod);
     }
 
     private MethodBuilder GenerateGetMethodHandlerCount (TypeBuilder proxyTypeBuilder, int methodCount, Type interfaceType)
@@ -349,6 +354,45 @@ namespace NativeMock.Emit
       ilGenerator.Emit (OpCodes.Ldarg_0);
       ilGenerator.Emit (OpCodes.Ldarg_1);
       ilGenerator.Emit (OpCodes.Stfld, underlyingImplementationField);
+      ilGenerator.Emit (OpCodes.Ret);
+
+      return setUnderlyingImplementationMethod;
+    }
+
+    private MethodBuilder GenerateReset (
+      TypeBuilder proxyTypeBuilder,
+      Type interfaceType,
+      FieldBuilder underlyingImplementationField,
+      FieldBuilder[] handlerFields,
+      FieldBuilder[] callCountFields)
+    {
+      var setUnderlyingImplementationMethod = proxyTypeBuilder.DefineExplicitInterfaceMethodImplementation (
+        typeof(void),
+        $"{typeof(INativeMockProxyController<>).Name}<{interfaceType.Name}>.{nameof(INativeMockProxyController<object>.SetUnderlyingImplementation)}");
+
+      var ilGenerator = setUnderlyingImplementationMethod.GetILGenerator();
+
+      // Clear the underlying implementation
+      ilGenerator.Emit (OpCodes.Ldarg_0);
+      ilGenerator.Emit (OpCodes.Ldnull);
+      ilGenerator.Emit (OpCodes.Stfld, underlyingImplementationField);
+
+      // Clear the call counts
+      foreach (var handlerField in handlerFields)
+      {
+        ilGenerator.Emit (OpCodes.Ldarg_0);
+        ilGenerator.Emit (OpCodes.Ldnull);
+        ilGenerator.Emit (OpCodes.Stfld, handlerField);
+      }
+
+      // Clear the call counts
+      foreach (var callCountField in callCountFields)
+      {
+        ilGenerator.Emit (OpCodes.Ldarg_0);
+        ilGenerator.Emit (OpCodes.Ldc_I4_0);
+        ilGenerator.Emit (OpCodes.Stfld, callCountField);
+      }
+
       ilGenerator.Emit (OpCodes.Ret);
 
       return setUnderlyingImplementationMethod;

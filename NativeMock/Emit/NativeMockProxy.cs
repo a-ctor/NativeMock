@@ -63,5 +63,10 @@ namespace NativeMock.Emit
 
       _nativeMockProxyController.SetMethodHandler (methodHandle, handler);
     }
+
+    public void Reset()
+    {
+      _nativeMockProxyController.Reset();
+    }
   }
 }

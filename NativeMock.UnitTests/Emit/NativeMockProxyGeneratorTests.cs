@@ -146,6 +146,57 @@
       _delegateFactoryMock.Verify();
     }
 
+    [Test]
+    public void ResetClearsCallCount()
+    {
+      var testDelegateMock = new Mock<TestDelegate> (MockBehavior.Strict);
+      testDelegateMock.Setup (e => e (3)).Returns (5);
+
+      var (testInterface, proxyController) = CreateNativeMockProxy<ITestInterface>();
+      proxyController.SetMethodHandler (1, testDelegateMock.Object);
+
+      Assert.That (proxyController.GetMethodHandlerCallCount (1), Is.EqualTo (0));
+
+      testInterface.Test (3);
+      Assert.That (proxyController.GetMethodHandlerCallCount (1), Is.EqualTo (1));
+
+      proxyController.Reset();
+      Assert.That (proxyController.GetMethodHandlerCallCount (1), Is.EqualTo (0));
+
+      testDelegateMock.Verify();
+      _delegateFactoryMock.Verify();
+    }
+
+    [Test]
+    public void ResetClearsHandlers()
+    {
+      var testDelegateMock = new Mock<TestDelegate> (MockBehavior.Strict);
+
+      var (testInterface, proxyController) = CreateNativeMockProxy<ITestInterface>();
+      proxyController.SetMethodHandler (1, testDelegateMock.Object);
+
+      proxyController.Reset();
+
+      Assert.That (() => testInterface.Test (3), Throws.TypeOf<NativeMockException>());
+
+      _delegateFactoryMock.Verify();
+    }
+
+    [Test]
+    public void ResetClearsUnderlyingImplementation()
+    {
+      var testInterfaceMock = new Mock<ITestInterface> (MockBehavior.Strict);
+
+      var (testInterface, proxyController) = CreateNativeMockProxy<ITestInterface>();
+      proxyController.SetUnderlyingImplementation (testInterfaceMock.Object);
+
+      proxyController.Reset();
+
+      Assert.That (() => testInterface.Test (3), Throws.TypeOf<NativeMockException>());
+
+      _delegateFactoryMock.Verify();
+    }
+
     private (T testInterface, INativeMockProxyController<T> proxyController) CreateNativeMockProxy<T>()
       where T : class
     {

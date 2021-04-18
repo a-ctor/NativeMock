@@ -14,5 +14,7 @@ namespace NativeMock.Emit
     Delegate? GetMethodHandler (int methodHandle);
 
     void SetMethodHandler (int methodHandle, Delegate handler);
+
+    void Reset();
   }
 }

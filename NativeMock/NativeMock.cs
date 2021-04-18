@@ -135,6 +135,11 @@ namespace NativeMock
       _proxy.Verify (target);
     }
 
+    public void Reset()
+    {
+      _proxy.Reset();
+    }
+
     private MethodInfo? GetTargetMethod<TDelegate> (Expression<Func<T, TDelegate>> selector)
     {
       if (selector.Body is not UnaryExpression unaryExpression || selector.Body.NodeType != ExpressionType.Convert)
