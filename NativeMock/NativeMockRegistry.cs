@@ -15,8 +15,8 @@ namespace NativeMock
   /// </summary>
   public static class NativeMockRegistry
   {
-    public const string ProxyAssemblyName = "NativeMockDynamicAssembly";
-    public const string ProxyAssemblyModuleName = "NativeMockDynamicAssemblyModule";
+    internal const string ProxyAssemblyName = "NativeMockDynamicAssembly";
+    internal const string ProxyAssemblyModuleName = "NativeMockDynamicAssemblyModule";
 
     private static readonly object s_initializedLock = new();
     private static bool s_initialized;
