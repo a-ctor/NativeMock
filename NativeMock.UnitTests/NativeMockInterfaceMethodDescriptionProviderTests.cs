@@ -4,12 +4,13 @@ namespace NativeMock.UnitTests
   using System.Linq.Expressions;
   using System.Reflection;
   using System.Runtime.InteropServices;
-  using Infrastructure;
   using NUnit.Framework;
   using Representation;
 
   public class NativeMockInterfaceMethodDescriptionProviderTests
   {
+    private const string c_dllName = "test.dll";
+
     private interface ITest
     {
       void Empty();
@@ -46,17 +47,17 @@ namespace NativeMock.UnitTests
       {
       }
 
-      [DllImport (FakeDllNames.Dll1)]
+      [DllImport (c_dllName)]
       public static extern void PublicDeclarationElsewhere();
 
-      [DllImport (FakeDllNames.Dll1)]
+      [DllImport (c_dllName)]
       // ReSharper disable once UnusedMember.Local
       private static extern void PrivateDeclarationElsewhere();
 
-      [DllImport (FakeDllNames.Dll1)]
+      [DllImport (c_dllName)]
       public static extern void RealRenamedDeclarationElsewhere();
 
-      [DllImport (FakeDllNames.Dll1, EntryPoint = "VirtualRenamedDeclarationElsewhere")]
+      [DllImport (c_dllName, EntryPoint = "VirtualRenamedDeclarationElsewhere")]
       public static extern void VirtualRenamedDeclarationElsewhere_();
     }
 
@@ -88,10 +89,10 @@ namespace NativeMock.UnitTests
     public void EmptyMethodTest()
     {
       var method = GetInterfaceMethod<ITest> (e => e.Empty());
-      var interfaceDescription = _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (FakeDllNames.Dll1, method, null, NativeMockBehavior.Default);
+      var interfaceDescription = _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (c_dllName, method, null, NativeMockBehavior.Default);
 
       Assert.That (interfaceDescription, Is.Not.Null);
-      Assert.That (interfaceDescription.Name, Is.EqualTo (new NativeFunctionIdentifier (FakeDllNames.Dll1, method.Name)));
+      Assert.That (interfaceDescription.Name, Is.EqualTo (new NativeFunctionIdentifier (c_dllName, method.Name)));
       Assert.That (interfaceDescription.InterfaceMethod, Is.EqualTo (method));
       Assert.That (interfaceDescription.PrototypeMethod, Is.EqualTo (method));
       Assert.That (interfaceDescription.Behavior, Is.EqualTo (NativeMockBehavior.Default));
@@ -101,10 +102,10 @@ namespace NativeMock.UnitTests
     public void EmptyAnnotatedMethodTest()
     {
       var method = GetInterfaceMethod<ITest> (e => e.EmptyAnnotated());
-      var interfaceDescription = _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (FakeDllNames.Dll1, method, null, NativeMockBehavior.Default);
+      var interfaceDescription = _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (c_dllName, method, null, NativeMockBehavior.Default);
 
       Assert.That (interfaceDescription, Is.Not.Null);
-      Assert.That (interfaceDescription.Name, Is.EqualTo (new NativeFunctionIdentifier (FakeDllNames.Dll1, method.Name)));
+      Assert.That (interfaceDescription.Name, Is.EqualTo (new NativeFunctionIdentifier (c_dllName, method.Name)));
       Assert.That (interfaceDescription.InterfaceMethod, Is.EqualTo (method));
       Assert.That (interfaceDescription.PrototypeMethod, Is.EqualTo (method));
       Assert.That (interfaceDescription.Behavior, Is.EqualTo (NativeMockBehavior.Default));
@@ -114,10 +115,10 @@ namespace NativeMock.UnitTests
     public void RenamedTest()
     {
       var method = GetInterfaceMethod<ITest> (e => e.Renamed());
-      var interfaceDescription = _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (FakeDllNames.Dll1, method, null, NativeMockBehavior.Default);
+      var interfaceDescription = _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (c_dllName, method, null, NativeMockBehavior.Default);
 
       Assert.That (interfaceDescription, Is.Not.Null);
-      Assert.That (interfaceDescription.Name, Is.EqualTo (new NativeFunctionIdentifier (FakeDllNames.Dll1, "Test")));
+      Assert.That (interfaceDescription.Name, Is.EqualTo (new NativeFunctionIdentifier (c_dllName, "Test")));
       Assert.That (interfaceDescription.InterfaceMethod, Is.EqualTo (method));
       Assert.That (interfaceDescription.PrototypeMethod, Is.EqualTo (method));
       Assert.That (interfaceDescription.Behavior, Is.EqualTo (NativeMockBehavior.Default));
@@ -127,14 +128,14 @@ namespace NativeMock.UnitTests
     public void MissingDeclarationTest()
     {
       var interfaceMethod = GetInterfaceMethod<ITest> (e => e.MissingDeclarationElsewhere());
-      Assert.That (() => _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (FakeDllNames.Dll1, interfaceMethod, null, NativeMockBehavior.Default), Throws.InvalidOperationException);
+      Assert.That (() => _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (c_dllName, interfaceMethod, null, NativeMockBehavior.Default), Throws.InvalidOperationException);
     }
 
     [Test]
     public void NonExternDeclarationTest()
     {
       var interfaceMethod = GetInterfaceMethod<ITest> (e => e.NonExtern());
-      Assert.That (() => _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (FakeDllNames.Dll1, interfaceMethod, null, NativeMockBehavior.Default), Throws.InvalidOperationException);
+      Assert.That (() => _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (c_dllName, interfaceMethod, null, NativeMockBehavior.Default), Throws.InvalidOperationException);
     }
 
     [Test]
@@ -142,10 +143,10 @@ namespace NativeMock.UnitTests
     {
       var interfaceMethod = GetInterfaceMethod<ITest> (e => e.PublicDeclarationElsewhere());
       var classMethod = GetClassMethod (Test.PublicDeclarationElsewhere);
-      var interfaceDescription = _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (FakeDllNames.Dll1, interfaceMethod, null, NativeMockBehavior.Default);
+      var interfaceDescription = _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (c_dllName, interfaceMethod, null, NativeMockBehavior.Default);
 
       Assert.That (interfaceDescription, Is.Not.Null);
-      Assert.That (interfaceDescription.Name, Is.EqualTo (new NativeFunctionIdentifier (FakeDllNames.Dll1, "PublicDeclarationElsewhere")));
+      Assert.That (interfaceDescription.Name, Is.EqualTo (new NativeFunctionIdentifier (c_dllName, "PublicDeclarationElsewhere")));
       Assert.That (interfaceDescription.InterfaceMethod, Is.EqualTo (interfaceMethod));
       Assert.That (interfaceDescription.PrototypeMethod, Is.EqualTo (classMethod));
       Assert.That (interfaceDescription.Behavior, Is.EqualTo (NativeMockBehavior.Default));
@@ -156,10 +157,10 @@ namespace NativeMock.UnitTests
     {
       var interfaceMethod = GetInterfaceMethod<ITest> (e => e.PrivateDeclarationElsewhere());
       var classMethod = typeof(Test).GetMethod ("PrivateDeclarationElsewhere", BindingFlags.NonPublic | BindingFlags.Static);
-      var interfaceDescription = _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (FakeDllNames.Dll1, interfaceMethod, null, NativeMockBehavior.Default);
+      var interfaceDescription = _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (c_dllName, interfaceMethod, null, NativeMockBehavior.Default);
 
       Assert.That (interfaceDescription, Is.Not.Null);
-      Assert.That (interfaceDescription.Name, Is.EqualTo (new NativeFunctionIdentifier (FakeDllNames.Dll1, "PrivateDeclarationElsewhere")));
+      Assert.That (interfaceDescription.Name, Is.EqualTo (new NativeFunctionIdentifier (c_dllName, "PrivateDeclarationElsewhere")));
       Assert.That (interfaceDescription.InterfaceMethod, Is.EqualTo (interfaceMethod));
       Assert.That (interfaceDescription.PrototypeMethod, Is.EqualTo (classMethod));
       Assert.That (interfaceDescription.Behavior, Is.EqualTo (NativeMockBehavior.Default));
@@ -170,10 +171,10 @@ namespace NativeMock.UnitTests
     {
       var interfaceMethod = GetInterfaceMethod<ITest> (e => e.RenamedDeclarationElsewhere());
       var classMethod = GetClassMethod (Test.RealRenamedDeclarationElsewhere);
-      var interfaceDescription = _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (FakeDllNames.Dll1, interfaceMethod, null, NativeMockBehavior.Default);
+      var interfaceDescription = _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (c_dllName, interfaceMethod, null, NativeMockBehavior.Default);
 
       Assert.That (interfaceDescription, Is.Not.Null);
-      Assert.That (interfaceDescription.Name, Is.EqualTo (new NativeFunctionIdentifier (FakeDllNames.Dll1, "RealRenamedDeclarationElsewhere")));
+      Assert.That (interfaceDescription.Name, Is.EqualTo (new NativeFunctionIdentifier (c_dllName, "RealRenamedDeclarationElsewhere")));
       Assert.That (interfaceDescription.InterfaceMethod, Is.EqualTo (interfaceMethod));
       Assert.That (interfaceDescription.PrototypeMethod, Is.EqualTo (classMethod));
       Assert.That (interfaceDescription.Behavior, Is.EqualTo (NativeMockBehavior.Default));
@@ -184,10 +185,10 @@ namespace NativeMock.UnitTests
     {
       var interfaceMethod = GetInterfaceMethod<ITest> (e => e.RealRenamedDeclarationElsewhere2());
       var classMethod = GetClassMethod (Test.VirtualRenamedDeclarationElsewhere_);
-      var interfaceDescription = _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (FakeDllNames.Dll1, interfaceMethod, null, NativeMockBehavior.Default);
+      var interfaceDescription = _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (c_dllName, interfaceMethod, null, NativeMockBehavior.Default);
 
       Assert.That (interfaceDescription, Is.Not.Null);
-      Assert.That (interfaceDescription.Name, Is.EqualTo (new NativeFunctionIdentifier (FakeDllNames.Dll1, "VirtualRenamedDeclarationElsewhere")));
+      Assert.That (interfaceDescription.Name, Is.EqualTo (new NativeFunctionIdentifier (c_dllName, "VirtualRenamedDeclarationElsewhere")));
       Assert.That (interfaceDescription.InterfaceMethod, Is.EqualTo (interfaceMethod));
       Assert.That (interfaceDescription.PrototypeMethod, Is.EqualTo (classMethod));
       Assert.That (interfaceDescription.Behavior, Is.EqualTo (NativeMockBehavior.Default));
@@ -203,13 +204,13 @@ namespace NativeMock.UnitTests
 
     private class Test2
     {
-      [DllImport (FakeDllNames.Dll1)]
+      [DllImport (c_dllName)]
       public static extern void InheritDeclaringType();
     }
 
     private class Test2B
     {
-      [DllImport (FakeDllNames.Dll1)]
+      [DllImport (c_dllName)]
       public static extern void OverrideDeclaringType();
     }
 
@@ -218,10 +219,10 @@ namespace NativeMock.UnitTests
     {
       var interfaceMethod = GetInterfaceMethod<ITest2> (e => e.InheritDeclaringType());
       var classMethod = GetClassMethod (Test2.InheritDeclaringType);
-      var interfaceDescription = _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (FakeDllNames.Dll1, interfaceMethod, typeof(Test2), NativeMockBehavior.Default);
+      var interfaceDescription = _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (c_dllName, interfaceMethod, typeof(Test2), NativeMockBehavior.Default);
 
       Assert.That (interfaceDescription, Is.Not.Null);
-      Assert.That (interfaceDescription.Name, Is.EqualTo (new NativeFunctionIdentifier (FakeDllNames.Dll1, "InheritDeclaringType")));
+      Assert.That (interfaceDescription.Name, Is.EqualTo (new NativeFunctionIdentifier (c_dllName, "InheritDeclaringType")));
       Assert.That (interfaceDescription.InterfaceMethod, Is.EqualTo (interfaceMethod));
       Assert.That (interfaceDescription.PrototypeMethod, Is.EqualTo (classMethod));
       Assert.That (interfaceDescription.Behavior, Is.EqualTo (NativeMockBehavior.Default));
@@ -232,10 +233,10 @@ namespace NativeMock.UnitTests
     {
       var interfaceMethod = GetInterfaceMethod<ITest2> (e => e.OverrideDeclaringType());
       var classMethod = GetClassMethod (Test2B.OverrideDeclaringType);
-      var interfaceDescription = _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (FakeDllNames.Dll1, interfaceMethod, typeof(Test2), NativeMockBehavior.Default);
+      var interfaceDescription = _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (c_dllName, interfaceMethod, typeof(Test2), NativeMockBehavior.Default);
 
       Assert.That (interfaceDescription, Is.Not.Null);
-      Assert.That (interfaceDescription.Name, Is.EqualTo (new NativeFunctionIdentifier (FakeDllNames.Dll1, "OverrideDeclaringType")));
+      Assert.That (interfaceDescription.Name, Is.EqualTo (new NativeFunctionIdentifier (c_dllName, "OverrideDeclaringType")));
       Assert.That (interfaceDescription.InterfaceMethod, Is.EqualTo (interfaceMethod));
       Assert.That (interfaceDescription.PrototypeMethod, Is.EqualTo (classMethod));
       Assert.That (interfaceDescription.Behavior, Is.EqualTo (NativeMockBehavior.Default));
@@ -264,22 +265,22 @@ namespace NativeMock.UnitTests
 
     private class MismatchInterface
     {
-      [DllImport (FakeDllNames.Dll1)]
+      [DllImport (c_dllName)]
       public static extern void ParameterCountMismatch (int a);
 
-      [DllImport (FakeDllNames.Dll1)]
+      [DllImport (c_dllName)]
       public static extern int ReturnTypeMismatch();
 
-      [DllImport (FakeDllNames.Dll1)]
+      [DllImport (c_dllName)]
       public static extern ref int ReturnTypeRefMismatch();
 
-      [DllImport (FakeDllNames.Dll1)]
+      [DllImport (c_dllName)]
       public static extern void ParameterMismatch (int a);
 
-      [DllImport (FakeDllNames.Dll1)]
+      [DllImport (c_dllName)]
       public static extern void ParameterInModifierMismatch (ref string a);
 
-      [DllImport (FakeDllNames.Dll1)]
+      [DllImport (c_dllName)]
       public static extern void ParameterRefModifierMismatch (in string a);
     }
 
@@ -290,7 +291,7 @@ namespace NativeMock.UnitTests
 
       Assert.That (
         () => _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (
-          FakeDllNames.Dll1,
+          c_dllName,
           interfaceMethod,
           typeof(MismatchInterface),
           NativeMockBehavior.Default),
@@ -304,7 +305,7 @@ namespace NativeMock.UnitTests
 
       Assert.That (
         () => _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (
-          FakeDllNames.Dll1,
+          c_dllName,
           interfaceMethod,
           typeof(MismatchInterface),
           NativeMockBehavior.Default),
@@ -318,7 +319,7 @@ namespace NativeMock.UnitTests
 
       Assert.That (
         () => _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (
-          FakeDllNames.Dll1,
+          c_dllName,
           interfaceMethod,
           typeof(MismatchInterface),
           NativeMockBehavior.Default),
@@ -332,7 +333,7 @@ namespace NativeMock.UnitTests
 
       Assert.That (
         () => _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (
-          FakeDllNames.Dll1,
+          c_dllName,
           interfaceMethod,
           typeof(MismatchInterface),
           NativeMockBehavior.Default),
@@ -347,7 +348,7 @@ namespace NativeMock.UnitTests
 
       Assert.That (
         () => _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (
-          FakeDllNames.Dll1,
+          c_dllName,
           interfaceMethod,
           typeof(MismatchInterface),
           NativeMockBehavior.Default),
@@ -362,7 +363,7 @@ namespace NativeMock.UnitTests
 
       Assert.That (
         () => _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (
-          FakeDllNames.Dll1,
+          c_dllName,
           interfaceMethod,
           typeof(MismatchInterface),
           NativeMockBehavior.Default),
@@ -381,10 +382,10 @@ namespace NativeMock.UnitTests
     public void DefaultBehaviorTest()
     {
       var interfaceMethod = GetInterfaceMethod<IMockBehavior> (e => e.DefaultBehavior());
-      var interfaceDescription = _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (FakeDllNames.Dll1, interfaceMethod, null, NativeMockBehavior.Default);
+      var interfaceDescription = _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (c_dllName, interfaceMethod, null, NativeMockBehavior.Default);
 
       Assert.That (interfaceDescription, Is.Not.Null);
-      Assert.That (interfaceDescription.Name, Is.EqualTo (new NativeFunctionIdentifier (FakeDllNames.Dll1, "DefaultBehavior")));
+      Assert.That (interfaceDescription.Name, Is.EqualTo (new NativeFunctionIdentifier (c_dllName, "DefaultBehavior")));
       Assert.That (interfaceDescription.InterfaceMethod, Is.EqualTo (interfaceMethod));
       Assert.That (interfaceDescription.PrototypeMethod, Is.EqualTo (interfaceMethod));
       Assert.That (interfaceDescription.Behavior, Is.EqualTo (NativeMockBehavior.Default));
@@ -394,10 +395,10 @@ namespace NativeMock.UnitTests
     public void OverrideDefaultBehaviorTest()
     {
       var interfaceMethod = GetInterfaceMethod<IMockBehavior> (e => e.OverrideDefaultBehavior());
-      var interfaceDescription = _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (FakeDllNames.Dll1, interfaceMethod, null, NativeMockBehavior.Default);
+      var interfaceDescription = _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (c_dllName, interfaceMethod, null, NativeMockBehavior.Default);
 
       Assert.That (interfaceDescription, Is.Not.Null);
-      Assert.That (interfaceDescription.Name, Is.EqualTo (new NativeFunctionIdentifier (FakeDllNames.Dll1, "OverrideDefaultBehavior")));
+      Assert.That (interfaceDescription.Name, Is.EqualTo (new NativeFunctionIdentifier (c_dllName, "OverrideDefaultBehavior")));
       Assert.That (interfaceDescription.InterfaceMethod, Is.EqualTo (interfaceMethod));
       Assert.That (interfaceDescription.PrototypeMethod, Is.EqualTo (interfaceMethod));
       Assert.That (interfaceDescription.Behavior, Is.EqualTo (NativeMockBehavior.Loose));
@@ -407,10 +408,10 @@ namespace NativeMock.UnitTests
     public void InheritDefaultBehaviorTest()
     {
       var interfaceMethod = GetInterfaceMethod<IMockBehavior> (e => e.DefaultBehavior());
-      var interfaceDescription = _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (FakeDllNames.Dll1, interfaceMethod, null, NativeMockBehavior.Strict);
+      var interfaceDescription = _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (c_dllName, interfaceMethod, null, NativeMockBehavior.Strict);
 
       Assert.That (interfaceDescription, Is.Not.Null);
-      Assert.That (interfaceDescription.Name, Is.EqualTo (new NativeFunctionIdentifier (FakeDllNames.Dll1, "DefaultBehavior")));
+      Assert.That (interfaceDescription.Name, Is.EqualTo (new NativeFunctionIdentifier (c_dllName, "DefaultBehavior")));
       Assert.That (interfaceDescription.InterfaceMethod, Is.EqualTo (interfaceMethod));
       Assert.That (interfaceDescription.PrototypeMethod, Is.EqualTo (interfaceMethod));
       Assert.That (interfaceDescription.Behavior, Is.EqualTo (NativeMockBehavior.Strict));
@@ -420,10 +421,10 @@ namespace NativeMock.UnitTests
     public void OverrideInheritedDefaultBehaviorTest()
     {
       var interfaceMethod = GetInterfaceMethod<IMockBehavior> (e => e.OverrideDefaultBehavior());
-      var interfaceDescription = _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (FakeDllNames.Dll1, interfaceMethod, null, NativeMockBehavior.Strict);
+      var interfaceDescription = _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (c_dllName, interfaceMethod, null, NativeMockBehavior.Strict);
 
       Assert.That (interfaceDescription, Is.Not.Null);
-      Assert.That (interfaceDescription.Name, Is.EqualTo (new NativeFunctionIdentifier (FakeDllNames.Dll1, "OverrideDefaultBehavior")));
+      Assert.That (interfaceDescription.Name, Is.EqualTo (new NativeFunctionIdentifier (c_dllName, "OverrideDefaultBehavior")));
       Assert.That (interfaceDescription.InterfaceMethod, Is.EqualTo (interfaceMethod));
       Assert.That (interfaceDescription.PrototypeMethod, Is.EqualTo (interfaceMethod));
       Assert.That (interfaceDescription.Behavior, Is.EqualTo (NativeMockBehavior.Loose));
@@ -436,10 +437,10 @@ namespace NativeMock.UnitTests
 
     public class AmbiguousMethod
     {
-      [DllImport (FakeDllNames.Dll1, EntryPoint = "AmbiguousMethod")]
+      [DllImport (c_dllName, EntryPoint = "AmbiguousMethod")]
       public static extern void AmbiguousMethod1();
 
-      [DllImport (FakeDllNames.Dll1, EntryPoint = "AmbiguousMethod")]
+      [DllImport (c_dllName, EntryPoint = "AmbiguousMethod")]
       public static extern void AmbiguousMethod2();
     }
 
@@ -447,7 +448,7 @@ namespace NativeMock.UnitTests
     public void AmbiguousMethodTest()
     {
       var interfaceMethod = GetInterfaceMethod<IAmbiguousMethod> (e => e.AmbiguousMethod());
-      Assert.That (() => _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (FakeDllNames.Dll1, interfaceMethod, typeof(AmbiguousMethod), NativeMockBehavior.Default), Throws.InvalidOperationException);
+      Assert.That (() => _nativeMockInterfaceMethodDescriptionProvider.GetMockInterfaceDescription (c_dllName, interfaceMethod, typeof(AmbiguousMethod), NativeMockBehavior.Default), Throws.InvalidOperationException);
     }
 
     private MethodInfo GetInterfaceMethod<T> (Expression<Action<T>> lambdaExpression) => ((MethodCallExpression) lambdaExpression.Body).Method;

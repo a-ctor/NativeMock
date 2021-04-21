@@ -12,6 +12,10 @@ namespace NativeMock.IntegrationTests
       NativeMockRegistry.RegisterFromAssembly (typeof(ModuleInitializer).Assembly, RegisterFromAssemblySearchBehavior.IncludeNestedTypes);
 
       TestDriver.LoadDriver();
+
+      NativeLibraryDummy.Load (FakeDllNames.Dll1);
+      NativeLibraryDummy.Load (FakeDllNames.Dll2);
+      NativeLibraryDummy.Load (FakeDllNames.Dll3);
     }
   }
 }

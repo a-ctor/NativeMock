@@ -3,13 +3,14 @@ namespace NativeMock.UnitTests
   using System;
   using System.Reflection;
   using System.Runtime.InteropServices;
-  using Infrastructure;
   using NUnit.Framework;
   using Representation;
 
   [TestFixture]
   public class PInvokeMemberProviderTests
   {
+    private const string c_dllName = "test.dll";
+
     private PInvokeMemberProvider _pInvokeMemberProvider;
 
     [SetUp]
@@ -42,7 +43,7 @@ namespace NativeMock.UnitTests
 
     private class NormalPInvokeMember
     {
-      [DllImport (FakeDllNames.Dll1)]
+      [DllImport (c_dllName)]
       public static extern void Test();
     }
 
@@ -51,7 +52,7 @@ namespace NativeMock.UnitTests
     {
       var pInvokeMembers = _pInvokeMemberProvider.GetPInvokeMembers (typeof(NormalPInvokeMember));
 
-      var nativeFunctionIdentifier = new NativeFunctionIdentifier (FakeDllNames.Dll1, "Test");
+      var nativeFunctionIdentifier = new NativeFunctionIdentifier (c_dllName, "Test");
       var expectedPInvokeMember = new PInvokeMember (nativeFunctionIdentifier, GetClassMethod (NormalPInvokeMember.Test));
 
       Assert.That (pInvokeMembers.Length, Is.EqualTo (1));
@@ -60,7 +61,7 @@ namespace NativeMock.UnitTests
 
     private class RenamedPInvokeMember
     {
-      [DllImport (FakeDllNames.Dll1, EntryPoint = "Renamed")]
+      [DllImport (c_dllName, EntryPoint = "Renamed")]
       public static extern void Test();
     }
 
@@ -69,7 +70,7 @@ namespace NativeMock.UnitTests
     {
       var pInvokeMembers = _pInvokeMemberProvider.GetPInvokeMembers (typeof(RenamedPInvokeMember));
 
-      var nativeFunctionIdentifier = new NativeFunctionIdentifier (FakeDllNames.Dll1, "Renamed");
+      var nativeFunctionIdentifier = new NativeFunctionIdentifier (c_dllName, "Renamed");
       var expectedPInvokeMember = new PInvokeMember (nativeFunctionIdentifier, GetClassMethod (RenamedPInvokeMember.Test));
 
       Assert.That (pInvokeMembers.Length, Is.EqualTo (1));
