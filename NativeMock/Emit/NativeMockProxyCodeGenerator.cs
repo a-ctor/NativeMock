@@ -9,6 +9,20 @@ namespace NativeMock.Emit
 
   internal class NativeMockProxyCodeGenerator : INativeMockProxyCodeGenerator
   {
+    private struct GeneratedProxyMethodResult
+    {
+      public readonly NativeMockProxyCodeGeneratedMethod GeneratedMethod;
+      public readonly FieldBuilder HanderField;
+      public readonly FieldBuilder CallCountField;
+
+      public GeneratedProxyMethodResult(NativeMockProxyCodeGeneratedMethod generatedMethod, FieldBuilder handerField, FieldBuilder callCountField)
+      {
+        GeneratedMethod = generatedMethod;
+        HanderField = handerField;
+        CallCountField = callCountField;
+      }
+    }
+    
     private static readonly ConstructorInfo s_argumentExceptionConstructor
       = ReflectionInfoUtility.SelectConstructor (() => new ArgumentException ("", ""));
 
@@ -63,10 +77,10 @@ namespace NativeMock.Emit
 
       for (var i = 0; i < interfaceMethods.Length; i++)
       {
-        var (generatedMethod, handlerField, callCountField) = GenerateProxyMethod (proxyTypeBuilder, interfaceMethods[i], i + 1, underlyingImplementationField);
-        generatedMethods.Add (generatedMethod);
-        handlerFields[i] = handlerField;
-        callCountFields[i] = callCountField;
+        var result = GenerateProxyMethod (proxyTypeBuilder, interfaceMethods[i], i + 1, underlyingImplementationField);
+        generatedMethods.Add (result.GeneratedMethod);
+        handlerFields[i] = result.HanderField;
+        callCountFields[i] = result.CallCountField;
       }
 
       // Implement the proxy interface
@@ -87,7 +101,7 @@ namespace NativeMock.Emit
       return new NativeMockProxyCodeGeneratorResult (proxyType, generatedMethods.MoveToImmutable());
     }
 
-    private (NativeMockProxyCodeGeneratedMethod generatedMethod, FieldBuilder handerField, FieldBuilder callCountField) GenerateProxyMethod (
+    private GeneratedProxyMethodResult GenerateProxyMethod (
       TypeBuilder proxyTypeBuilder,
       MethodInfo methodInfo,
       int methodHandle,
@@ -157,7 +171,7 @@ namespace NativeMock.Emit
       ilGenerator.Emit (OpCodes.Ret);
 
       var nativeMockProxyCodeGeneratedMethod = new NativeMockProxyCodeGeneratedMethod (methodInfo, methodHandle);
-      return (nativeMockProxyCodeGeneratedMethod, handlerFieldBuilder, callCountFieldBuilder);
+      return new GeneratedProxyMethodResult (nativeMockProxyCodeGeneratedMethod, handlerFieldBuilder, callCountFieldBuilder);
     }
 
     private void GenerateProxyMetaMethods (
