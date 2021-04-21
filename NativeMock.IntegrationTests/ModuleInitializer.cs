@@ -1,11 +1,17 @@
 namespace NativeMock.IntegrationTests
 {
-  using System.Runtime.CompilerServices;
   using Infrastructure;
 
+#if NET461
+  [NUnit.Framework.SetUpFixture]
+#endif
   public static class ModuleInitializer
   {
-    [ModuleInitializer]
+#if NET461
+    [NUnit.Framework.OneTimeSetUp]
+#else
+    [System.Runtime.CompilerServices.ModuleInitializer]
+#endif
     public static void Initialize()
     {
       NativeMockRegistry.Initialize();

@@ -46,7 +46,12 @@ namespace NativeMock.Emit
       var parameters = interfaceMethod.GetParameters();
       var parameterTypes = parameters.Select (e => e.ParameterType).ToArray();
 
-      var proxyMethod = new DynamicMethod ($"{method.Name}_NativeFunctionForwardProxy", returnType, parameterTypes);
+      var proxyMethod = new DynamicMethod (
+        $"{method.Name}_NativeFunctionForwardProxy",
+        returnType,
+        parameterTypes,
+        typeof(NativeFunctionForwardProxyCodeGenerator).Module,
+        true);
       var ilGenerator = proxyMethod.GetILGenerator();
 
       // var temp0 = NativeMockRegistry.GetMockForwardProxy<T>();

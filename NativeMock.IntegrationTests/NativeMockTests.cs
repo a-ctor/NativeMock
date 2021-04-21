@@ -150,7 +150,7 @@ namespace NativeMock.IntegrationTests
 
       var result = testUnsafeMock.Object.RefStructReturn();
 
-      Assert.That (result == "hello", Is.True);
+      Assert.That (result.SequenceEqual ("hello".AsSpan()), Is.True);
     }
 
     [Test]

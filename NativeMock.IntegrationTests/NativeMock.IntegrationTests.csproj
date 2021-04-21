@@ -1,7 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFrameworks>net5.0;net461</TargetFrameworks>
+    <LangVersion>9.0</LangVersion>
     <Platforms>AnyCPU;x64;x86</Platforms>
 
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>

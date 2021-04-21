@@ -61,7 +61,12 @@ namespace NativeMock.Emit
       var parameters = interfaceMethod.GetParameters();
       var parameterTypes = parameters.Select (e => e.ParameterType).ToArray();
 
-      var proxyMethod = new DynamicMethod ($"{method.Name}_NativeFunctionProxy", returnType, parameterTypes);
+      var proxyMethod = new DynamicMethod (
+        $"{method.Name}_NativeFunctionProxy",
+        returnType,
+        parameterTypes,
+        typeof(NativeFunctionProxyCodeGenerator).Module,
+        true);
       var ilGenerator = proxyMethod.GetILGenerator();
 
       var noMockObjectLabel = ilGenerator.DefineLabel();

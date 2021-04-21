@@ -10,6 +10,25 @@
   [TestFixture]
   public class NativeMockProxyGeneratorTests
   {
+    private struct NativeProxyResult<T>
+      where T : class
+    {
+      public readonly T TestInterface;
+      public readonly INativeMockProxyController<T> ProxyController;
+
+      public NativeProxyResult (T testInterface, INativeMockProxyController<T> proxyController)
+      {
+        TestInterface = testInterface;
+        ProxyController = proxyController;
+      }
+
+      public void Deconstruct (out T testInterface, out INativeMockProxyController<T> proxyController)
+      {
+        testInterface = TestInterface;
+        proxyController = ProxyController;
+      }
+    }
+
     public interface ITestInterface
     {
       int Test (int value);
@@ -197,7 +216,7 @@
       _delegateFactoryMock.Verify();
     }
 
-    private (T testInterface, INativeMockProxyController<T> proxyController) CreateNativeMockProxy<T>()
+    private NativeProxyResult<T> CreateNativeMockProxy<T>()
       where T : class
     {
       var proxyObjectResult = _nativeMockProxyCodeGenerator.CreateProxy (typeof(T));
@@ -206,7 +225,7 @@
       var testInterface = (T) proxyObject;
       var proxyController = (INativeMockProxyController<T>) proxyObject;
 
-      return (testInterface, proxyController);
+      return new(testInterface, proxyController);
     }
   }
 }

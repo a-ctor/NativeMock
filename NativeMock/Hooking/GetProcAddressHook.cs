@@ -9,7 +9,12 @@ namespace NativeMock.Hooking
   {
     private delegate IntPtr GetProcAddressDelegate (IntPtr hModule, IntPtr procName);
 
-    private const string c_coreClrDll = "coreclr.dll";
+#if NET461
+    public const string c_clrModuleName = "clr.dll";
+#else
+    public const string c_clrModuleName = "coreclr.dll";
+#endif
+
     private const string c_kernel32Dll = "kernel32.dll";
     private const string c_getProcAddressName = "GetProcAddress";
 
@@ -49,14 +54,15 @@ namespace NativeMock.Hooking
         if (_isInitialized)
           return;
 
-        var coreClrModule = Process.GetCurrentProcess().Modules
+        var clrModule = Process.GetCurrentProcess()
+          .Modules
           .Cast<ProcessModule>()
-          .SingleOrDefault (p => p.ModuleName?.Equals (c_coreClrDll, StringComparison.OrdinalIgnoreCase) ?? false);
+          .SingleOrDefault (p => p.ModuleName?.Equals (c_clrModuleName, StringComparison.OrdinalIgnoreCase) ?? false);
 
-        if (coreClrModule == null)
-          throw new InvalidOperationException ("Cannot find the CoreCLR module in the current process.");
+        if (clrModule == null)
+          throw new InvalidOperationException ("Cannot find the CLR module in the current process.");
 
-        _hook = _hookFactory.CreateHook<GetProcAddressDelegate> (coreClrModule, c_kernel32Dll, c_getProcAddressName, GetProcAddress);
+        _hook = _hookFactory.CreateHook<GetProcAddressDelegate> (clrModule, c_kernel32Dll, c_getProcAddressName, GetProcAddress);
         _isInitialized = true;
       }
     }

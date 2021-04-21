@@ -49,7 +49,9 @@ namespace NativeMock.Emit
       }
       catch (TypeLoadException ex)
       {
-        throw new InvalidOperationException ($"Could not create the requested proxy type. Make sure that the specified interface is publicly accessible or internal with an [assembly: InternalsVisibleTo(\"{NativeMockRegistry.ProxyAssemblyName}\")] attribute.", ex);
+        throw new InvalidOperationException (
+          $"Could not create the requested proxy type. Make sure that the specified interface is publicly accessible or internal with an [assembly: InternalsVisibleTo(\"{NativeMockRegistry.ProxyAssemblyName}\")] attribute.",
+          ex);
       }
     }
 
