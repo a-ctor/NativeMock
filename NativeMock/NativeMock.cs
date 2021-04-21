@@ -113,26 +113,41 @@ namespace NativeMock
     public void Verify<TDelegate> (Expression<Func<T, TDelegate>> selector)
       where TDelegate : Delegate
     {
+      Verify (selector, NativeMockCalled.AtLeastOnce);
+    }
+
+    public void Verify<TDelegate> (Expression<Func<T, TDelegate>> selector, NativeMockCalled called)
+      where TDelegate : Delegate
+    {
       if (selector == null)
         throw new ArgumentNullException (nameof(selector));
+      if (called == null)
+        throw new ArgumentNullException (nameof(called));
 
       var target = GetTargetMethod (selector);
       if (target == null)
         throw new ArgumentException ("The specified selector is invalid. Please specify the interface method using an expression like 'e => e.MyInterfaceMethod'.");
 
-      _proxy.Verify (target);
+      _proxy.Verify (target, called);
     }
 
     public void VerifyAlternate (Action<T> selector)
     {
+      VerifyAlternate(selector, NativeMockCalled.AtLeastOnce);
+    }
+
+    public void VerifyAlternate (Action<T> selector, NativeMockCalled called)
+    {
       if (selector == null)
         throw new ArgumentNullException (nameof(selector));
+      if (called == null)
+        throw new ArgumentNullException (nameof(called));
 
       var target = NativeMockRegistry.GetSelectedMethod (selector);
       if (target == null)
         throw new ArgumentException ("The specified selector is invalid. Please specify the interface method using an expression like 'e => e.MyInterfaceMethod'.");
 
-      _proxy.Verify (target);
+      _proxy.Verify (target, called);
     }
 
     public void Reset()

@@ -35,20 +35,23 @@ namespace NativeMock.Emit
     public void Verify()
     {
       foreach (var method in _methodHandleLookup.Keys)
-        Verify (method);
+        Verify (method, NativeMockCalled.AtLeastOnce);
     }
 
-    public void Verify (MethodInfo method)
+    public void Verify (MethodInfo method, NativeMockCalled called)
     {
       if (method == null)
         throw new ArgumentNullException (nameof(method));
+      if (called == null)
+        throw new ArgumentNullException (nameof(called));
       if (!_methodHandleLookup.TryGetValue (method, out var methodHandle))
         throw new ArgumentException ("Invalid method specified.", nameof(method));
 
       if (_nativeMockProxyController.GetMethodHandler (methodHandle) == null)
         return;
 
-      if (_nativeMockProxyController.GetMethodHandlerCallCount (methodHandle) == 0)
+      var setupCalled = _nativeMockProxyController.GetMethodHandlerCallCount (methodHandle);
+      if (!called.IsValidCallCount (setupCalled))
         throw new NativeMockException ($"This mock failed verification because the setup for '{method.Name}' was not matched.");
     }
 
