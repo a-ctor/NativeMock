@@ -4,22 +4,20 @@ namespace NativeMock.IntegrationTests.Infrastructure
 
   public class DeclaringTypeInheritNativeApi
   {
-    public const string DllName = "coreclr.dll";
+    [DllImport (FakeDllNames.Dll1)]
+    [return: MarshalAs (UnmanagedType.LPWStr)]
+    public static extern string NmDeclaringTypeInherit ([MarshalAs (UnmanagedType.LPWStr)] string value);
 
-    [DllImport (DllName)]
-    [return: MarshalAs (UnmanagedType.LPUTF8Str)]
-    public static extern string NmDeclaringTypeInherit ([MarshalAs (UnmanagedType.LPUTF8Str)] string value);
-
-    [DllImport (DllName)]
+    [DllImport (FakeDllNames.Dll1)]
     // ReSharper disable once UnusedMember.Global
     public static extern string NmDeclaringTypeOverride (string value);
 
     public class Inner
     {
-      [DllImport (DllName)]
-      [return: MarshalAs (UnmanagedType.LPUTF8Str)]
+      [DllImport (FakeDllNames.Dll1)]
+      [return: MarshalAs (UnmanagedType.LPWStr)]
       // ReSharper disable once MemberHidesStaticFromOuterClass
-      public static extern string NmDeclaringTypeOverride ([MarshalAs (UnmanagedType.LPUTF8Str)] string value);
+      public static extern string NmDeclaringTypeOverride ([MarshalAs (UnmanagedType.LPWStr)] string value);
     }
   }
 }

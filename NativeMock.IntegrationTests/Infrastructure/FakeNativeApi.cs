@@ -15,7 +15,7 @@ namespace NativeMock.IntegrationTests.Infrastructure
     public static extern string NmStringReturn();
 
     [DllImport (FakeDllNames.Dll1)]
-    [return: MarshalAs (UnmanagedType.LPUTF8Str)]
+    [return: MarshalAs (UnmanagedType.LPWStr)]
     public static extern string NmUtf8StringReturn();
 
 
@@ -26,7 +26,7 @@ namespace NativeMock.IntegrationTests.Infrastructure
     public static extern void NmStringArg (string value);
 
     [DllImport (FakeDllNames.Dll1)]
-    public static extern void NmUtf8StringArg ([MarshalAs (UnmanagedType.LPUTF8Str)] string value);
+    public static extern void NmUtf8StringArg ([MarshalAs (UnmanagedType.LPWStr)] string value);
 
 
     [DllImport (FakeDllNames.Dll1)]
@@ -34,12 +34,12 @@ namespace NativeMock.IntegrationTests.Infrastructure
 
 
     [DllImport (FakeDllNames.Dll1)]
-    [return: MarshalAs (UnmanagedType.LPUTF8Str)]
-    public static extern string NmMethodDefinitionReference ([MarshalAs (UnmanagedType.LPUTF8Str)] string value);
+    [return: MarshalAs (UnmanagedType.LPWStr)]
+    public static extern string NmMethodDefinitionReference ([MarshalAs (UnmanagedType.LPWStr)] string value);
 
     [DllImport (FakeDllNames.Dll1, EntryPoint = "NmMethodDefinitionReference2")]
-    [return: MarshalAs (UnmanagedType.LPUTF8Str)]
-    public static extern string NmMethodDefinitionReferenceRenamed ([MarshalAs (UnmanagedType.LPUTF8Str)] string value);
+    [return: MarshalAs (UnmanagedType.LPWStr)]
+    public static extern string NmMethodDefinitionReferenceRenamed ([MarshalAs (UnmanagedType.LPWStr)] string value);
 
     [DllImport (FakeDllNames.Dll1, EntryPoint = "NmPrivateRenamed")]
     private static extern void NmPrivate();

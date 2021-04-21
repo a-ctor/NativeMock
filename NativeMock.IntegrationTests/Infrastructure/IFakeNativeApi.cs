@@ -12,7 +12,7 @@ namespace NativeMock.IntegrationTests.Infrastructure
 
     string NmStringReturn();
 
-    [return: MarshalAs (UnmanagedType.LPUTF8Str)]
+    [return: MarshalAs (UnmanagedType.LPWStr)]
     string NmUtf8StringReturn();
 
 
@@ -20,7 +20,7 @@ namespace NativeMock.IntegrationTests.Infrastructure
 
     void NmStringArg (string value);
 
-    void NmUtf8StringArg ([MarshalAs (UnmanagedType.LPUTF8Str)] string value);
+    void NmUtf8StringArg ([MarshalAs (UnmanagedType.LPWStr)] string value);
 
 
     [NativeMockCallback ("NmRenameQ")]

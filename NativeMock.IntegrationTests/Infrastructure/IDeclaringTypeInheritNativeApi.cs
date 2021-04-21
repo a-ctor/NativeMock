@@ -1,6 +1,6 @@
 namespace NativeMock.IntegrationTests.Infrastructure
 {
-  [NativeMockInterface (DeclaringTypeInheritNativeApi.DllName, DeclaringType = typeof(DeclaringTypeInheritNativeApi))]
+  [NativeMockInterface (FakeDllNames.Dll1, DeclaringType = typeof(DeclaringTypeInheritNativeApi))]
   public interface IDeclaringTypeInheritNativeApi
   {
     string NmDeclaringTypeInherit (string value);

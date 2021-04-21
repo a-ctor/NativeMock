@@ -27,9 +27,9 @@ namespace NativeMock.Emit
         throw new ArgumentNullException (nameof(proxyType));
       if (proxy == null)
         throw new ArgumentNullException (nameof(proxy));
-      if (!proxyType.IsAssignableTo (typeof(Delegate)))
+      if (!typeof(Delegate).IsAssignableFrom (proxyType))
         throw new ArgumentException ("Must be a delegate type.", nameof(proxyType));
-      if (!proxy.GetType().IsAssignableTo (proxyType))
+      if (!proxyType.IsInstanceOfType (proxy))
         throw new ArgumentException ("Must be assignable to the specified delegate type.");
 
       Name = name;

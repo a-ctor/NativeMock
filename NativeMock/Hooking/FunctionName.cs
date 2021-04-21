@@ -30,7 +30,7 @@ namespace NativeMock.Hooking
 
       // Only consider ordinal values in the form of '#23' which do not exceed the ordinal bit limit
       // Otherwise just return the string as function name
-      return s.StartsWith ('#') && int.TryParse (s.AsSpan().Slice (1), out var ordinalValue) && ordinalValue < c_ordinalBits
+      return s.StartsWith ("#") && int.TryParse (s.Substring (1), out var ordinalValue) && ordinalValue < c_ordinalBits
         ? new FunctionName (ordinalValue)
         : new FunctionName (s);
     }
