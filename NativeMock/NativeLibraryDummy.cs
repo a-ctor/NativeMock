@@ -26,6 +26,8 @@
       if (dllName == null)
         throw new ArgumentNullException (nameof(dllName));
 
+      PlatformUtility.EnsurePlatformIsWindows();
+
       if (!dllName.EndsWith (c_dllExtension))
         dllName += c_dllExtension;
 

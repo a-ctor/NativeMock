@@ -102,6 +102,8 @@ namespace NativeMock
       if (s_initialized)
         return;
 
+      PlatformUtility.EnsurePlatformIsWindows();
+
       lock (s_initializedLock)
       {
         if (s_initialized)
