@@ -1,6 +1,7 @@
 namespace NativeMock.UnitTests
 {
   using System;
+  using System.Runtime.InteropServices;
   using System.Text;
   using Moq;
   using NUnit.Framework;
@@ -24,10 +25,10 @@ namespace NativeMock.UnitTests
     [Test]
     public void ThrowsOnNonInterfaceTest()
     {
-      Assert.That (() => _nativeMockInterfaceDescriptionProvider.GetMockInterfaceDescription (typeof(int)), Throws.TypeOf<InvalidOperationException>());
-      Assert.That (() => _nativeMockInterfaceDescriptionProvider.GetMockInterfaceDescription (typeof(ConsoleColor)), Throws.TypeOf<InvalidOperationException>());
-      Assert.That (() => _nativeMockInterfaceDescriptionProvider.GetMockInterfaceDescription (typeof(StringBuilder)), Throws.TypeOf<InvalidOperationException>());
-      Assert.That (() => _nativeMockInterfaceDescriptionProvider.GetMockInterfaceDescription (typeof(Action)), Throws.TypeOf<InvalidOperationException>());
+      Assert.That (() => _nativeMockInterfaceDescriptionProvider.GetMockInterfaceDescription (typeof(int)), Throws.TypeOf<ArgumentException>().With.Message.EqualTo("The specified type must be an interface."));
+      Assert.That (() => _nativeMockInterfaceDescriptionProvider.GetMockInterfaceDescription (typeof(ConsoleColor)), Throws.TypeOf<ArgumentException>().With.Message.EqualTo("The specified type must be an interface."));
+      Assert.That (() => _nativeMockInterfaceDescriptionProvider.GetMockInterfaceDescription (typeof(StringBuilder)), Throws.TypeOf<ArgumentException>().With.Message.EqualTo("The specified type must be an interface."));
+      Assert.That (() => _nativeMockInterfaceDescriptionProvider.GetMockInterfaceDescription (typeof(Action)), Throws.TypeOf<ArgumentException>().With.Message.EqualTo("The specified type must be an interface."));
     }
 
     [Test]
@@ -55,6 +56,21 @@ namespace NativeMock.UnitTests
     public void InterfaceWithNoAnnotationThrowsTest()
     {
       Assert.That (() => _nativeMockInterfaceDescriptionProvider.GetMockInterfaceDescription (typeof(ISimple)), Throws.InvalidOperationException);
+    }
+
+    private interface IParent
+    {
+    }
+
+    [NativeMockInterface ("TestDll", Behavior = NativeMockBehavior.Strict)]
+    private interface IChild : IParent
+    {
+    }
+
+    [Test]
+    public void ThrowsOnInterfaceWithParent()
+    {
+      Assert.That (() => _nativeMockInterfaceDescriptionProvider.GetMockInterfaceDescription (typeof(IChild)), Throws.ArgumentException.With.Message.StartsWith ("The specified interface type cannot"));
     }
 
     [NativeMockInterface ("TestDll", DeclaringType = typeof(int))]

@@ -35,11 +35,6 @@ namespace NativeMock.Registration
       _nativeFunctionProxyFactory = nativeFunctionProxyFactory;
     }
 
-    public bool IsRegistered<TInterface>()
-    {
-      return IsRegistered (typeof(TInterface));
-    }
-
     public bool IsRegistered (Type interfaceType)
     {
       if (interfaceType == null)
@@ -58,17 +53,14 @@ namespace NativeMock.Registration
       }
     }
 
-    public void Register<TInterface>()
-    {
-      Register (typeof(TInterface));
-    }
-
     public void Register (Type interfaceType)
     {
       if (interfaceType == null)
         throw new ArgumentNullException (nameof(interfaceType));
       if (!interfaceType.IsInterface)
         throw new ArgumentException ("The specified type parameter must be a interface.");
+      if (interfaceType.GetInterfaces().Length > 0)
+        throw new ArgumentException ("The specified interface type cannot implement other interfaces.");
 
       _readerWriterLock.EnterWriteLock();
       try

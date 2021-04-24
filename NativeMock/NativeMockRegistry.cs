@@ -123,7 +123,7 @@ namespace NativeMock
     public static bool IsRegistered<TInterface>()
       where TInterface : class
     {
-      return s_nativeMockInterfaceRegistry.IsRegistered<TInterface>();
+      return IsRegistered (typeof(TInterface));
     }
 
     /// <summary>
@@ -151,7 +151,7 @@ namespace NativeMock
     {
       CheckInitialized();
 
-      s_nativeMockInterfaceRegistry.Register<TInterface>();
+      Register (typeof(TInterface));
     }
 
     /// <summary>

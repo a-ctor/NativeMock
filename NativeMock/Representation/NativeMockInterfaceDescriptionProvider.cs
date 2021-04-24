@@ -21,7 +21,9 @@ namespace NativeMock.Representation
       if (interfaceType == null)
         throw new ArgumentNullException (nameof(interfaceType));
       if (!interfaceType.IsInterface)
-        throw new InvalidOperationException ("The specified type must be an interface.");
+        throw new ArgumentException ("The specified type must be an interface.");
+      if (interfaceType.GetInterfaces().Length > 0)
+        throw new ArgumentException ("The specified interface type cannot implement other interfaces.");
 
       var methods = interfaceType.GetMethods();
       if (methods.Length == 0)
