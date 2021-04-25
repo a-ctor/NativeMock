@@ -188,7 +188,7 @@ namespace NativeMock
     ///   </item>
     /// </list>
     /// </remarks>
-    public static void RegisterFromAssembly (Assembly assembly, RegisterFromAssemblySearchBehavior registerFromAssemblySearchBehavior = RegisterFromAssemblySearchBehavior.TopLevelTypesOnly)
+    public static void RegisterFromAssembly (Assembly assembly, RegisterFromAssemblySearchBehavior registerFromAssemblySearchBehavior = RegisterFromAssemblySearchBehavior.Default)
     {
       if (assembly == null)
         throw new ArgumentNullException (nameof(assembly));

@@ -15,12 +15,9 @@ namespace NativeMock.Representation
     /// <inheritdoc />
     public INativeMockInterfaceLocator CreateMockInterfaceLocator (RegisterFromAssemblySearchBehavior registerFromAssemblySearchBehavior)
     {
-      return registerFromAssemblySearchBehavior switch
-      {
-        RegisterFromAssemblySearchBehavior.TopLevelTypesOnly => new TopLevelNativeMockInterfaceLocator (_nativeMockInterfaceIdentifier),
-        RegisterFromAssemblySearchBehavior.IncludeNestedTypes => new NestedTypesNativeMockInterfaceLocator (_nativeMockInterfaceIdentifier),
-        _ => throw new ArgumentOutOfRangeException (nameof(registerFromAssemblySearchBehavior), registerFromAssemblySearchBehavior, null)
-      };
+      return (registerFromAssemblySearchBehavior & RegisterFromAssemblySearchBehavior.IncludeNestedTypes) != 0
+        ? new NestedTypesNativeMockInterfaceLocator (_nativeMockInterfaceIdentifier)
+        : new TopLevelNativeMockInterfaceLocator (_nativeMockInterfaceIdentifier);
     }
   }
 }
