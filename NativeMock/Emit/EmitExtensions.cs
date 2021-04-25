@@ -1,6 +1,7 @@
 ﻿namespace NativeMock.Emit
 {
   using System;
+  using System.Linq;
   using System.Reflection;
   using System.Reflection.Emit;
 
@@ -39,13 +40,52 @@
         parameters);
     }
 
-    public static MethodBuilder DefineExplicitInterfaceMethodImplementation (this TypeBuilder typeBuilder, Type returnType, string name, params Type[] parameters)
+    public static MethodBuilder DefineExplicitInterfaceMethodImplementation (this TypeBuilder typeBuilder, MethodInfo interfaceMethod)
     {
-      return typeBuilder.DefineMethod (
-        name,
+      static Type[] GetRequiredCustomModifiers (ParameterInfo? parameterInfo) => parameterInfo?.GetRequiredCustomModifiers() ?? Array.Empty<Type>();
+      static Type[] GetOptionalCustomModifiers (ParameterInfo? parameterInfo) => parameterInfo?.GetOptionalCustomModifiers() ?? Array.Empty<Type>();
+
+      var parameters = interfaceMethod.GetParameters();
+      var parameterTypes = parameters.Select (e => e.ParameterType).ToArray();
+
+      var returnTypeRequiredCustomModifiers = GetRequiredCustomModifiers (interfaceMethod.ReturnParameter);
+      var returnTypeOptionalCustomModifiers = GetOptionalCustomModifiers (interfaceMethod.ReturnParameter);
+
+      var parameterTypeRequiredCustomModifiers = parameters.Select (GetRequiredCustomModifiers).ToArray();
+      var parameterTypeOptionalCustomModifiers = parameters.Select (GetOptionalCustomModifiers).ToArray();
+
+      var methodBuilder = typeBuilder.DefineMethod (
+        interfaceMethod.Name,
         c_explicitMethodImplementationAttributes,
-        returnType,
-        parameters);
+        interfaceMethod.CallingConvention,
+        interfaceMethod.ReturnType,
+        returnTypeRequiredCustomModifiers,
+        returnTypeOptionalCustomModifiers,
+        parameterTypes,
+        parameterTypeRequiredCustomModifiers,
+        parameterTypeOptionalCustomModifiers);
+
+      if (interfaceMethod.ReturnParameter != null)
+        methodBuilder.DefineParameterFromParameterInfo (0, interfaceMethod.ReturnParameter);
+
+      for (var i = 0; i < parameters.Length; i++)
+        methodBuilder.DefineParameterFromParameterInfo (i + 1, parameters[i]);
+
+      typeBuilder.DefineMethodOverride (methodBuilder, interfaceMethod);
+
+      return methodBuilder;
+    }
+
+    public static void DefineParameterFromParameterInfo (this MethodBuilder methodBuilder, int position, ParameterInfo? parameterInfo)
+    {
+      if (parameterInfo == null)
+        return;
+
+      var parameterBuilder = methodBuilder.DefineParameter (position, parameterInfo.Attributes, parameterInfo.Name);
+
+      // Apply any default value
+      if (parameterInfo.IsOptional)
+        parameterBuilder.SetConstant (parameterInfo.DefaultValue);
     }
 
     public static FieldBuilder DefinePrivateField (this TypeBuilder typeBuilder, Type type, string name)

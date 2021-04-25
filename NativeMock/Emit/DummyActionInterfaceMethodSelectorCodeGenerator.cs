@@ -60,7 +60,7 @@ namespace NativeMock.Emit
       var returnType = methodInfo.ReturnType;
       var parameters = methodInfo.GetParameters().Select (e => e.ParameterType).ToArray();
 
-      var methodBuilder = dummySelectorTypeBuilder.DefineImplicitInterfaceMethodImplementation (returnType, methodInfo.Name, parameters);
+      var methodBuilder = dummySelectorTypeBuilder.DefineExplicitInterfaceMethodImplementation (methodInfo);
       var ilGenerator = methodBuilder.GetILGenerator();
 
       // setCount++;
@@ -107,43 +107,33 @@ namespace NativeMock.Emit
 
       // MethodInfo ? GetResult();
       var getResultInterfaceMethod = dummyActionControllerType.GetMethod (nameof(IDummyActionInterfaceMethodSelectorController.GetResult))!;
-      var getResultMethod = GenerateSimpleGetMethod (dummySelectorTypeBuilder, getResultInterfaceMethod.Name, resultField);
-      dummySelectorTypeBuilder.DefineMethodOverride (getResultMethod, getResultInterfaceMethod);
+      var getResultMethodBuilder = dummySelectorTypeBuilder.DefineExplicitInterfaceMethodImplementation (getResultInterfaceMethod);
+      GenerateSimpleGetMethod (getResultMethodBuilder, resultField);
 
       // int GetSetCount();
       var setCountInterfaceMethod = dummyActionControllerType.GetMethod (nameof(IDummyActionInterfaceMethodSelectorController.GetSetCount))!;
-      var setCountMethod = GenerateSimpleGetMethod (dummySelectorTypeBuilder, setCountInterfaceMethod.Name, setCountField);
-      dummySelectorTypeBuilder.DefineMethodOverride (setCountMethod, setCountInterfaceMethod);
+      var setCountMethodBuilder = dummySelectorTypeBuilder.DefineExplicitInterfaceMethodImplementation (setCountInterfaceMethod);
+      GenerateSimpleGetMethod (setCountMethodBuilder, setCountField);
 
       // void Reset();
       var resetInterfaceMethod = dummyActionControllerType.GetMethod (nameof(IDummyActionInterfaceMethodSelectorController.Reset))!;
-      var resetMethod = GenerateResetMethod (dummySelectorTypeBuilder, setCountField, resultField);
-      dummySelectorTypeBuilder.DefineMethodOverride (resetMethod, resetInterfaceMethod);
+      var resetMethodBuilder = dummySelectorTypeBuilder.DefineExplicitInterfaceMethodImplementation (resetInterfaceMethod);
+      GenerateResetMethod (resetMethodBuilder, setCountField, resultField);
     }
 
-    private MethodBuilder GenerateSimpleGetMethod (TypeBuilder dummySelectorTypeBuilder, string name, FieldBuilder field)
+    private void GenerateSimpleGetMethod (MethodBuilder methodBuilder, FieldBuilder field)
     {
-      var getMethod = dummySelectorTypeBuilder.DefineExplicitInterfaceMethodImplementation (
-        field.FieldType,
-        $"{nameof(IDummyActionInterfaceMethodSelectorController)}.Get{name}");
-
-      var ilGenerator = getMethod.GetILGenerator();
+      var ilGenerator = methodBuilder.GetILGenerator();
 
       // return this.XXX;
       ilGenerator.Emit (OpCodes.Ldarg_0);
       ilGenerator.Emit (OpCodes.Ldfld, field);
       ilGenerator.Emit (OpCodes.Ret);
-
-      return getMethod;
     }
 
-    private MethodBuilder GenerateResetMethod (TypeBuilder dummySelectorTypeBuilder, FieldBuilder setCountField, FieldBuilder resultField)
+    private void GenerateResetMethod (MethodBuilder methodBuilder, FieldBuilder setCountField, FieldBuilder resultField)
     {
-      var getMethod = dummySelectorTypeBuilder.DefineExplicitInterfaceMethodImplementation (
-        typeof(void),
-        $"{nameof(IDummyActionInterfaceMethodSelectorController)}.Reset");
-
-      var ilGenerator = getMethod.GetILGenerator();
+      var ilGenerator = methodBuilder.GetILGenerator();
 
       // this.setCount = 0;
       ilGenerator.Emit (OpCodes.Ldarg_0);
@@ -157,8 +147,6 @@ namespace NativeMock.Emit
 
       // return;
       ilGenerator.Emit (OpCodes.Ret);
-
-      return getMethod;
     }
   }
 }

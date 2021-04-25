@@ -1,7 +1,6 @@
 namespace NativeMock.Emit
 {
   using System;
-  using System.Linq;
   using System.Reflection;
   using System.Reflection.Emit;
   using System.Runtime.InteropServices;
@@ -61,7 +60,9 @@ namespace NativeMock.Emit
       }
       catch (TypeLoadException ex)
       {
-        throw new InvalidOperationException ($"Could not create the requested proxy type. Make sure that the specified interface is publicly accessible or internal with an [assembly: InternalsVisibleTo(\"{NativeMockRegistry.ProxyAssemblyName}\")] attribute.", ex);
+        throw new InvalidOperationException (
+          $"Could not create the requested proxy type. Make sure that the specified interface is publicly accessible or internal with an [assembly: InternalsVisibleTo(\"{NativeMockRegistry.ProxyAssemblyName}\")] attribute.",
+          ex);
       }
     }
 
@@ -69,8 +70,7 @@ namespace NativeMock.Emit
     {
       var methodInfo = methodDescription.InterfaceMethod;
 
-      var returnType = methodInfo.ReturnType;
-      var parameters = methodInfo.GetParameters().Select (e => e.ParameterType).ToArray();
+      var parameters = methodInfo.GetParameters();
 
       var delegateType = _delegateFactory.CreateDelegateType (methodInfo);
       var delegateInvokeMethod = delegateType.GetMethod ("Invoke")!;
@@ -78,7 +78,7 @@ namespace NativeMock.Emit
       // Instance field containing the handler
       var forwardFieldBuilder = proxyTypeBuilder.DefinePrivateField (delegateType, $"field{methodHandle}");
 
-      var methodBuilder = proxyTypeBuilder.DefineImplicitInterfaceMethodImplementation (returnType, methodInfo.Name, parameters);
+      var methodBuilder = proxyTypeBuilder.DefineExplicitInterfaceMethodImplementation (methodInfo);
       var ilGenerator = methodBuilder.GetILGenerator();
 
       var callHandlerLabel = ilGenerator.DefineLabel();

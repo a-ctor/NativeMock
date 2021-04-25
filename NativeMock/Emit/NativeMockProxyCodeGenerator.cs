@@ -15,14 +15,14 @@ namespace NativeMock.Emit
       public readonly FieldBuilder HanderField;
       public readonly FieldBuilder CallCountField;
 
-      public GeneratedProxyMethodResult(NativeMockProxyCodeGeneratedMethod generatedMethod, FieldBuilder handerField, FieldBuilder callCountField)
+      public GeneratedProxyMethodResult (NativeMockProxyCodeGeneratedMethod generatedMethod, FieldBuilder handerField, FieldBuilder callCountField)
       {
         GeneratedMethod = generatedMethod;
         HanderField = handerField;
         CallCountField = callCountField;
       }
     }
-    
+
     private static readonly ConstructorInfo s_argumentExceptionConstructor
       = ReflectionInfoUtility.SelectConstructor (() => new ArgumentException ("", ""));
 
@@ -107,8 +107,7 @@ namespace NativeMock.Emit
       int methodHandle,
       FieldBuilder underlyingImplementationField)
     {
-      var returnType = methodInfo.ReturnType;
-      var parameters = methodInfo.GetParameters().Select (e => e.ParameterType).ToArray();
+      var parameters = methodInfo.GetParameters().ToArray();
 
       var delegateType = _delegateFactory.CreateDelegateType (methodInfo);
       var delegateInvokeMethod = delegateType.GetMethod ("Invoke")!;
@@ -117,7 +116,7 @@ namespace NativeMock.Emit
       var handlerFieldBuilder = proxyTypeBuilder.DefinePrivateField (delegateType, $"handler{methodHandle}");
       var callCountFieldBuilder = proxyTypeBuilder.DefinePrivateField (typeof(int), $"callCount{methodHandle}");
 
-      var methodBuilder = proxyTypeBuilder.DefineImplicitInterfaceMethodImplementation (returnType, methodInfo.Name, parameters);
+      var methodBuilder = proxyTypeBuilder.DefineExplicitInterfaceMethodImplementation (methodInfo);
       var ilGenerator = methodBuilder.GetILGenerator();
 
       var callHandlerLabel = ilGenerator.DefineLabel();
@@ -185,62 +184,49 @@ namespace NativeMock.Emit
 
       // GetMethodCount ()
       var getMethodHandlerCountInterfaceMethod = proxyControllerType.GetMethod (nameof(INativeMockProxyController<object>.GetMethodCount))!;
-      var getMethodHandlerCountMethod = GenerateGetMethodHandlerCount (proxyTypeBuilder, handlerFields.Length, interfaceType);
-      proxyTypeBuilder.DefineMethodOverride (getMethodHandlerCountMethod, getMethodHandlerCountInterfaceMethod);
+      var getMethodHandlerCountMethodBuilder = proxyTypeBuilder.DefineExplicitInterfaceMethodImplementation (getMethodHandlerCountInterfaceMethod);
+      GenerateGetMethodHandlerCount (getMethodHandlerCountMethodBuilder, handlerFields.Length);
 
       // GetMethodHandlerCallCount (int methodHandle, Delegate handler)
       var getMethodHandlerCallCountInterfaceMethod = proxyControllerType.GetMethod (nameof(INativeMockProxyController<object>.GetMethodHandlerCallCount))!;
-      var getMethodHandlerCallCountMethod = GenerateGetMethod (proxyTypeBuilder, callCountFields, interfaceType, typeof(int));
-      proxyTypeBuilder.DefineMethodOverride (getMethodHandlerCallCountMethod, getMethodHandlerCallCountInterfaceMethod);
+      var getMethodHandlerCallCountMethodBuilder = proxyTypeBuilder.DefineExplicitInterfaceMethodImplementation (getMethodHandlerCallCountInterfaceMethod);
+      GenerateGetMethod (getMethodHandlerCallCountMethodBuilder, callCountFields);
 
       // GetMethodHandler (int methodHandle)
       var getMethodHandlerInterfaceMethod = proxyControllerType.GetMethod (nameof(INativeMockProxyController<object>.GetMethodHandler))!;
-      var getMethodHandlerMethod = GenerateGetMethod (proxyTypeBuilder, handlerFields, interfaceType, typeof(Delegate));
-      proxyTypeBuilder.DefineMethodOverride (getMethodHandlerMethod, getMethodHandlerInterfaceMethod);
+      var getMethodHandlerMethodBuilder = proxyTypeBuilder.DefineExplicitInterfaceMethodImplementation (getMethodHandlerInterfaceMethod);
+      GenerateGetMethod (getMethodHandlerMethodBuilder, handlerFields);
 
       // SetHandler (int methodHandle, Delegate handler)
       var setHandlerInterfaceMethod = proxyControllerType.GetMethod (nameof(INativeMockProxyController<object>.SetMethodHandler))!;
-      var setHandlerMethod = GenerateSetHandlerMethod (proxyTypeBuilder, handlerFields, interfaceType);
-      proxyTypeBuilder.DefineMethodOverride (setHandlerMethod, setHandlerInterfaceMethod);
+      var setHandlerMethodBuilder = proxyTypeBuilder.DefineExplicitInterfaceMethodImplementation (setHandlerInterfaceMethod);
+      GenerateSetHandlerMethod (setHandlerMethodBuilder, handlerFields);
 
       // void SetUnderlyingImplementation (T underlyingImplementation);
       var setUnderlyingImplementationInterfaceMethod = proxyControllerType.GetMethod (nameof(INativeMockProxyController<object>.SetUnderlyingImplementation))!;
-      var setUnderlyingImplementationMethod = GenerateSetUnderlyingImplementation (proxyTypeBuilder, interfaceType, underlyingImplementationField);
-      proxyTypeBuilder.DefineMethodOverride (setUnderlyingImplementationMethod, setUnderlyingImplementationInterfaceMethod);
+      var setUnderlyingImplementationMethodBuilder = proxyTypeBuilder.DefineExplicitInterfaceMethodImplementation (setUnderlyingImplementationInterfaceMethod);
+      GenerateSetUnderlyingImplementation (setUnderlyingImplementationMethodBuilder, interfaceType, underlyingImplementationField);
 
       // void Reset ();
       var resetInterfaceMethod = proxyControllerType.GetMethod (nameof(INativeMockProxyController<object>.Reset))!;
-      var resetMethod = GenerateReset (proxyTypeBuilder, interfaceType, underlyingImplementationField, handlerFields, callCountFields);
-      proxyTypeBuilder.DefineMethodOverride (resetMethod, resetInterfaceMethod);
+      var resetInterfaceMethodBuilder = proxyTypeBuilder.DefineExplicitInterfaceMethodImplementation (resetInterfaceMethod);
+      GenerateReset (resetInterfaceMethodBuilder, underlyingImplementationField, handlerFields, callCountFields);
     }
 
-    private MethodBuilder GenerateGetMethodHandlerCount (TypeBuilder proxyTypeBuilder, int methodCount, Type interfaceType)
+    private void GenerateGetMethodHandlerCount (MethodBuilder methodBuilder, int methodCount)
     {
-      var getMethodHandlerCount = proxyTypeBuilder.DefineExplicitInterfaceMethodImplementation (
-        typeof(int),
-        $"{typeof(INativeMockProxyController<>).Name}<{interfaceType.Name}>.{nameof(INativeMockProxyController<object>.GetMethodCount)}");
-
-      var ilGenerator = getMethodHandlerCount.GetILGenerator();
+      var ilGenerator = methodBuilder.GetILGenerator();
 
       // return methodCount;
       ilGenerator.Emit (OpCodes.Ldc_I4, methodCount);
       ilGenerator.Emit (OpCodes.Ret);
-
-      return getMethodHandlerCount;
     }
 
-    private MethodBuilder GenerateGetMethod (
-      TypeBuilder proxyTypeBuilder,
-      FieldBuilder[] generatedMethodFields,
-      Type interfaceType,
-      Type returnType)
+    private void GenerateGetMethod (
+      MethodBuilder methodBuilder,
+      FieldBuilder[] generatedMethodFields)
     {
-      var getMethodHandlerCallCount = proxyTypeBuilder.DefineExplicitInterfaceMethodImplementation (
-        returnType,
-        $"{typeof(INativeMockProxyController<>).Name}<{interfaceType.Name}>.{nameof(INativeMockProxyController<object>.GetMethodHandlerCallCount)}",
-        typeof(int));
-
-      var ilGenerator = getMethodHandlerCallCount.GetILGenerator();
+      var ilGenerator = methodBuilder.GetILGenerator();
 
       Label[] switchLabels = new Label[generatedMethodFields.Length];
       for (var i = 0; i < switchLabels.Length; i++)
@@ -271,19 +257,11 @@ namespace NativeMock.Emit
         ilGenerator.Emit (OpCodes.Ret);
       }
       // }
-
-      return getMethodHandlerCallCount;
     }
 
-    private MethodBuilder GenerateSetHandlerMethod (TypeBuilder proxyTypeBuilder, FieldBuilder[] generatedMethodFields, Type interfaceType)
+    private void GenerateSetHandlerMethod (MethodBuilder methodBuilder, FieldBuilder[] generatedMethodFields)
     {
-      var setHandlerMethod = proxyTypeBuilder.DefineExplicitInterfaceMethodImplementation (
-        typeof(void),
-        $"{typeof(INativeMockProxyController<>).Name}<{interfaceType.Name}>.{nameof(INativeMockProxyController<object>.SetMethodHandler)}",
-        typeof(int),
-        typeof(Delegate));
-
-      var ilGenerator = setHandlerMethod.GetILGenerator();
+      var ilGenerator = methodBuilder.GetILGenerator();
 
       Label[] switchLabels = new Label[generatedMethodFields.Length];
       for (var i = 0; i < switchLabels.Length; i++)
@@ -353,38 +331,26 @@ namespace NativeMock.Emit
         ilGenerator.Emit (OpCodes.Ret);
       }
       // }
-
-      return setHandlerMethod;
     }
 
-    private MethodBuilder GenerateSetUnderlyingImplementation (TypeBuilder proxyTypeBuilder, Type interfaceType, FieldBuilder underlyingImplementationField)
+    private void GenerateSetUnderlyingImplementation (MethodBuilder methodBuilder, Type interfaceType, FieldBuilder underlyingImplementationField)
     {
-      var setUnderlyingImplementationMethod = proxyTypeBuilder.DefineExplicitInterfaceMethodImplementation (
-        typeof(void),
-        $"{typeof(INativeMockProxyController<>).Name}<{interfaceType.Name}>.{nameof(INativeMockProxyController<object>.SetUnderlyingImplementation)}",
-        interfaceType);
+      var ilGenerator = methodBuilder.GetILGenerator();
 
-      var ilGenerator = setUnderlyingImplementationMethod.GetILGenerator();
+      // return this.underlyingImplementation;
       ilGenerator.Emit (OpCodes.Ldarg_0);
       ilGenerator.Emit (OpCodes.Ldarg_1);
       ilGenerator.Emit (OpCodes.Stfld, underlyingImplementationField);
       ilGenerator.Emit (OpCodes.Ret);
-
-      return setUnderlyingImplementationMethod;
     }
 
-    private MethodBuilder GenerateReset (
-      TypeBuilder proxyTypeBuilder,
-      Type interfaceType,
+    private void GenerateReset (
+      MethodBuilder methodBuilder,
       FieldBuilder underlyingImplementationField,
       FieldBuilder[] handlerFields,
       FieldBuilder[] callCountFields)
     {
-      var setUnderlyingImplementationMethod = proxyTypeBuilder.DefineExplicitInterfaceMethodImplementation (
-        typeof(void),
-        $"{typeof(INativeMockProxyController<>).Name}<{interfaceType.Name}>.{nameof(INativeMockProxyController<object>.SetUnderlyingImplementation)}");
-
-      var ilGenerator = setUnderlyingImplementationMethod.GetILGenerator();
+      var ilGenerator = methodBuilder.GetILGenerator();
 
       // Clear the underlying implementation
       ilGenerator.Emit (OpCodes.Ldarg_0);
@@ -408,8 +374,6 @@ namespace NativeMock.Emit
       }
 
       ilGenerator.Emit (OpCodes.Ret);
-
-      return setUnderlyingImplementationMethod;
     }
   }
 }
