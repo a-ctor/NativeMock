@@ -6,7 +6,7 @@ namespace NativeMock.SourceGenerator
   using Microsoft.CodeAnalysis;
   using Microsoft.CodeAnalysis.CSharp;
   using Microsoft.CodeAnalysis.CSharp.Syntax;
-  
+
   [Generator]
   public class NativeMockInterfaceDelegateMemberSourceGenerator : ISourceGenerator
   {
@@ -27,7 +27,7 @@ namespace NativeMock.SourceGenerator
       var sb = new StringBuilder();
 
       var namespaceInformation = GetNamespaceInformation (interfaceSyntax);
-      
+
       sb.AppendLine ($"namespace {namespaceInformation.Namepace}");
       sb.AppendLine ("{");
       foreach (var usingDirectiveSyntax in namespaceInformation.Usings)
@@ -35,29 +35,37 @@ namespace NativeMock.SourceGenerator
         sb.Append ("  ");
         sb.AppendLine (usingDirectiveSyntax.NormalizeWhitespace().ToString());
       }
+
       if (namespaceInformation.Usings.Count > 0)
         sb.AppendLine();
 
-      sb.AppendLine ($"  partial interface {interfaceSyntax.Identifier.Text}");
+      sb.Append ("  ");
+
+      if (interfaceSyntax.Modifiers.Any (SyntaxKind.UnsafeKeyword))
+        sb.Append ("unsafe ");
+
+      sb.AppendLine ($"partial interface {interfaceSyntax.Identifier.Text}");
       sb.AppendLine ("  {");
       foreach (var method in interfaceSyntax.Members.OfType<MethodDeclarationSyntax>())
       {
         var id = method.Identifier;
 
         var delegateDeclaration = SyntaxFactory.DelegateDeclaration (
-          method.AttributeLists,
-          new SyntaxTokenList(),
-          SyntaxFactory.Token (SyntaxKind.DelegateKeyword),
-          method.ReturnType,
-          SyntaxFactory.Identifier (id.Text + "Delegate"),
-          method.TypeParameterList,
-          method.ParameterList,
-          method.ConstraintClauses,
-          method.SemicolonToken).NormalizeWhitespace ();
+            method.AttributeLists,
+            new SyntaxTokenList(),
+            SyntaxFactory.Token (SyntaxKind.DelegateKeyword),
+            method.ReturnType,
+            SyntaxFactory.Identifier (id.Text + "Delegate"),
+            method.TypeParameterList,
+            method.ParameterList,
+            method.ConstraintClauses,
+            method.SemicolonToken)
+          .NormalizeWhitespace();
 
         sb.Append ("    ");
-        sb.AppendLine(delegateDeclaration.ToString());
+        sb.AppendLine (delegateDeclaration.ToString());
       }
+
       sb.AppendLine ("  }");
       sb.AppendLine ("}");
 

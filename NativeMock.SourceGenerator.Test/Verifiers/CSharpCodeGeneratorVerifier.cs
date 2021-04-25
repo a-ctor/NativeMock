@@ -52,7 +52,7 @@ namespace Test
         "compilation",
         new[] {CSharpSyntaxTree.ParseText (source)},
         new[] {MetadataReference.CreateFromFile (typeof(Binder).GetTypeInfo().Assembly.Location)},
-        new CSharpCompilationOptions (OutputKind.DynamicallyLinkedLibrary));
+        new CSharpCompilationOptions (OutputKind.DynamicallyLinkedLibrary, allowUnsafe: true));
     }
   }
 }

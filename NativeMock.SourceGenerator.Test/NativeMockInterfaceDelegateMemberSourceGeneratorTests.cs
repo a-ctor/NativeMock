@@ -117,6 +117,27 @@ namespace Test
     }
 
     [Test]
+    public void InterfaceWithUnsafeMembers()
+    {
+      VerifyCS.VerifyCodeGenerator (
+        @"
+[NativeMock.NativeMockInterface] 
+unsafe partial interface ITest 
+{
+  void Test(void* ptr);
+}",
+        @"
+namespace Test
+{
+  unsafe partial interface ITest
+  {
+    delegate void TestDelegate(void *ptr);
+  }
+}
+");
+    }
+
+    [Test]
     public void UsingImportsOnSingleLevel()
     {
       VerifyCS.VerifyCodeGenerator (
