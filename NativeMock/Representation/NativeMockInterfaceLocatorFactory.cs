@@ -1,23 +1,24 @@
 namespace NativeMock.Representation
 {
-  using System;
-
   /// <inheritdoc />
   internal class NativeMockInterfaceLocatorFactory : INativeMockInterfaceLocatorFactory
   {
-    private readonly INativeMockInterfaceIdentifier _nativeMockInterfaceIdentifier;
+    private readonly INativeMockInterfaceIdentifierFactory _nativeMockInterfaceIdentifierFactory;
 
-    public NativeMockInterfaceLocatorFactory (INativeMockInterfaceIdentifier nativeMockInterfaceIdentifier)
+    public NativeMockInterfaceLocatorFactory (INativeMockInterfaceIdentifierFactory nativeMockInterfaceIdentifierFactory)
     {
-      _nativeMockInterfaceIdentifier = nativeMockInterfaceIdentifier;
+      _nativeMockInterfaceIdentifierFactory = nativeMockInterfaceIdentifierFactory;
     }
 
     /// <inheritdoc />
     public INativeMockInterfaceLocator CreateMockInterfaceLocator (RegisterFromAssemblySearchBehavior registerFromAssemblySearchBehavior)
     {
-      return (registerFromAssemblySearchBehavior & RegisterFromAssemblySearchBehavior.IncludeNestedTypes) != 0
-        ? new NestedTypesNativeMockInterfaceLocator (_nativeMockInterfaceIdentifier)
-        : new TopLevelNativeMockInterfaceLocator (_nativeMockInterfaceIdentifier);
+      var nativeMockInterfaceIdentifier = _nativeMockInterfaceIdentifierFactory.CreateNativeMockIdentifier (registerFromAssemblySearchBehavior);
+      INativeMockInterfaceLocator locator = (registerFromAssemblySearchBehavior & RegisterFromAssemblySearchBehavior.IncludeNestedTypes) != 0
+        ? new NestedTypesNativeMockInterfaceLocator (nativeMockInterfaceIdentifier)
+        : new TopLevelNativeMockInterfaceLocator (nativeMockInterfaceIdentifier);
+
+      return locator;
     }
   }
 }

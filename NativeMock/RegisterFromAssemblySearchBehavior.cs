@@ -12,11 +12,16 @@ namespace NativeMock
     /// <summary>
     /// Searches for public non-nested types.
     /// </summary>
-    Default = 0x0,
-    
+    Default = IncludeNestedTypes | IncludePrivateTypes,
+
     /// <summary>
     /// Nested types are searched as suitable native mock interface definitions.
     /// </summary>
-    IncludeNestedTypes = 0x1
+    IncludeNestedTypes = 0x1,
+
+    /// <summary>
+    /// Non-public types are included as suitable mock interface definitions.
+    /// </summary>
+    IncludePrivateTypes = 0x2
   }
 }

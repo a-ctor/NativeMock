@@ -30,9 +30,8 @@ namespace NativeMock
 
     static NativeMockRegistry()
     {
-      var nativeMockInterfaceIdentifier = new NativeMockInterfaceIdentifier();
-      var nativeMockInterfaceIdentifierWithOnlyPublicTypes = new PublicTypesOnlyNativeMockInterfaceIdentifierDecorator (nativeMockInterfaceIdentifier);
-      var nativeMockInterfaceLocatorFactory = new NativeMockInterfaceLocatorFactory (nativeMockInterfaceIdentifierWithOnlyPublicTypes);
+      var nativeMockInterfaceIdentifierFactory = new NativeMockInterfaceIdentifierFactory();
+      var nativeMockInterfaceLocatorFactory = new NativeMockInterfaceLocatorFactory (nativeMockInterfaceIdentifierFactory);
 
       var pInvokeMemberProvider = new PInvokeMemberProvider();
       var pInvokeMemberProviderWithCaching = new CachingPInvokeMemberProviderDecorator (pInvokeMemberProvider);
