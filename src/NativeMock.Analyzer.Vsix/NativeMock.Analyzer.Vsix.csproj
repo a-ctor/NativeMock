@@ -33,8 +33,8 @@
   <Import Project="$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets" Condition="Exists('$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets')" />
 
   <ItemGroup>
-    <ProjectReference Include="..\NativeMock.Analyzer.CodeFixes\NativeMock.Analyzer.CodeFixes.csproj" />
-    <ProjectReference Include="..\NativeMock.Analyzer\NativeMock.Analyzer.csproj" />
+    <ProjectReference Include="..\..\src\NativeMock.Analyzer.CodeFixes\NativeMock.Analyzer.CodeFixes.csproj" />
+    <ProjectReference Include="..\..\src\NativeMock.Analyzer\NativeMock.Analyzer.csproj" />
   </ItemGroup>
 
   <ItemGroup>

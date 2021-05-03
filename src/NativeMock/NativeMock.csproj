@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFrameworks>net5.0;net461</TargetFrameworks>
@@ -46,8 +46,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="..\Resources\DummyDll.x64.dll" Link="DummyDll.x64.dll" />
-    <EmbeddedResource Include="..\Resources\DummyDll.x86.dll" Link="DummyDll.x86.dll" />
+    <EmbeddedResource Include="..\..\Resources\DummyDll.x64.dll" Link="DummyDll.x64.dll" />
+    <EmbeddedResource Include="..\..\Resources\DummyDll.x86.dll" Link="DummyDll.x86.dll" />
   </ItemGroup>
 
   <Target Name="_AddAnalyzersToOutput" Condition="'$(TargetFramework)' != 'net461'">

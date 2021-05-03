@@ -12,7 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\NativeMock.Analyzer.TestAssembly\NativeMock.Analyzer.TestAssembly.csproj" />
-    <ProjectReference Include="..\NativeMock.SourceGenerator\NativeMock.SourceGenerator.csproj" />
+    <ProjectReference Include="..\..\src\NativeMock.SourceGenerator\NativeMock.SourceGenerator.csproj" />
   </ItemGroup>
 
   <ItemGroup>

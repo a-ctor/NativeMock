@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\..\src\NativeMock\NativeFunctionNotMockedException.cs" Link="NativeFunctionNotMockedException.cs" />
+    <Compile Include="..\..\src\NativeMock\NativeMockBehavior.cs" Link="NativeMockBehavior.cs" />
+    <Compile Include="..\..\src\NativeMock\NativeMockCallbackAttribute.cs" Link="NativeMockCallbackAttribute.cs" />
+    <Compile Include="..\..\src\NativeMock\NativeMockInterfaceAttribute.cs" Link="NativeMockInterfaceAttribute.cs" />
+  </ItemGroup>
+
+</Project>

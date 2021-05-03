@@ -5,7 +5,6 @@
     <LangVersion>9.0</LangVersion>
     <Platforms>AnyCPU;x64;x86</Platforms>
 
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
@@ -25,12 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\NativeMock.IntegrationTests.Driver\NativeMock.IntegrationTests.Driver.vcxproj">
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-      <OutputItemType>Content</OutputItemType>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </ProjectReference>
-    <ProjectReference Include="..\NativeMock\NativeMock.csproj" />
+    <ProjectReference Include="..\..\src\NativeMock\NativeMock.csproj" />
   </ItemGroup>
 
 </Project>

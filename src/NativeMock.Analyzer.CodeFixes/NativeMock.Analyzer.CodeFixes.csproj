@@ -13,7 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\NativeMock.Analyzer\NativeMock.Analyzer.csproj" />
+    <ProjectReference Include="..\..\src\NativeMock.Analyzer\NativeMock.Analyzer.csproj" />
   </ItemGroup>
 
   <ItemGroup>
