@@ -3,17 +3,17 @@
   <PropertyGroup>
     <TargetFrameworks>net5.0;net461</TargetFrameworks>
     <LangVersion>9.0</LangVersion>
-    <Platforms>AnyCPU;x64;x86</Platforms>
+    <Platforms>x64;x86</Platforms>
 
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Platform)'=='x86'">
+  <PropertyGroup Condition="'$(Platform)' == 'x86' OR '$(Platform)' != 'x64'">
     <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Platform)'=='x64'">
+  <PropertyGroup Condition="'$(Platform)' == 'x64'">
     <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
 
@@ -25,12 +25,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\NativeMock.IntegrationTests.Driver\NativeMock.IntegrationTests.Driver.vcxproj">
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-      <OutputItemType>Content</OutputItemType>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </ProjectReference>
     <ProjectReference Include="..\..\src\NativeMock\NativeMock.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="..\..\lib\x64\NativeMock.IntegrationTests.Driver.dll" Link="NativeMock.IntegrationTests.Driver.dll" CopyToOutputDirectory="PreserveNewest" Condition="'$(PlatformTarget)' == 'x64'" />
+    <EmbeddedResource Include="..\..\lib\x86\NativeMock.IntegrationTests.Driver.dll" Link="NativeMock.IntegrationTests.Driver.dll" CopyToOutputDirectory="PreserveNewest" Condition="'$(PlatformTarget)' != 'x64'" />
   </ItemGroup>
 
 </Project>
