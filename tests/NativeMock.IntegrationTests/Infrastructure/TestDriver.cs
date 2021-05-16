@@ -1,6 +1,7 @@
 namespace NativeMock.IntegrationTests.Infrastructure
 {
   using System;
+  using System.IO;
   using System.Runtime.InteropServices;
   using NativeApis;
 
@@ -18,7 +19,9 @@ namespace NativeMock.IntegrationTests.Infrastructure
 
     public static void LoadDriver()
     {
-      NativeLibrary.Load (DllName);
+      var baseFolder = Path.GetDirectoryName (typeof(TestDriver).Assembly.Location) ?? Environment.CurrentDirectory;
+      var architectureFolder = IntPtr.Size == 8 ? "x64" : "x86";
+      NativeLibrary.Load (Path.Combine(baseFolder, architectureFolder, DllName));
     }
 
     public static void ClearForwardHandler()

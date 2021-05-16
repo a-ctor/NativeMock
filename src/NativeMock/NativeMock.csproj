@@ -46,8 +46,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="..\..\lib\x64\DummyDll.dll" Link="DummyDll.x64.dll" />
-    <EmbeddedResource Include="..\..\lib\x86\DummyDll.dll" Link="DummyDll.x86.dll" />
+    <EmbeddedResource Include="..\..\lib\x64\NativeMock.DummyDll.dll" Link="DummyDll.x64.dll" />
+    <EmbeddedResource Include="..\..\lib\x86\NativeMock.DummyDll.dll" Link="DummyDll.x86.dll" />
   </ItemGroup>
 
   <Target Name="_AddAnalyzersToOutput" Condition="'$(TargetFramework)' != 'net461'">

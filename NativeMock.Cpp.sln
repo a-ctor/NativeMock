@@ -9,12 +9,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{C14D5E01
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NativeMock.IntegrationTests.Driver", "tests\NativeMock.IntegrationTests.Driver\NativeMock.IntegrationTests.Driver.vcxproj", "{2A0FFA35-58F4-48B1-936B-B1897B417926}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NativeMock.DummyDll", "src\NativeMock.DummyDll\NativeMock.DummyDll.vcxproj", "{16EFD4F0-9FF4-4FB3-BB10-695F1E9FEDAE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|Any CPU = Debug|Any CPU
 		Debug|x64 = Debug|x64
 		Debug|x86 = Debug|x86
-		Release|Any CPU = Release|Any CPU
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
 	EndGlobalSection
@@ -23,19 +23,24 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{2A0FFA35-58F4-48B1-936B-B1897B417926} = {C14D5E01-021F-4CB1-AE35-F5C0B9F2519A}
+		{16EFD4F0-9FF4-4FB3-BB10-695F1E9FEDAE} = {7A11D60F-4CAA-4EC9-B4E4-DE77FA0A6405}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{2A0FFA35-58F4-48B1-936B-B1897B417926}.Debug|Any CPU.ActiveCfg = Debug|Win32
-		{2A0FFA35-58F4-48B1-936B-B1897B417926}.Debug|Any CPU.Build.0 = Debug|Win32
 		{2A0FFA35-58F4-48B1-936B-B1897B417926}.Debug|x64.ActiveCfg = Debug|x64
 		{2A0FFA35-58F4-48B1-936B-B1897B417926}.Debug|x64.Build.0 = Debug|x64
 		{2A0FFA35-58F4-48B1-936B-B1897B417926}.Debug|x86.ActiveCfg = Debug|Win32
 		{2A0FFA35-58F4-48B1-936B-B1897B417926}.Debug|x86.Build.0 = Debug|Win32
-		{2A0FFA35-58F4-48B1-936B-B1897B417926}.Release|Any CPU.ActiveCfg = Release|Win32
-		{2A0FFA35-58F4-48B1-936B-B1897B417926}.Release|Any CPU.Build.0 = Release|Win32
 		{2A0FFA35-58F4-48B1-936B-B1897B417926}.Release|x64.ActiveCfg = Release|x64
 		{2A0FFA35-58F4-48B1-936B-B1897B417926}.Release|x64.Build.0 = Release|x64
 		{2A0FFA35-58F4-48B1-936B-B1897B417926}.Release|x86.ActiveCfg = Release|Win32
 		{2A0FFA35-58F4-48B1-936B-B1897B417926}.Release|x86.Build.0 = Release|Win32
+		{16EFD4F0-9FF4-4FB3-BB10-695F1E9FEDAE}.Debug|x64.ActiveCfg = Debug|x64
+		{16EFD4F0-9FF4-4FB3-BB10-695F1E9FEDAE}.Debug|x64.Build.0 = Debug|x64
+		{16EFD4F0-9FF4-4FB3-BB10-695F1E9FEDAE}.Debug|x86.ActiveCfg = Debug|Win32
+		{16EFD4F0-9FF4-4FB3-BB10-695F1E9FEDAE}.Debug|x86.Build.0 = Debug|Win32
+		{16EFD4F0-9FF4-4FB3-BB10-695F1E9FEDAE}.Release|x64.ActiveCfg = Release|x64
+		{16EFD4F0-9FF4-4FB3-BB10-695F1E9FEDAE}.Release|x64.Build.0 = Release|x64
+		{16EFD4F0-9FF4-4FB3-BB10-695F1E9FEDAE}.Release|x86.ActiveCfg = Release|Win32
+		{16EFD4F0-9FF4-4FB3-BB10-695F1E9FEDAE}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 EndGlobal
