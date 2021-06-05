@@ -2,6 +2,7 @@ namespace NativeMock.Hooking
 {
   using System;
   using System.Diagnostics;
+  using System.Linq;
   using System.Runtime.InteropServices;
 
   /// <summary>
@@ -12,11 +13,9 @@ namespace NativeMock.Hooking
     private const nint c_addressOfNewExeHeaderFieldOffset = 0x3c;
     private const nint c_importTableOffset32 = 0x80;
     private const nint c_importTableOffset64 = 0x90;
-    private const uint c_pageExecuteReadWrite = 0x40;
     private const int c_hintSize = 2;
 
-    [DllImport ("kernel32.dll")]
-    private static extern bool VirtualProtect (IntPtr lpAddress, nint dwSize, uint flNewProtect, out uint lpflOldProtect);
+    public const string c_kernel32ModuleName = "kernel32.dll";
 
     /// <summary>
     /// Creates a hook for an imported function using <paramref name="hook" />
@@ -35,16 +34,30 @@ namespace NativeMock.Hooking
     {
       nint baseAddress = module.BaseAddress;
 
+      var kernel32Module = Process.GetCurrentProcess()
+        .Modules
+        .Cast<ProcessModule>()
+        .SingleOrDefault (p => p.ModuleName?.Equals (c_kernel32ModuleName, StringComparison.OrdinalIgnoreCase) ?? false);
+
+      if (kernel32Module == null)
+        throw new InvalidOperationException ("Cannot find the kernel32 module in the current process.");
+
       var iatEntryPtr = (nint*) GetFunctionPointerForIatEntry (baseAddress, targetModuleName, targetFunctionName);
       if (iatEntryPtr == null)
         throw new InvalidOperationException ($"Cannot find the import table entry for '{targetModuleName}+{targetFunctionName}'.");
 
-      VirtualProtect (new IntPtr (iatEntryPtr), sizeof(nint), c_pageExecuteReadWrite, out var oldProtect);
-      var orig = Marshal.GetDelegateForFunctionPointer (new IntPtr (*iatEntryPtr), typeof(TDelegate));
-      *iatEntryPtr = Marshal.GetFunctionPointerForDelegate (hook);
-      VirtualProtect (new IntPtr (iatEntryPtr), sizeof(nint), oldProtect, out _);
+      var origAddress = *iatEntryPtr;
+      var origKernel32ModuleAddressOffset = origAddress - kernel32Module.BaseAddress;
+      if (origKernel32ModuleAddressOffset < 0 || origKernel32ModuleAddressOffset > kernel32Module.ModuleMemorySize)
+        throw new InvalidOperationException ("The GetProcAddress function is already in use and cannot be hooked. Most likely another app domain is already using it.");
 
-      return new HookedFunction<TDelegate> ((TDelegate) orig, hook);
+      var orig = Marshal.GetDelegateForFunctionPointer (new IntPtr (origAddress), typeof(TDelegate));
+      var hookAddress = Marshal.GetFunctionPointerForDelegate (hook);
+
+      using (VirtualMemoryProtectionScope.SetReadWrite (new IntPtr (iatEntryPtr), sizeof(nint)))
+        *iatEntryPtr = hookAddress;
+
+      return new HookedFunction<TDelegate> (new IntPtr (iatEntryPtr), (TDelegate) orig, origAddress, hook, hookAddress);
     }
 
     private static unsafe nint GetFunctionPointerForIatEntry (nint moduleBaseAddress, string targetModuleName, FunctionName targetFunctionName)

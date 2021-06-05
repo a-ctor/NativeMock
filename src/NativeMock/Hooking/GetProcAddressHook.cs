@@ -25,6 +25,7 @@ namespace NativeMock.Hooking
     private readonly object _lock = new();
 
     private bool _isInitialized;
+    private int _appDomainId;
     private HookedFunction<GetProcAddressDelegate> _hook = null!;
 
     public GetProcAddressHook (
@@ -63,12 +64,24 @@ namespace NativeMock.Hooking
           throw new InvalidOperationException ("Cannot find the CLR module in the current process.");
 
         _hook = _hookFactory.CreateHook<GetProcAddressDelegate> (clrModule, c_kernel32Dll, c_getProcAddressName, GetProcAddress);
+        _appDomainId = AppDomain.CurrentDomain.Id;
         _isInitialized = true;
       }
     }
 
+    public void Destroy()
+    {
+      _hook.Dispose();
+    }
+
     private IntPtr GetProcAddress (IntPtr module, IntPtr procName)
     {
+#if NET461
+      // Make sure we do not affect other app domains
+      if (AppDomain.CurrentDomain.Id != _appDomainId)
+        return _hook.Original (module, procName);
+#endif
+
       var importFunctionName = FunctionName.ParseFromProcName (procName);
 
       var moduleName = _moduleNameResolver.Resolve (module);

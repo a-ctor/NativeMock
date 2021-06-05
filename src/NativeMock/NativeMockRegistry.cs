@@ -110,6 +110,13 @@ namespace NativeMock
 
         s_getGetProcAddressHook.Initialize();
 
+        // Make sure we revert the hook when the app domain is unloaded
+        // Otherwise calls to a native methods will cause an exception since an unloaded app domain is accessed
+        AppDomain.CurrentDomain.DomainUnload += (_, _) =>
+        {
+          s_getGetProcAddressHook.Destroy();
+        };
+
         s_initialized = true;
       }
     }
