@@ -12,6 +12,7 @@ namespace NativeMock.IntegrationTests
     {
       IntPtr GetProcAddressDelegate (IntPtr hModule, string procName);
 
+      [NativeMockCallback(Behavior = NativeMockBehavior.Forward)]
       int GetModuleFileNameW (IntPtr handle, IntPtr fileName, int capacity);
     }
 
