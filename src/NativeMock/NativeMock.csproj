@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net5.0;net461</TargetFrameworks>
+    <TargetFrameworks>net5.0;net462</TargetFrameworks>
     <LangVersion>9.0</LangVersion>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Nullable>enable</Nullable>
@@ -22,7 +22,7 @@
     <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);_AddAnalyzersToOutput</TargetsForTfmSpecificContentInPackage>
   </PropertyGroup>
   
-  <ItemGroup Condition="'$(TargetFramework)' == 'net461'">
+  <ItemGroup Condition="'$(TargetFramework)' == 'net462'">
     <PackageReference Include="System.Collections.Immutable" Version="5.0.0" />
   </ItemGroup>
   
@@ -50,7 +50,7 @@
     <EmbeddedResource Include="..\..\lib\x86\NativeMock.DummyDll.dll" Link="DummyDll.x86.dll" />
   </ItemGroup>
 
-  <Target Name="_AddAnalyzersToOutput" Condition="'$(TargetFramework)' != 'net461'">
+  <Target Name="_AddAnalyzersToOutput" Condition="'$(TargetFramework)' != 'net462'">
     <ItemGroup>
       <TfmSpecificPackageFile Include="..\NativeMock.Analyzer\bin\$(Configuration)\netstandard2.0\NativeMock.Analyzer.dll" PackagePath="analyzers/dotnet/cs" />
       <TfmSpecificPackageFile Include="..\NativeMock.Analyzer.CodeFixes\bin\$(Configuration)\netstandard2.0\NativeMock.Analyzer.CodeFixes.dll" PackagePath="analyzers/dotnet/cs" />

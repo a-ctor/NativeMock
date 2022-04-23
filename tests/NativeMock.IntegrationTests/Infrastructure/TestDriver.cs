@@ -5,7 +5,7 @@ namespace NativeMock.IntegrationTests.Infrastructure
   using System.Runtime.InteropServices;
   using NativeApis;
 
-#if NET461
+#if NETFRAMEWORK
   using Utilities;
 #endif
 

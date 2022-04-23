@@ -9,7 +9,7 @@ namespace NativeMock.Hooking
   {
     private delegate IntPtr GetProcAddressDelegate (IntPtr hModule, IntPtr procName);
 
-#if NET461
+#if NETFRAMEWORK
     public const string c_clrModuleName = "clr.dll";
 #else
     public const string c_clrModuleName = "coreclr.dll";
@@ -76,7 +76,7 @@ namespace NativeMock.Hooking
 
     private IntPtr GetProcAddress (IntPtr module, IntPtr procName)
     {
-#if NET461
+#if NETFRAMEWORK
       // Make sure we do not affect other app domains
       if (AppDomain.CurrentDomain.Id != _appDomainId)
         return _hook.Original (module, procName);

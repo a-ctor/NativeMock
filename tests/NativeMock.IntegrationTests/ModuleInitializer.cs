@@ -2,12 +2,12 @@ namespace NativeMock.IntegrationTests
 {
   using Infrastructure;
 
-#if NET461
+#if NETFRAMEWORK
   [NUnit.Framework.SetUpFixture]
 #endif
   public static class ModuleInitializer
   {
-#if NET461
+#if NETFRAMEWORK
     [NUnit.Framework.OneTimeSetUp]
 #else
     [System.Runtime.CompilerServices.ModuleInitializer]

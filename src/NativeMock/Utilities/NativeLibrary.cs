@@ -1,6 +1,6 @@
 namespace NativeMock.Utilities
 {
-#if NET461
+#if NETFRAMEWORK
   using System;
   using System.ComponentModel;
   using System.Runtime.InteropServices;

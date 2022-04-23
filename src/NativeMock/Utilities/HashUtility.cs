@@ -13,7 +13,7 @@ namespace NativeMock.Utilities
     {
       using var sha256 = SHA256.Create();
       var hashValue = sha256.ComputeHash (stream);
-#if NET461
+#if NETFRAMEWORK
       var hashString = BitConverter.ToString (hashValue).Replace ("-", string.Empty);
       return new GenericHash (hashString);
 #else
