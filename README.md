@@ -1,19 +1,21 @@
 # NativeMock
 
-A .NET 5 library that allows you to mock native function using custom interfaces.
+A .NET 5/.NET Framework 4.6.2 library that allows you to mock native function using custom interfaces.
 
-Lets say you have a dependency on a native function:
+Lets say you have a dependency on the following native function:
 
 ```c#
 [DllImport("test.dll")]
 public static extern int MyExternalFunction([MarshalAs (UnmanagedType.LPUTF8Str)] string s);
 ```
 
-You can either load the native DLL in your tests or create a custom native DLL for testing purposes. *NativeMock* simplifies such scenarios by allowing you to mock native function calls in a straightforward manner.
+To test your code you have to deal with this dependency. Common solutions are loading the actual DLL in your tests or creating a custom DLL just for testing purposes. Both solutions are tedious and make testing harder.
+
+*NativeMock* simplifies such scenarios by allowing you to mock native function by intercepting calls to the actual DLL. It also supports loading dummy DLLs that can be used instead of the actual DLL.
 
 ## Example
 
-The following example shows how you can test the previous native function. To simplify testing a mocking framework can be used. The following example assumes the *NUnit* unit test framework together with *Moq* as mocking framework, but neither are required. You can use the tools you like most.
+The following example shows how you can test the previous native function. To simplify testing a mocking framework can be used. The following example assumes the *NUnit* unit test framework together with *Moq* as mocking framework, but neither are required.
 
 ```c#
 [NativeMockInterface ("test.dll")]
@@ -33,6 +35,11 @@ public void MyExternalFunctionTest()
   mock.VerifyAll();
 }
 ```
+
+## Limitations
+
+- **Windows only**: Currently, the library only supports windows as the import address table (IAT) hook is only implemented for windows.
+- **Initialization necessary:** To intercept calls using IAT hooks the initialization must be done **before** any of the native methods are called. For the same reason dynamically generated interfaces cannot be used.
 
 ## Installation
 
