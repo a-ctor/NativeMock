@@ -16,6 +16,8 @@
     <Description>A .NET 5 library that allows you to mock native function using custom interfaces.</Description>
     <Copyright>Copyright (c) Patrick Widauer 2021</Copyright>
     <NoPackageAnalysis>true</NoPackageAnalysis>
+    <EmbedAllSources>true</EmbedAllSources>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
 
@@ -24,6 +26,10 @@
   
   <ItemGroup Condition="'$(TargetFramework)' == 'net462'">
     <PackageReference Include="System.Collections.Immutable" Version="5.0.0" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All"/>
   </ItemGroup>
   
   <ItemGroup>
