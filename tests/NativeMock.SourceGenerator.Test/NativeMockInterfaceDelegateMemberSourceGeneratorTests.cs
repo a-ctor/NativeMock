@@ -131,7 +131,7 @@ namespace Test
 {
   unsafe partial interface ITest
   {
-    delegate void TestDelegate(void *ptr);
+    delegate void TestDelegate(void* ptr);
   }
 }
 ");
