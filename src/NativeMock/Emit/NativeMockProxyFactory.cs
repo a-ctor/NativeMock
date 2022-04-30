@@ -25,7 +25,7 @@ namespace NativeMock.Emit
       if (!typeof(T).IsInterface)
         throw new ArgumentException ("The specified type must be an interface.");
 
-      var nativeMockProxyDefinition = (NativeMockProxyDefinition<T>) _proxyDefinitions.GetOrAdd (typeof(T), GetNativeMockProxyDefinition<T>());
+      var nativeMockProxyDefinition = (NativeMockProxyDefinition<T>) _proxyDefinitions.GetOrAdd (typeof(T), _ => GetNativeMockProxyDefinition<T>());
       return nativeMockProxyDefinition.CreateProxy();
     }
 
