@@ -1,7 +1,6 @@
 namespace NativeMock.Hooking
 {
   using System;
-  using System.Runtime.CompilerServices;
   using System.Threading;
 
   /// <summary>
@@ -17,16 +16,13 @@ namespace NativeMock.Hooking
 
     public IntPtr OriginalAddress { get; }
 
-    public TDelegate Hook { get; }
-
     public IntPtr HookAddress { get; }
 
-    public HookedFunction (IntPtr location, TDelegate original, IntPtr originalAddress, TDelegate hook, IntPtr hookAddress)
+    public HookedFunction (IntPtr location, TDelegate original, IntPtr originalAddress, IntPtr hookAddress)
     {
       _location = location;
       Original = original;
       OriginalAddress = originalAddress;
-      Hook = hook;
       HookAddress = hookAddress;
     }
 

@@ -8,7 +8,7 @@ namespace NativeMock.Hooking
   /// </summary>
   internal interface IHookFactory
   {
-    unsafe HookedFunction<TDelegate> CreateHook<TDelegate> (ProcessModule module, string targetModuleName, FunctionName targetFunctionName, TDelegate hook)
+    unsafe HookedFunction<TDelegate> CreateHook<TDelegate> (ProcessModule module, string targetModuleName, FunctionName targetFunctionName, IntPtr hook)
       where TDelegate : Delegate;
   }
 }

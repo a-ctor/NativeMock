@@ -1,3 +1,4 @@
+using System.IO;
 using Nuke.Common;
 using Nuke.Common.IO;
 using Nuke.Common.Tooling;
@@ -23,7 +24,7 @@ partial class _Build
           .SetProperty ("Platform", (string) v)));
 
       foreach (var platform in Platform.Values)
-        DeleteFile (LibDirectory / platform / WellKnownProject.IntegrationTestDriver.OutputArtifactName);
+        DeleteDirectory (LibDirectory / platform);
     });
 
   Target RestoreCpp => _ => _
@@ -57,6 +58,9 @@ partial class _Build
       var dummyDllProject = WellKnownProject.DummyDll;
       var dummyDllProjectPath = SolutionCpp.GetProject (dummyDllProject)!.Directory;
 
+      var nativeProject = WellKnownProject.Native;
+      var nativeProjectPath = SolutionCpp.GetProject (nativeProject)!.Directory;
+
       foreach (var platform in Platform.Values)
       {
         // Copy output files of NativeMock.IntegrationTests.Driver to lib
@@ -69,6 +73,19 @@ partial class _Build
         CopyFile (
           dummyDllProjectPath / dummyDllProject.ProjectType.GetRelativeOutputDirectory (Configuration, platform) / dummyDllProject.OutputArtifactName,
           LibDirectory / platform / dummyDllProject.OutputArtifactName,
+          FileExistsPolicy.Overwrite);
+
+        // Copy output files of NativeMock.Native to lib
+        CopyFile (
+          nativeProjectPath / nativeProject.ProjectType.GetRelativeOutputDirectory (Configuration, platform) / nativeProject.OutputArtifactName,
+          LibDirectory / platform / nativeProject.OutputArtifactName,
+          FileExistsPolicy.Overwrite);
+
+        // Copy output files of NativeMock.Native to lib
+        var symbolName = Path.ChangeExtension (nativeProject.OutputArtifactName, ".pdb");
+        CopyFile (
+          nativeProjectPath / nativeProject.ProjectType.GetRelativeOutputDirectory (Configuration, platform) / symbolName,
+          LibDirectory / platform / symbolName,
           FileExistsPolicy.Overwrite);
       }
     });

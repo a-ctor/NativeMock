@@ -15,21 +15,21 @@ namespace NativeMock.Hooking
     private const nint c_importTableOffset64 = 0x90;
     private const int c_hintSize = 2;
 
-    public const string c_kernel32ModuleName = "kernel32.dll";
+    private const string c_kernel32ModuleName = "kernel32.dll";
 
     /// <summary>
-    /// Creates a hook for an imported function using <paramref name="hook" />
+    /// Creates a hook for an imported function using <paramref name="hookAddress" /> as target
     /// </summary>
     /// <typeparam name="TDelegate">The delegate type describing the signature of the target function.</typeparam>
     /// <param name="module">The target module whose imported function should be hooked.</param>
     /// <param name="targetModuleName">The module name (e.g. kernel32.dll) of the module containing the function to be hooked.</param>
     /// <param name="targetFunctionName">The name of the function to be hooked.</param>
-    /// <param name="hook">The delegate that will be called instead of the original function.</param>
+    /// <param name="hookAddress">The address that will be called instead of the original function.</param>
     /// <returns>
     /// Returns a <see cref="HookedFunction{TDelegate}" /> which contains the original function that has been replaced
     /// by the hook.
     /// </returns>
-    public unsafe HookedFunction<TDelegate> CreateHook<TDelegate> (ProcessModule module, string targetModuleName, FunctionName targetFunctionName, TDelegate hook)
+    public unsafe HookedFunction<TDelegate> CreateHook<TDelegate> (ProcessModule module, string targetModuleName, FunctionName targetFunctionName, IntPtr hookAddress)
       where TDelegate : Delegate
     {
       nint baseAddress = module.BaseAddress;
@@ -52,12 +52,11 @@ namespace NativeMock.Hooking
         throw new InvalidOperationException ("The GetProcAddress function is already in use and cannot be hooked. Most likely another app domain is already using it.");
 
       var orig = Marshal.GetDelegateForFunctionPointer (new IntPtr (origAddress), typeof(TDelegate));
-      var hookAddress = Marshal.GetFunctionPointerForDelegate (hook);
 
       using (VirtualMemoryProtectionScope.SetReadWrite (new IntPtr (iatEntryPtr), sizeof(nint)))
         *iatEntryPtr = hookAddress;
 
-      return new HookedFunction<TDelegate> (new IntPtr (iatEntryPtr), (TDelegate) orig, origAddress, hook, hookAddress);
+      return new HookedFunction<TDelegate> (new IntPtr (iatEntryPtr), (TDelegate) orig, origAddress, hookAddress);
     }
 
     private static unsafe nint GetFunctionPointerForIatEntry (nint moduleBaseAddress, string targetModuleName, FunctionName targetFunctionName)

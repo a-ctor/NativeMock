@@ -6,6 +6,7 @@ public class WellKnownProject : Enumeration
 {
   public static WellKnownProject IntegrationTestDriver = new("NativeMock.IntegrationTests.Driver", WellKnownProjectType.CPlusPlus);
   public static WellKnownProject DummyDll = new("NativeMock.DummyDll", WellKnownProjectType.CPlusPlus);
+  public static WellKnownProject Native = new("NativeMock.Native", WellKnownProjectType.CPlusPlus);
 
   public WellKnownProjectType ProjectType { get; }
 

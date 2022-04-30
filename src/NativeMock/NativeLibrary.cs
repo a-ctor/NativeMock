@@ -1,11 +1,11 @@
-namespace NativeMock.Utilities
-{
 #if NETFRAMEWORK
+namespace NativeMock
+{
   using System;
   using System.ComponentModel;
   using System.Runtime.InteropServices;
 
-  public static class NativeLibrary
+  internal static class NativeLibrary
   {
     private const long c_moduleNotFoundErrorCode = 0x7E;
 
@@ -25,5 +25,5 @@ namespace NativeMock.Utilities
       throw new Win32Exception (lastWin32Error);
     }
   }
-#endif
 }
+#endif

@@ -6,9 +6,10 @@ namespace NativeMock.Registration
   using System.Reflection;
   using System.Threading;
   using Emit;
+  using Hooking;
   using Representation;
 
-  internal class NativeMockInterfaceRegistry : INativeFunctionProxyLookup, INativeMockInterfaceDescriptionLookup
+  internal class NativeMockInterfaceRegistry : INativeMockInterfaceDescriptionLookup
   {
     private readonly INativeMockInterfaceLocatorFactory _nativeMockInterfaceLocatorFactory;
     private readonly INativeMockInterfaceDescriptionProvider _nativeMockInterfaceDescriptionProvider;
@@ -119,6 +120,10 @@ namespace NativeMock.Registration
       foreach (var nativeFunctionProxy in nativeFunctionProxies)
         _nativeFunctionProxies.Add (nativeFunctionProxy.Name, nativeFunctionProxy);
       _registeredInterfaces.Add (interfaceType, interfaceDescription);
+      
+      // 4. Register the proxies with the native component which does the resolving on GetProcAddress
+      foreach (var nativeFunctionProxy in nativeFunctionProxies)
+        UnsafeNativeFunctions.RegisterProxy (nativeFunctionProxy);
     }
 
     public NativeFunctionProxy? GetNativeFunctionProxy (NativeFunctionIdentifier nativeFunctionIdentifier)

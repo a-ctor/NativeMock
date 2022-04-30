@@ -56,11 +56,7 @@ namespace NativeMock
         nativeFunctionProxyFactory);
 
       var iatHookFactory = new IatHookFactory();
-      var moduleNameResolver = new ModuleNameResolver();
-      s_getGetProcAddressHook = new GetProcAddressHook (
-        iatHookFactory,
-        moduleNameResolver,
-        s_nativeMockInterfaceRegistry);
+      s_getGetProcAddressHook = new GetProcAddressHook (iatHookFactory);
 
       var nativeMockProxyCodeGenerator = new NativeMockProxyCodeGenerator (moduleBuilder, delegateFactory);
       s_nativeMockProxyFactory = new NativeMockProxyFactory (nativeMockProxyCodeGenerator);

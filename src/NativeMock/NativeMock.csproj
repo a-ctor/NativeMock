@@ -52,6 +52,27 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="..\..\lib\x64\NativeMock.Native.dll"
+             CopyToOutputDirectory="PreserveNewest"
+             Link="x64\NativeMock.Native.dll"
+             PackagePath="content\x64\NativeMock.Native.dll;contentFiles\any\net462\x64\NativeMock.Native.dll;contentFiles\any\net5.0\x64\NativeMock.Native.dll" />
+    <Content Include="..\..\lib\x64\NativeMock.Native.pdb"
+             CopyToOutputDirectory="PreserveNewest"
+             Link="x64\NativeMock.Native.pdb"
+             PackagePath="content\x64\NativeMock.Native.pdb;contentFiles\any\net462\x64\NativeMock.Native.pdb;contentFiles\any\net5.0\x64\NativeMock.Native.pdb"
+             Condition="Exists('..\..\lib\x64\NativeMock.Native.pdb')" />
+    <Content Include="..\..\lib\x86\NativeMock.Native.dll"
+             CopyToOutputDirectory="PreserveNewest"
+             Link="x86\NativeMock.Native.dll"
+             PackagePath="content\x86\NativeMock.Native.dll;contentFiles\any\net462\x86\NativeMock.Native.dll;contentFiles\any\net5.0\x86\NativeMock.Native.dll" />
+    <Content Include="..\..\lib\x86\NativeMock.Native.pdb"
+             CopyToOutputDirectory="PreserveNewest"
+             Link="x86\NativeMock.Native.pdb"
+             PackagePath="content\x86\NativeMock.Native.pdb;contentFiles\any\net462\x86\NativeMock.Native.pdb;contentFiles\any\net5.0\x86\NativeMock.Native.pdb"
+             Condition="Exists('..\..\lib\x86\NativeMock.Native.pdb')" />
+  </ItemGroup>
+
+  <ItemGroup>
     <EmbeddedResource Include="..\..\lib\x64\NativeMock.DummyDll.dll" Link="DummyDll.x64.dll" />
     <EmbeddedResource Include="..\..\lib\x86\NativeMock.DummyDll.dll" Link="DummyDll.x86.dll" />
   </ItemGroup>
