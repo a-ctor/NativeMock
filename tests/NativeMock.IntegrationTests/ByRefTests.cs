@@ -1,6 +1,5 @@
 namespace NativeMock.IntegrationTests
 {
-  using System;
   using System.Runtime.InteropServices;
   using Infrastructure;
   using NUnit.Framework;

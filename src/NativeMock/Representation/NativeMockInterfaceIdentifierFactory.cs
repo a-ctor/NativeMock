@@ -5,7 +5,7 @@ namespace NativeMock.Representation
     /// <inheritdoc />
     public INativeMockInterfaceIdentifier CreateNativeMockIdentifier (RegisterFromAssemblySearchBehavior registerFromAssemblySearchBehavior)
     {
-      INativeMockInterfaceIdentifier? nativeMockInterfaceIdentifier = new NativeMockInterfaceIdentifier();
+      INativeMockInterfaceIdentifier nativeMockInterfaceIdentifier = new NativeMockInterfaceIdentifier();
 
       if ((registerFromAssemblySearchBehavior & RegisterFromAssemblySearchBehavior.IncludePrivateTypes) == 0)
         nativeMockInterfaceIdentifier = new PublicTypesOnlyNativeMockInterfaceIdentifierDecorator (nativeMockInterfaceIdentifier);

@@ -12,10 +12,10 @@ namespace NativeMock.Emit
         throw new ArgumentNullException (nameof(expression));
 
       var newExpression = (NewExpression) expression.Body;
-      if (newExpression == null)
+      if (newExpression == null || newExpression.Constructor == null)
         throw new ArgumentException ("The specified constructor selector is invalid.");
 
-      return newExpression.Constructor!;
+      return newExpression.Constructor;
     }
 
     public static MethodInfo SelectMethod (Expression<Action> expression)

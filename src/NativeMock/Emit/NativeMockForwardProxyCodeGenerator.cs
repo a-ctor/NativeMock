@@ -13,6 +13,7 @@ namespace NativeMock.Emit
       = ReflectionInfoUtility.SelectMethod (() => Type.GetTypeFromHandle (default));
 
     private static readonly MethodInfo s_getDelegateForFunctionPointerMethod
+      // ReSharper disable once ReturnValueOfPureMethodIsNotUsed
       = ReflectionInfoUtility.SelectMethod (() => Marshal.GetDelegateForFunctionPointer (default, default!));
 
     private readonly ModuleBuilder _moduleBuilder;

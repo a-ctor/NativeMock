@@ -95,20 +95,24 @@ namespace NativeMock.Representation
       }
     }
 
-    private static bool IsParameterEqual (ParameterInfo original, ParameterInfo declaration)
+    private static bool IsParameterEqual (ParameterInfo? original, ParameterInfo? declaration)
     {
-      return original.ParameterType == declaration.ParameterType
+      return original != null && declaration != null
+             && original.ParameterType == declaration.ParameterType
              && original.IsIn == declaration.IsIn
              && original.IsOut == declaration.IsOut;
     }
 
-    private static string FormatComparison (ParameterInfo original, ParameterInfo declaration)
+    private static string FormatComparison (ParameterInfo? original, ParameterInfo? declaration)
     {
       return $"'{FormatParameter (original)}' vs '{FormatParameter (declaration)}'";
     }
 
-    private static string FormatParameter (ParameterInfo parameter)
+    private static string FormatParameter (ParameterInfo? parameter)
     {
+      if (parameter == null)
+        return string.Empty;
+
       var stringBuilder = new StringBuilder();
 
       if (parameter.IsIn)

@@ -1,7 +1,6 @@
 namespace NativeMock.UnitTests
 {
   using System;
-  using System.Runtime.InteropServices;
   using System.Text;
   using Moq;
   using NUnit.Framework;

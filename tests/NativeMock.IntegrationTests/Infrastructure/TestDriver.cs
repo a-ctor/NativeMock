@@ -5,10 +5,6 @@ namespace NativeMock.IntegrationTests.Infrastructure
   using System.Runtime.InteropServices;
   using NativeApis;
 
-#if NETFRAMEWORK
-  using Utilities;
-#endif
-
   public static class TestDriver
   {
     public const string DllName = "NativeMock.IntegrationTests.Driver.dll";

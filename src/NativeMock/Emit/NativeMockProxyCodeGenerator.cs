@@ -205,7 +205,7 @@ namespace NativeMock.Emit
       // void SetUnderlyingImplementation (T underlyingImplementation);
       var setUnderlyingImplementationInterfaceMethod = proxyControllerType.GetMethod (nameof(INativeMockProxyController<object>.SetUnderlyingImplementation))!;
       var setUnderlyingImplementationMethodBuilder = proxyTypeBuilder.DefineExplicitInterfaceMethodImplementation (setUnderlyingImplementationInterfaceMethod);
-      GenerateSetUnderlyingImplementation (setUnderlyingImplementationMethodBuilder, interfaceType, underlyingImplementationField);
+      GenerateSetUnderlyingImplementation (setUnderlyingImplementationMethodBuilder, underlyingImplementationField);
 
       // void Reset ();
       var resetInterfaceMethod = proxyControllerType.GetMethod (nameof(INativeMockProxyController<object>.Reset))!;
@@ -333,7 +333,7 @@ namespace NativeMock.Emit
       // }
     }
 
-    private void GenerateSetUnderlyingImplementation (MethodBuilder methodBuilder, Type interfaceType, FieldBuilder underlyingImplementationField)
+    private void GenerateSetUnderlyingImplementation (MethodBuilder methodBuilder, FieldBuilder underlyingImplementationField)
     {
       var ilGenerator = methodBuilder.GetILGenerator();
 

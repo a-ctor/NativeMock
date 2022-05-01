@@ -1,9 +1,11 @@
-﻿namespace NativeMock
+namespace NativeMock
 {
   using System;
   using System.IO;
-  using System.Runtime.InteropServices;
   using Utilities;
+#if NET
+  using System.Runtime.InteropServices;
+#endif
 
   /// <summary>
   /// Provides methods for loading dummy DLL files to satisfy P/Invoke dependencies.

@@ -1,7 +1,6 @@
 namespace NativeMock.Emit
 {
   using System;
-  using System.Linq;
   using System.Reflection;
   using System.Reflection.Emit;
   using Fluent;
@@ -58,7 +57,6 @@ namespace NativeMock.Emit
     private void GenerateSelectorMethod (TypeBuilder dummySelectorTypeBuilder, MethodInfo methodInfo, FieldBuilder setCountField, FieldBuilder resultField)
     {
       var returnType = methodInfo.ReturnType;
-      var parameters = methodInfo.GetParameters().Select (e => e.ParameterType).ToArray();
 
       var methodBuilder = dummySelectorTypeBuilder.DefineExplicitInterfaceMethodImplementation (methodInfo);
       var ilGenerator = methodBuilder.GetILGenerator();
