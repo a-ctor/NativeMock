@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "NativeMock.IntegrationTests": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    }
+  }
+}
