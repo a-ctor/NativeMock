@@ -28,6 +28,9 @@ partial class _Build
       DotNetBuild (s => s
         .SetProjectFile (Solution)
         .SetConfiguration (Configuration)
+        .SetAssemblyVersion(GitVersion.AssemblySemVer)
+        .SetFileVersion(GitVersion.AssemblySemFileVer)
+        .SetInformationalVersion(GitVersion.InformationalVersion)
         .SetNoRestore (true));
     });
 
@@ -56,6 +59,7 @@ partial class _Build
       DotNetPack (s => s
         .SetProject (Solution)
         .SetConfiguration (Configuration)
+        .SetVersion(GitVersion.NuGetVersionV2)
         .SetNoBuild (true)
         .SetNoRestore (true)
         .SetOutputDirectory (ArtifactsDirectory));

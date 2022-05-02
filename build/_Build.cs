@@ -3,6 +3,7 @@ using Nuke.Common.CI.GitHubActions;
 using Nuke.Common.Execution;
 using Nuke.Common.IO;
 using Nuke.Common.ProjectModel;
+using Nuke.Common.Tools.GitVersion;
 using static Nuke.Common.IO.FileSystemTasks;
 
 [GitHubActions(
@@ -31,6 +32,8 @@ partial class _Build : NukeBuild
   [Solution] readonly Solution Solution;
 
   [Solution] readonly Solution SolutionCpp;
+
+  [GitVersion] readonly GitVersion GitVersion;
 
   public AbsolutePath ArtifactsDirectory => RootDirectory / "artifacts";
   

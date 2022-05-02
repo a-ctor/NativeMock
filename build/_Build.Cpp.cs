@@ -49,6 +49,9 @@ partial class _Build
         .SetProjectFile (SolutionCpp)
         .SetTargets ("Build")
         .SetConfiguration (Configuration)
+        .SetAssemblyVersion(GitVersion.AssemblySemVer)
+        .SetFileVersion(GitVersion.AssemblySemFileVer)
+        .SetInformationalVersion(GitVersion.InformationalVersion)
         .CombineWith (Platform.Values, (oo, v) => oo
           .SetProperty ("Platform", (string) v)));
 

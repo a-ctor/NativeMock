@@ -10,6 +10,12 @@
     <PackageId>*$(MSBuildProjectFullPath)*</PackageId>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <Authors>Patrick Widauer (a-ctor)</Authors>
+    <Description>A companion library to NativeMock that provides roslyn analyzer to provide usage hints.</Description>
+    <Copyright>Copyright (c) Patrick Widauer 2021</Copyright>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.3">
       <PrivateAssets>all</PrivateAssets>
