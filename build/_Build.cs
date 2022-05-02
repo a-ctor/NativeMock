@@ -1,12 +1,18 @@
 using Nuke.Common;
+using Nuke.Common.CI.GitHubActions;
 using Nuke.Common.Execution;
 using Nuke.Common.IO;
 using Nuke.Common.ProjectModel;
-using Nuke.Common.Tooling;
-using Nuke.Common.Tools.DotNet;
 using static Nuke.Common.IO.FileSystemTasks;
-using static Nuke.Common.Tools.DotNet.DotNetTasks;
 
+[GitHubActions(
+  "continuous",
+  GitHubActionsImage.WindowsLatest,
+  OnPushBranches = new[] { "master", },
+  PublishArtifacts = false,
+  InvokedTargets = new[] { nameof(Test), nameof(Pack)},
+  CacheKeyFiles = new[] { "src/*/*.csproj", "tests/*/*.csproj", },
+  EnableGitHubToken = false)]
 [CheckBuildProjectConfigurations]
 partial class _Build : NukeBuild
 {

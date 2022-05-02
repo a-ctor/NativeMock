@@ -9,7 +9,7 @@ using static Nuke.Common.Tools.MSBuild.MSBuildTasks;
 partial class _Build
 {
   // We need to use VS Msbuild to build the C++ projects
-  [Parameter] readonly string MsBuildPath = MSBuildToolPathResolver.Resolve (MSBuildVersion.VS2019, MSBuildPlatform.x86);
+  [Parameter] readonly string MsBuildPath = MSBuildToolPathResolver.Resolve (MSBuildVersion.VS2022, MSBuildPlatform.x86);
 
   Target CleanCpp => _ => _
     .Requires (() => MsBuildPath)
