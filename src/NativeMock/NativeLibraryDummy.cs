@@ -19,6 +19,8 @@ namespace NativeMock
 
     private const string c_integrityExceptionMessage = "The integrity of the dummy DLL file could not be verified.";
 
+    private static bool s_firstCall = true;
+
     /// <summary>
     /// Creates a temporary dummy dll with the specified <paramref name="dllName" /> and loads it.
     /// </summary>
@@ -35,6 +37,8 @@ namespace NativeMock
 
       var temporaryDirectory = GetTemporaryDllDirectory();
       var dummyDll = new FileInfo (Path.Combine (temporaryDirectory.FullName, dllName));
+
+      DoCleanUpOnFirstRun(temporaryDirectory);
 
       try
       {
@@ -88,6 +92,25 @@ namespace NativeMock
       {
         using var resourceStream = NativeLibraryDummyProvider.OpenDummyDllStream();
         resourceStream.CopyTo (stream);
+      }
+    }
+
+    private static void DoCleanUpOnFirstRun(DirectoryInfo tempDirectory)
+    {
+      if (!s_firstCall)
+        return;
+
+      s_firstCall = true;
+      foreach (var tempDllFile in tempDirectory.EnumerateFiles("*.dll"))
+      {
+        try
+        {
+          tempDllFile.Delete();
+        }
+        catch
+        {
+          // Ignore temp files we cannot delete
+        }
       }
     }
 
