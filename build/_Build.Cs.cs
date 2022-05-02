@@ -31,6 +31,7 @@ partial class _Build
         .SetAssemblyVersion(GitVersion.AssemblySemVer)
         .SetFileVersion(GitVersion.AssemblySemFileVer)
         .SetInformationalVersion(GitVersion.InformationalVersion)
+        .SetContinuousIntegrationBuild(IsServerBuild)
         .SetNoRestore (true));
     });
 
@@ -62,6 +63,7 @@ partial class _Build
         .SetVersion(GitVersion.NuGetVersionV2)
         .SetNoBuild (true)
         .SetNoRestore (true)
-        .SetOutputDirectory (ArtifactsDirectory));
+        .SetOutputDirectory (ArtifactsDirectory)
+        .SetContinuousIntegrationBuild(IsServerBuild));
     });
 }
