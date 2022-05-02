@@ -4,5 +4,3 @@
 ### New Rules
 Rule ID | Category | Severity | Notes
 --------|----------|----------|-------
-NM0001 | Design | Error | Rules
-NM0002 | Design | Error | Rules
