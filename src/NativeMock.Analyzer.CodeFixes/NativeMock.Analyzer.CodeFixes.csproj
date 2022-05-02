@@ -6,6 +6,7 @@
     <RootNamespace>NativeMock.Analyzer</RootNamespace>
     <Nullable>enable</Nullable>
     <LangVersion>latest</LangVersion>
+    <Version>0.1</Version>
   </PropertyGroup>
 
   <PropertyGroup>
