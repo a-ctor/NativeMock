@@ -49,6 +49,8 @@ partial class _Build
   Target PackCs => _ => _
     .DependsOn (CleanArtifacts)
     .DependsOn (BuildCs)
+    .Produces (ArtifactsDirectory / "*.nupkg")
+    .Produces (ArtifactsDirectory / "*.snupkg")
     .Executes (() =>
     {
       DotNetPack (s => s

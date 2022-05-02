@@ -6,11 +6,19 @@ using Nuke.Common.ProjectModel;
 using static Nuke.Common.IO.FileSystemTasks;
 
 [GitHubActions(
+  "release",
+  GitHubActionsImage.WindowsLatest,
+  OnPushTags = new[] { "v*" },
+  PublishArtifacts = true,
+  InvokedTargets = new[] { nameof(FullBuild) },
+  CacheKeyFiles = new[] { "src/*/*.csproj", "tests/*/*.csproj", },
+  EnableGitHubToken = false)]
+[GitHubActions(
   "continuous",
   GitHubActionsImage.WindowsLatest,
   OnPushBranches = new[] { "master", },
-  PublishArtifacts = false,
-  InvokedTargets = new[] { nameof(Test), nameof(Pack)},
+  PublishArtifacts = true,
+  InvokedTargets = new[] { nameof(FullBuild) },
   CacheKeyFiles = new[] { "src/*/*.csproj", "tests/*/*.csproj", },
   EnableGitHubToken = false)]
 [CheckBuildProjectConfigurations]
