@@ -55,21 +55,25 @@
     <Content Include="..\..\lib\x64\NativeMock.Native.dll"
              CopyToOutputDirectory="PreserveNewest"
              Link="x64\NativeMock.Native.dll"
-             PackagePath="content\x64\NativeMock.Native.dll;contentFiles\any\net462\x64\NativeMock.Native.dll;contentFiles\any\net5.0\x64\NativeMock.Native.dll" />
+             PackagePath="content\x64\NativeMock.Native.dll;contentFiles\any\net462\x64\NativeMock.Native.dll;contentFiles\any\net5.0\x64\NativeMock.Native.dll"
+             PackageCopyToOutput="true" />
     <Content Include="..\..\lib\x64\NativeMock.Native.pdb"
              CopyToOutputDirectory="PreserveNewest"
              Link="x64\NativeMock.Native.pdb"
              PackagePath="content\x64\NativeMock.Native.pdb;contentFiles\any\net462\x64\NativeMock.Native.pdb;contentFiles\any\net5.0\x64\NativeMock.Native.pdb"
-             Condition="Exists('..\..\lib\x64\NativeMock.Native.pdb')" />
+             Condition="Exists('..\..\lib\x64\NativeMock.Native.pdb')"
+             PackageCopyToOutput="true" />
     <Content Include="..\..\lib\x86\NativeMock.Native.dll"
              CopyToOutputDirectory="PreserveNewest"
              Link="x86\NativeMock.Native.dll"
-             PackagePath="content\x86\NativeMock.Native.dll;contentFiles\any\net462\x86\NativeMock.Native.dll;contentFiles\any\net5.0\x86\NativeMock.Native.dll" />
+             PackagePath="content\x86\NativeMock.Native.dll;contentFiles\any\net462\x86\NativeMock.Native.dll;contentFiles\any\net5.0\x86\NativeMock.Native.dll"
+             PackageCopyToOutput="true" />
     <Content Include="..\..\lib\x86\NativeMock.Native.pdb"
              CopyToOutputDirectory="PreserveNewest"
              Link="x86\NativeMock.Native.pdb"
              PackagePath="content\x86\NativeMock.Native.pdb;contentFiles\any\net462\x86\NativeMock.Native.pdb;contentFiles\any\net5.0\x86\NativeMock.Native.pdb"
-             Condition="Exists('..\..\lib\x86\NativeMock.Native.pdb')" />
+             Condition="Exists('..\..\lib\x86\NativeMock.Native.pdb')"
+             PackageCopyToOutput="true" />
   </ItemGroup>
 
   <ItemGroup>
