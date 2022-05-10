@@ -20,6 +20,7 @@
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <PackageIcon>logo.png</PackageIcon>
 
     <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);_AddAnalyzersToOutput</TargetsForTfmSpecificContentInPackage>
   </PropertyGroup>
@@ -74,6 +75,9 @@
              PackagePath="content\x86\NativeMock.Native.pdb;contentFiles\any\net462\x86\NativeMock.Native.pdb;contentFiles\any\net5.0\x86\NativeMock.Native.pdb"
              Condition="Exists('..\..\lib\x86\NativeMock.Native.pdb')"
              PackageCopyToOutput="true" />
+    <Content Include="logo.png"
+             PackagePath="logo.png"
+             Visible="False" />
   </ItemGroup>
 
   <ItemGroup>
