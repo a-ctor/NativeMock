@@ -17,11 +17,14 @@
     <Copyright>Copyright (c) Patrick Widauer 2021</Copyright>
     <NoPackageAnalysis>true</NoPackageAnalysis>
     <EmbedAllSources>true</EmbedAllSources>
+    <PackageProjectUrl>https://github.com/a-ctor/NativeMock</PackageProjectUrl>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <PackageLicenseExpression>ISC</PackageLicenseExpression>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <PackageIcon>logo.png</PackageIcon>
     <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageTags>pinvoke;mocking;mocks;unittesting;unittest;testing;test</PackageTags>
 
     <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);_AddAnalyzersToOutput</TargetsForTfmSpecificContentInPackage>
   </PropertyGroup>
