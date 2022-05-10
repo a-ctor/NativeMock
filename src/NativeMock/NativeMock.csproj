@@ -21,6 +21,7 @@
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <PackageIcon>logo.png</PackageIcon>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
 
     <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);_AddAnalyzersToOutput</TargetsForTfmSpecificContentInPackage>
   </PropertyGroup>
@@ -77,6 +78,9 @@
              PackageCopyToOutput="true" />
     <Content Include="logo.png"
              PackagePath="logo.png"
+             Visible="False" />
+    <Content Include="..\..\README.md"
+             PackagePath="README.md"
              Visible="False" />
   </ItemGroup>
 
